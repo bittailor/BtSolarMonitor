@@ -2,6 +2,8 @@
 #define INC_Bt_FonaTcpClient_H
 
 #include <Arduino.h>
+#include <Client.h>
+#include <Adafruit_FONA.h>
 
 class Bt_FonaTcpClient : public Client {
 
@@ -19,6 +21,9 @@ public:
     virtual void stop();
     virtual uint8_t connected();
     virtual operator bool();
+private:
+    Adafruit_FONA* mFona;    
+
 };
 
 #endif

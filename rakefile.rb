@@ -1,7 +1,9 @@
 require 'uri'
 
+arduino = "/Applications/Arduino.app/Contents/MacOS/Arduino"
 arduino_folder = "/Applications/Arduino.app/Contents/Java"
 builder = "#{arduino_folder}/arduino-builder"
+
 
 options = [
     "-hardware #{arduino_folder}/hardware", 
@@ -11,14 +13,16 @@ options = [
     "-tools #{arduino_folder}/hardware/tools/avr",
     "-tools #{ENV['HOME']}/Library/Arduino15/packages",
     
-    "-libraries Thing/sketchbook/library",
+    "-libraries Thing/sketchbook/libraries",
        
     "-fqbn=adafruit:samd:adafruit_feather_m0" 
 ].join(" ")
 
 libraries = [
     ["zip", "http://ftp-stud.fht-esslingen.de/pub/Mirrors/eclipse/paho/arduino_1.0.0.zip"],
-    ["git", "https://github.com/bittailor/Adafruit_FONA_Library.git","bt-gprs-improvements"]   
+    ["git", "https://github.com/adafruit/Adafruit_MQTT_Library.git"], 
+    ["git", "https://github.com/bblanchon/ArduinoJson.git","v5.0.7"], 
+    #["git", "https://github.com/bittailor/Adafruit_FONA_Library.git","bt-gprs-improvements"]   
 ]
 
 def installGit(url , branch = nil)
@@ -47,7 +51,7 @@ def installLibrary(library)
 end
 
 task :install do 
-    library_path = "Thing/sketchbook/library"
+    library_path = "Thing/sketchbook/libraries"
     rm_r library_path , :force => true
     mkdir library_path
     Dir.chdir(library_path) do
@@ -59,7 +63,7 @@ task :install do
         next if (library =='.' || library == '..' || library.start_with?("."))
         puts "** link #{library} **" 
         name = File.basename(library)
-        ln_s "../../libraries/#{name}", "Thing/sketchbook/library/"
+        ln_s "../../libraries/#{name}", "#{library_path}/"
     end   
 end
 
@@ -72,6 +76,10 @@ task :compile do
     end
     puts "************"
     puts "#{sketches.count} compiled"
+end
+
+task :upload do
+    sh "#{arduino} --board adafruit:samd:adafruit_feather_m0 --pref sketchbook.path=#{Dir.pwd}/Thing/sketchbook --upload --port /dev/cu.usbmodem1411 -v Thing/sketchbook/ResourceCheck/ResourceCheck.ino" 
 end
 
 

@@ -8,20 +8,29 @@ builder = "#{arduino_folder}/arduino-builder"
 options = [
     "-hardware #{arduino_folder}/hardware", 
     "-hardware #{ENV['HOME']}/Library/Arduino15/packages",
+    #"-hardware Thing/sketchbook/hardware",
     
     "-tools #{arduino_folder}/tools-builder", 
     "-tools #{arduino_folder}/hardware/tools/avr",
     "-tools #{ENV['HOME']}/Library/Arduino15/packages",
     
     "-libraries Thing/sketchbook/libraries",
-       
-    "-fqbn=adafruit:samd:adafruit_feather_m0" 
+    
+    #"-warnings default", 
 ].join(" ")
+
+boards = [
+    "-fqbn=adafruit:samd:adafruit_feather_m0",
+    # "-fqbn=breadboard:avr:atmega328bb",    
+]
 
 libraries = [
     ["zip", "http://ftp-stud.fht-esslingen.de/pub/Mirrors/eclipse/paho/arduino_1.0.0.zip"],
     ["git", "https://github.com/adafruit/Adafruit_MQTT_Library.git"], 
     ["git", "https://github.com/bblanchon/ArduinoJson.git","v5.0.7"], 
+    ["git", "https://github.com/adafruit/Adafruit-PCD8544-Nokia-5110-LCD-library.git","1.0.0"], 
+    ["git", "https://github.com/adafruit/Adafruit-GFX-Library.git","v1.1.4"], 
+    ["git", "https://github.com/adafruit/Adafruit_INA219.git"], 
     #["git", "https://github.com/bittailor/Adafruit_FONA_Library.git","bt-gprs-improvements"]   
 ]
 
@@ -70,12 +79,14 @@ end
 task :compile do
     sketches = Dir.glob("Thing/sketchbook/*/*.ino")
     sketches.each do |sketch|
-        puts "compile #{sketch} ..."
-        sh "#{builder} #{options}  #{sketch}"
-        puts "...  #{sketch} done"
+        boards.each do |board|
+            puts "compile #{sketch} ..."
+            sh "#{builder} #{options} #{board} #{sketch}"
+            puts "...  #{sketch} done"
+        end
     end
     puts "************"
-    puts "#{sketches.count} compiled"
+    puts "compiled #{sketches.count} sketches for #{boards.count} boards"
 end
 
 task :upload do

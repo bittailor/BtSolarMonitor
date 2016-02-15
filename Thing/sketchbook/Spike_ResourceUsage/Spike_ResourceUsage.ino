@@ -16,7 +16,8 @@ void setup() {
     
     pinMode(13, OUTPUT);
     digitalWrite(13, HIGH);
-    while (!Serial);
+    Bt_PahoTimer t(5000);
+    while (!Serial && !t.expired()) {}
     Serial.begin(115200); 
     Serial.println(F("** ResourceCheck **"));
     digitalWrite(13, LOW);            
@@ -28,7 +29,9 @@ void setup() {
 
 void loop() {
     static unsigned long sLast = 0;
-    static unsigned long sInterval = 10 * 1000;
+    static unsigned long sInterval = 10 * 60 * 1000;
+    
+    Serial.println("loop 1");
     
     if (!sMqttClient.isConnected()) {
         if (!connect()) {
@@ -36,23 +39,47 @@ void loop() {
         }   
     }
     
-    sMqttClient.yield(10);
-       
+    Serial.println("loop 2");
+    
+    /*
     unsigned long delay = millis() - sLast;  
     if (delay < sInterval)
     {
         return;
     }
+    */
     
+    Serial.println("loop 3");
 
+    for(int i = 0 ; i < 100 ; i++) {
+        sendData();
+        Serial.print("i ");Serial.println(i);
+        sMqttClient.yield(100);    
+    }
     
-    sendData();
+    char buf[20];
+    strcpy(buf, "end");
+    sMessage.qos = MQTT::QOS1;
+    sMessage.retained = true;
+    sMessage.dup = false;
+    sMessage.payload = (void*)buf;
+    sMessage.payloadlen = strlen(buf)+1;
+    sMqttClient.publish("bt/resource/status", sMessage);
     
-    sLast = millis();
+    sMqttClient.disconnect();
+    
+    sNetwork.disconnect();
+    
+    Serial.println("end"); 
+    
+    while(true) {
+           
+    }
 }
 
 
 bool connect() {
+    Serial.println(F("connect ..."));
     if(!connectGPRS()) {
         return false;
     }

@@ -1,0 +1,3 @@
+[submodule "Thing/libraries/Adafruit_FONA_Library"]
+	path = Thing/libraries/Adafruit_FONA_Library
+	url = https://github.com/bittailor/Adafruit_FONA_Library.git

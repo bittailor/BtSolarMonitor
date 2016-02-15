@@ -8,13 +8,13 @@ builder = "#{arduino_folder}/arduino-builder"
 options = [
     "-hardware #{arduino_folder}/hardware", 
     "-hardware #{ENV['HOME']}/Library/Arduino15/packages",
-    #"-hardware Thing/sketchbook/hardware",
+    #"-hardware Firmware/sketchbook/hardware",
     
     "-tools #{arduino_folder}/tools-builder", 
     "-tools #{arduino_folder}/hardware/tools/avr",
     "-tools #{ENV['HOME']}/Library/Arduino15/packages",
     
-    "-libraries Thing/sketchbook/libraries",
+    "-libraries Firmware/sketchbook/libraries",
     
     #"-warnings default", 
 ].join(" ")
@@ -60,7 +60,7 @@ def installLibrary(library)
 end
 
 task :install do 
-    library_path = "Thing/sketchbook/libraries"
+    library_path = "Firmware/sketchbook/libraries"
     rm_r library_path , :force => true
     mkdir library_path
     Dir.chdir(library_path) do
@@ -68,7 +68,7 @@ task :install do
             installLibrary(library)    
         end              
     end
-    Dir.entries("Thing/libraries").each do |library| 
+    Dir.entries("Firmware/libraries").each do |library| 
         next if (library =='.' || library == '..' || library.start_with?("."))
         puts "** link #{library} **" 
         name = File.basename(library)
@@ -77,7 +77,7 @@ task :install do
 end
 
 task :compile do
-    sketches = Dir.glob("Thing/sketchbook/*/*.ino")
+    sketches = Dir.glob("Firmware/sketchbook/*/*.ino")
     sketches.each do |sketch|
         boards.each do |board|
             puts "compile #{sketch} ..."
@@ -92,7 +92,7 @@ task :compile do
 end
 
 task :upload do
-    sh "#{arduino} --board adafruit:samd:adafruit_feather_m0 --pref sketchbook.path=#{Dir.pwd}/Thing/sketchbook --upload --port /dev/cu.usbmodem1411 -v Thing/sketchbook/ResourceCheck/ResourceCheck.ino" 
+    sh "#{arduino} --board adafruit:samd:adafruit_feather_m0 --pref sketchbook.path=#{Dir.pwd}/Firmware/sketchbook --upload --port /dev/cu.usbmodem1411 -v Firmware/sketchbook/ResourceCheck/ResourceCheck.ino" 
 end
 
 

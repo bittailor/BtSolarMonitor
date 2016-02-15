@@ -1,2 +1,4 @@
 .DS_Store
-Thing/sketchbook/libraries
+.*.sch.lck
+.*.brd.lck
+Firmware/sketchbook/libraries

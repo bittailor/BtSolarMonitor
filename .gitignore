@@ -1,4 +1,6 @@
 .DS_Store
 .*.sch.lck
 .*.brd.lck
+eagle.epf
+
 Firmware/sketchbook/libraries

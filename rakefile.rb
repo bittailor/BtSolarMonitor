@@ -26,12 +26,12 @@ boards = [
 
 libraries = [
     ["zip", "http://ftp-stud.fht-esslingen.de/pub/Mirrors/eclipse/paho/arduino_1.0.0.zip"],
+    
     ["git", "https://github.com/adafruit/Adafruit_MQTT_Library.git"], 
-    ["git", "https://github.com/bblanchon/ArduinoJson.git","v5.0.7"], 
-    ["git", "https://github.com/adafruit/Adafruit-PCD8544-Nokia-5110-LCD-library.git","1.0.0"], 
     ["git", "https://github.com/adafruit/Adafruit-GFX-Library.git","v1.1.4"], 
     ["git", "https://github.com/adafruit/Adafruit_INA219.git"], 
-    #["git", "https://github.com/bittailor/Adafruit_FONA_Library.git","bt-gprs-improvements"]   
+    
+    ["git", "https://github.com/bblanchon/ArduinoJson.git","v5.0.7"],   
 ]
 
 def installGit(url , branch = nil)
@@ -81,8 +81,10 @@ task :compile do
     sketches.each do |sketch|
         boards.each do |board|
             puts "compile #{sketch} ..."
-            sh "#{builder} #{options} #{board} #{sketch}"
-            puts "...  #{sketch} done"
+            verbose(false) do 
+                sh "#{builder} #{options} #{board} #{sketch}"
+            end
+            puts "   ...  #{sketch} done"
         end
     end
     puts "************"

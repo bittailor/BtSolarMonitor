@@ -1,3 +1,6 @@
 [submodule "Thing/libraries/Adafruit_FONA_Library"]
 	path = Thing/libraries/Adafruit_FONA_Library
 	url = https://github.com/bittailor/Adafruit_FONA_Library.git
+[submodule "Thing/libraries/Adafruit-PCD8544-Nokia-5110-LCD-library"]
+	path = Thing/libraries/Adafruit-PCD8544-Nokia-5110-LCD-library
+	url = https://github.com/bittailor/Adafruit-PCD8544-Nokia-5110-LCD-library.git

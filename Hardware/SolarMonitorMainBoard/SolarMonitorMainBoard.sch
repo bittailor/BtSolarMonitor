@@ -3631,8 +3631,8 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="SUPPLY3" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="SUPPLY4" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="SUPPLY5" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
-<part name="R10" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R11" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R41" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R42" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="SUPPLY6" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="C1" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
 <part name="GND6" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
@@ -3683,16 +3683,16 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="GND20" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND21" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="X6" library="con-phoenix-508" deviceset="MKDSN1,5/8-5,08" device=""/>
+<part name="R11" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="R21" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R8" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="GND22" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND23" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="K1" library="relay" deviceset="RT?F*" device="314" technology="12"/>
-<part name="R22" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="R12" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R22" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="GND24" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
+<part name="R13" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="R23" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R14" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="GND25" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="X5" library="con-phoenix-mkds_5" deviceset="MKDS_5/3-" device="7,62"/>
 <part name="J3" library="SparkFun-Connectors" deviceset="M04X2" device=""/>
@@ -3724,8 +3724,8 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <instance part="SUPPLY3" gate="G$1" x="0" y="309.88"/>
 <instance part="SUPPLY4" gate="G$1" x="0" y="261.62"/>
 <instance part="SUPPLY5" gate="G$1" x="0" y="213.36"/>
-<instance part="R10" gate="G$1" x="7.62" y="58.42"/>
-<instance part="R11" gate="G$1" x="38.1" y="58.42"/>
+<instance part="R41" gate="G$1" x="7.62" y="58.42"/>
+<instance part="R42" gate="G$1" x="38.1" y="58.42"/>
 <instance part="SUPPLY6" gate="G$1" x="22.86" y="63.5"/>
 <instance part="C1" gate="G$1" x="-10.16" y="401.32" rot="R90"/>
 <instance part="GND6" gate="1" x="-20.32" y="401.32" rot="R270"/>
@@ -3791,17 +3791,17 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <instance part="X6" gate="-6" x="208.28" y="396.24"/>
 <instance part="X6" gate="-7" x="208.28" y="391.16"/>
 <instance part="X6" gate="-8" x="208.28" y="386.08"/>
-<instance part="R21" gate="G$1" x="271.78" y="373.38" rot="R90"/>
-<instance part="R8" gate="G$1" x="271.78" y="350.52" rot="R90"/>
+<instance part="R11" gate="G$1" x="271.78" y="373.38" rot="R90"/>
+<instance part="R21" gate="G$1" x="271.78" y="350.52" rot="R90"/>
 <instance part="GND22" gate="1" x="271.78" y="340.36"/>
 <instance part="GND23" gate="1" x="167.64" y="421.64" rot="R270"/>
 <instance part="K1" gate="1" x="358.14" y="393.7" rot="R90"/>
 <instance part="K1" gate="2" x="198.12" y="215.9"/>
-<instance part="R22" gate="G$1" x="294.64" y="373.38" rot="R90"/>
-<instance part="R12" gate="G$1" x="294.64" y="350.52" rot="R90"/>
+<instance part="R12" gate="G$1" x="294.64" y="373.38" rot="R90"/>
+<instance part="R22" gate="G$1" x="294.64" y="350.52" rot="R90"/>
 <instance part="GND24" gate="1" x="294.64" y="340.36"/>
-<instance part="R23" gate="G$1" x="317.5" y="373.38" rot="R90"/>
-<instance part="R14" gate="G$1" x="317.5" y="350.52" rot="R90"/>
+<instance part="R13" gate="G$1" x="317.5" y="373.38" rot="R90"/>
+<instance part="R23" gate="G$1" x="317.5" y="350.52" rot="R90"/>
 <instance part="GND25" gate="1" x="317.5" y="340.36"/>
 <instance part="X5" gate="-1" x="-137.16" y="312.42"/>
 <instance part="X5" gate="-2" x="-137.16" y="307.34"/>
@@ -4040,7 +4040,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </segment>
 <segment>
 <pinref part="GND24" gate="1" pin="GND"/>
-<pinref part="R12" gate="G$1" pin="1"/>
+<pinref part="R22" gate="G$1" pin="1"/>
 <wire x1="294.64" y1="342.9" x2="294.64" y2="345.44" width="0.1524" layer="91"/>
 <pinref part="D22" gate="G$1" pin="A"/>
 <wire x1="287.02" y1="347.98" x2="287.02" y2="342.9" width="0.1524" layer="91"/>
@@ -4049,7 +4049,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </segment>
 <segment>
 <pinref part="GND25" gate="1" pin="GND"/>
-<pinref part="R14" gate="G$1" pin="1"/>
+<pinref part="R23" gate="G$1" pin="1"/>
 <wire x1="317.5" y1="342.9" x2="317.5" y2="345.44" width="0.1524" layer="91"/>
 <pinref part="D23" gate="G$1" pin="A"/>
 <wire x1="309.88" y1="347.98" x2="309.88" y2="342.9" width="0.1524" layer="91"/>
@@ -4057,7 +4057,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <junction x="317.5" y="342.9"/>
 </segment>
 <segment>
-<pinref part="R8" gate="G$1" pin="1"/>
+<pinref part="R21" gate="G$1" pin="1"/>
 <pinref part="GND22" gate="1" pin="GND"/>
 <wire x1="271.78" y1="345.44" x2="271.78" y2="342.9" width="0.1524" layer="91"/>
 <pinref part="D21" gate="G$1" pin="A"/>
@@ -4125,11 +4125,11 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="-7.62" y1="210.82" x2="0" y2="210.82" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="R10" gate="G$1" pin="2"/>
+<pinref part="R41" gate="G$1" pin="2"/>
 <pinref part="SUPPLY6" gate="G$1" pin="VCC"/>
 <wire x1="12.7" y1="58.42" x2="22.86" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="22.86" y1="58.42" x2="22.86" y2="63.5" width="0.1524" layer="91"/>
-<pinref part="R11" gate="G$1" pin="1"/>
+<pinref part="R42" gate="G$1" pin="1"/>
 <wire x1="33.02" y1="58.42" x2="22.86" y2="58.42" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -4203,7 +4203,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="-2.54" y1="200.66" x2="5.08" y2="200.66" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="195.58" x2="-2.54" y2="152.4" width="0.1524" layer="91"/>
 <label x="-2.54" y="53.34" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R10" gate="G$1" pin="1"/>
+<pinref part="R41" gate="G$1" pin="1"/>
 <wire x1="-2.54" y1="152.4" x2="-2.54" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="58.42" x2="-2.54" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="-2.54" y1="58.42" x2="2.54" y2="58.42" width="0.1524" layer="91"/>
@@ -4239,7 +4239,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="48.26" y1="208.28" x2="40.64" y2="208.28" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="208.28" x2="48.26" y2="160.02" width="0.1524" layer="91"/>
 <label x="48.26" y="53.34" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R11" gate="G$1" pin="2"/>
+<pinref part="R42" gate="G$1" pin="2"/>
 <wire x1="48.26" y1="160.02" x2="48.26" y2="121.92" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="120.396" x2="48.26" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="58.42" x2="48.26" y2="53.34" width="0.1524" layer="91"/>
@@ -4382,9 +4382,9 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="-40.64" y1="-22.86" x2="-55.88" y2="-22.86" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="J2" gate="G$1" pin="15"/>
-<wire x1="-119.38" y1="-17.78" x2="-129.54" y2="-17.78" width="0.1524" layer="91"/>
-<label x="-129.54" y="-17.78" size="1.27" layer="95"/>
+<pinref part="J2" gate="G$1" pin="13"/>
+<wire x1="-129.54" y1="-15.24" x2="-119.38" y2="-15.24" width="0.1524" layer="91"/>
+<label x="-129.54" y="-15.24" size="1.27" layer="95"/>
 </segment>
 </net>
 <net name="FONA_RST" class="0">
@@ -4589,7 +4589,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="-45.72" y="215.9" size="1.27" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="R21" gate="G$1" pin="2"/>
+<pinref part="R11" gate="G$1" pin="2"/>
 <wire x1="271.78" y1="378.46" x2="271.78" y2="383.54" width="0.1524" layer="91"/>
 <wire x1="271.78" y1="383.54" x2="279.4" y2="383.54" width="0.1524" layer="91"/>
 <label x="274.32" y="383.54" size="1.27" layer="95"/>
@@ -4732,8 +4732,8 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="R21" gate="G$1" pin="1"/>
-<pinref part="R8" gate="G$1" pin="2"/>
+<pinref part="R11" gate="G$1" pin="1"/>
+<pinref part="R21" gate="G$1" pin="2"/>
 <wire x1="271.78" y1="368.3" x2="271.78" y2="365.76" width="0.1524" layer="91"/>
 <wire x1="271.78" y1="365.76" x2="271.78" y2="355.6" width="0.1524" layer="91"/>
 <wire x1="271.78" y1="365.76" x2="266.7" y2="365.76" width="0.1524" layer="91"/>
@@ -4787,7 +4787,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="170.18" y="220.98" size="1.27" layer="95"/>
 </segment>
 <segment>
-<pinref part="R22" gate="G$1" pin="2"/>
+<pinref part="R12" gate="G$1" pin="2"/>
 <wire x1="294.64" y1="378.46" x2="294.64" y2="383.54" width="0.1524" layer="91"/>
 <wire x1="294.64" y1="383.54" x2="307.34" y2="383.54" width="0.1524" layer="91"/>
 <label x="297.18" y="383.54" size="1.27" layer="95"/>
@@ -4805,7 +4805,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="246.38" y="220.98" size="1.27" layer="95"/>
 </segment>
 <segment>
-<pinref part="R23" gate="G$1" pin="2"/>
+<pinref part="R13" gate="G$1" pin="2"/>
 <wire x1="317.5" y1="378.46" x2="317.5" y2="383.54" width="0.1524" layer="91"/>
 <wire x1="317.5" y1="383.54" x2="327.66" y2="383.54" width="0.1524" layer="91"/>
 <label x="320.04" y="383.54" size="1.27" layer="95"/>
@@ -4813,8 +4813,8 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </net>
 <net name="N$38" class="0">
 <segment>
-<pinref part="R22" gate="G$1" pin="1"/>
-<pinref part="R12" gate="G$1" pin="2"/>
+<pinref part="R12" gate="G$1" pin="1"/>
+<pinref part="R22" gate="G$1" pin="2"/>
 <wire x1="294.64" y1="368.3" x2="294.64" y2="365.76" width="0.1524" layer="91"/>
 <wire x1="294.64" y1="365.76" x2="294.64" y2="355.6" width="0.1524" layer="91"/>
 <wire x1="294.64" y1="365.76" x2="287.02" y2="365.76" width="0.1524" layer="91"/>
@@ -4832,8 +4832,8 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </net>
 <net name="N$40" class="0">
 <segment>
-<pinref part="R23" gate="G$1" pin="1"/>
-<pinref part="R14" gate="G$1" pin="2"/>
+<pinref part="R13" gate="G$1" pin="1"/>
+<pinref part="R23" gate="G$1" pin="2"/>
 <wire x1="317.5" y1="368.3" x2="317.5" y2="365.76" width="0.1524" layer="91"/>
 <wire x1="317.5" y1="365.76" x2="317.5" y2="355.6" width="0.1524" layer="91"/>
 <wire x1="317.5" y1="365.76" x2="309.88" y2="365.76" width="0.1524" layer="91"/>
@@ -5061,9 +5061,9 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="-53.34" y="-20.32" size="1.27" layer="95"/>
 </segment>
 <segment>
-<pinref part="J2" gate="G$1" pin="13"/>
-<wire x1="-119.38" y1="-15.24" x2="-129.54" y2="-15.24" width="0.1524" layer="91"/>
-<label x="-129.54" y="-15.24" size="1.27" layer="95"/>
+<pinref part="J2" gate="G$1" pin="15"/>
+<wire x1="-119.38" y1="-17.78" x2="-129.54" y2="-17.78" width="0.1524" layer="91"/>
+<label x="-129.54" y="-17.78" size="1.27" layer="95"/>
 </segment>
 </net>
 <net name="SLAVE_EXT_IO" class="0">

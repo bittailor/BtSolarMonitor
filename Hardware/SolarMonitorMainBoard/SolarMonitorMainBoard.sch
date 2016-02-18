@@ -4065,6 +4065,11 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="266.7" y1="342.9" x2="271.78" y2="342.9" width="0.1524" layer="91"/>
 <junction x="271.78" y="342.9"/>
 </segment>
+<segment>
+<pinref part="J3" gate="G$1" pin="6"/>
+<wire x1="121.92" y1="297.18" x2="142.24" y2="297.18" width="0.1524" layer="91"/>
+<label x="124.46" y="297.18" size="1.27" layer="95"/>
+</segment>
 </net>
 <net name="VCC" class="0">
 <segment>
@@ -4180,6 +4185,11 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <pinref part="SUPPLY12" gate="G$1" pin="VCC"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="147.32" y1="363.22" x2="147.32" y2="360.68" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="J3" gate="G$1" pin="2"/>
+<wire x1="121.92" y1="302.26" x2="142.24" y2="302.26" width="0.1524" layer="91"/>
+<label x="124.46" y="302.26" size="1.27" layer="95"/>
 </segment>
 </net>
 <net name="SCL" class="0">
@@ -4938,13 +4948,6 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="228.6" y="322.58" size="1.27" layer="95"/>
 </segment>
 </net>
-<net name="SLAVE_VCC" class="0">
-<segment>
-<pinref part="J3" gate="G$1" pin="2"/>
-<wire x1="121.92" y1="302.26" x2="142.24" y2="302.26" width="0.1524" layer="91"/>
-<label x="124.46" y="302.26" size="1.27" layer="95"/>
-</segment>
-</net>
 <net name="SLAVE_MOSI" class="0">
 <segment>
 <pinref part="J3" gate="G$1" pin="4"/>
@@ -4955,13 +4958,6 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <pinref part="U7" gate="U$1" pin="PB3(MOSI/OC2)"/>
 <wire x1="226.06" y1="292.1" x2="241.3" y2="292.1" width="0.1524" layer="91"/>
 <label x="228.6" y="292.1" size="1.27" layer="95"/>
-</segment>
-</net>
-<net name="SLAVE_GND" class="0">
-<segment>
-<pinref part="J3" gate="G$1" pin="6"/>
-<wire x1="121.92" y1="297.18" x2="142.24" y2="297.18" width="0.1524" layer="91"/>
-<label x="124.46" y="297.18" size="1.27" layer="95"/>
 </segment>
 </net>
 <net name="SLAVE_TX" class="0">
@@ -4978,20 +4974,20 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </net>
 <net name="N$30" class="0">
 <segment>
-<pinref part="U7" gate="U$1" pin="ADC6"/>
-<wire x1="226.06" y1="330.2" x2="266.7" y2="330.2" width="0.1524" layer="91"/>
-<wire x1="266.7" y1="330.2" x2="266.7" y2="322.58" width="0.1524" layer="91"/>
 <pinref part="U8" gate="A" pin="1B"/>
+<wire x1="266.7" y1="327.66" x2="266.7" y2="322.58" width="0.1524" layer="91"/>
 <wire x1="266.7" y1="322.58" x2="274.32" y2="322.58" width="0.1524" layer="91"/>
+<pinref part="U7" gate="U$1" pin="ADC7"/>
+<wire x1="226.06" y1="327.66" x2="266.7" y2="327.66" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$31" class="0">
 <segment>
-<pinref part="U7" gate="U$1" pin="ADC7"/>
-<wire x1="226.06" y1="327.66" x2="264.16" y2="327.66" width="0.1524" layer="91"/>
-<wire x1="264.16" y1="327.66" x2="264.16" y2="320.04" width="0.1524" layer="91"/>
+<wire x1="264.16" y1="330.2" x2="264.16" y2="320.04" width="0.1524" layer="91"/>
 <pinref part="U8" gate="A" pin="2B"/>
 <wire x1="264.16" y1="320.04" x2="274.32" y2="320.04" width="0.1524" layer="91"/>
+<pinref part="U7" gate="U$1" pin="ADC6"/>
+<wire x1="264.16" y1="330.2" x2="226.06" y2="330.2" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="OUT_12V_1" class="0">

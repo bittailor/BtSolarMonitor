@@ -4101,18 +4101,18 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="SUPPLY3" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="SUPPLY4" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="SUPPLY5" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
-<part name="R41" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R42" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R41" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="10k"/>
+<part name="R42" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="10k"/>
 <part name="SUPPLY6" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
-<part name="C1" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
+<part name="C1" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="GND6" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="C2" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
+<part name="C2" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="GND7" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="C3" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
+<part name="C3" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="GND8" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="C4" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
+<part name="C4" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="GND9" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="C5" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
+<part name="C5" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="GND10" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="X1" library="con-phoenix-mkds_5" deviceset="MKDS_5/3-" device="7,62"/>
 <part name="X2" library="con-phoenix-mkds_5" deviceset="MKDS_5/3-" device="7,62"/>
@@ -4135,17 +4135,17 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="U6" library="Texas Instruments_By_element14_Batch_1" deviceset="INA219AIDR" device=""/>
 <part name="GND16" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="SUPPLY10" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
-<part name="C6" library="SparkFun-Capacitors" deviceset="CAP" device="0805"/>
+<part name="C6" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="GND17" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="D2" library="SparkFun-DiscreteSemi" deviceset="DIODE-SCHOTTKY" device="-MBRA140" value="MBRA140"/>
 <part name="D3" library="SparkFun-DiscreteSemi" deviceset="DIODE-SCHOTTKY" device="-MBRA140" value="MBRA140"/>
-<part name="J2" library="SparkFun-Connectors" deviceset="M10X2" device=""/>
+<part name="J2" library="SparkFun-Connectors" deviceset="M10X2" device="" value="ToTopPrint"/>
 <part name="GND12" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="SUPPLY11" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="U8" library="Texas Instruments_By_element14_Batch_1" deviceset="ULN2803ADW" device=""/>
 <part name="GND18" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND19" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="R7" library="SparkFun-Resistors" deviceset="RESISTOR" device="2512"/>
+<part name="R7" library="SparkFun-Resistors" deviceset="RESISTOR" device="2512" value="100m"/>
 <part name="U7" library="SparkFun-DigitalIC" deviceset="ATMEGA328P_TQFP" device="" value="ATMEGA328P_TQFP"/>
 <part name="GND15" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="SUPPLY9" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
@@ -4165,7 +4165,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="R23" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
 <part name="GND25" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="X5" library="con-phoenix-mkds_5" deviceset="MKDS_5/3-" device="7,62"/>
-<part name="J3" library="SparkFun-Connectors" deviceset="M04X2" device=""/>
+<part name="J3" library="SparkFun-Connectors" deviceset="M04X2" device="" value="ISP"/>
 <part name="C8" library="SparkFun-Capacitors" deviceset="CAP" device="0805" value="0.1uF"/>
 <part name="D21" library="SparkFun-DiscreteSemi" deviceset="DIODE-ZENER" device="3.3V" value="3.3V"/>
 <part name="D22" library="SparkFun-DiscreteSemi" deviceset="DIODE-ZENER" device="3.3V" value="3.3V"/>
@@ -4549,7 +4549,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="124.46" y="297.18" size="1.27" layer="95"/>
 </segment>
 </net>
-<net name="VCC" class="0">
+<net name="3V" class="0">
 <segment>
 <pinref part="SUPPLY1" gate="G$1" pin="VCC"/>
 <wire x1="0" y1="403.86" x2="0" y2="401.32" width="0.1524" layer="91"/>
@@ -5604,24 +5604,40 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </sheet>
 </sheets>
 <errors>
+<approved hash="102,1,2.54,-2.54,USB,5V,,,,"/>
+<approved hash="102,1,0,403.86,VCC,3V,,,,"/>
+<approved hash="102,1,0,355.6,VCC,3V,,,,"/>
+<approved hash="102,1,0,309.88,VCC,3V,,,,"/>
+<approved hash="102,1,0,261.62,VCC,3V,,,,"/>
+<approved hash="102,1,0,213.36,VCC,3V,,,,"/>
+<approved hash="102,1,22.86,63.5,VCC,3V,,,,"/>
+<approved hash="102,1,-63.5,10.16,VCC,3V,,,,"/>
+<approved hash="102,1,-33.02,-78.74,VSS,GND,,,,"/>
+<approved hash="102,1,-33.02,-76.2,VDD,3V,,,,"/>
+<approved hash="102,1,-33.02,-83.82,GND1,GND,,,,"/>
+<approved hash="102,1,-48.26,-76.2,VCC,3V,,,,"/>
+<approved hash="102,1,0,165.1,VCC,3V,,,,"/>
+<approved hash="102,1,-129.54,-2.54,VCC,3V,,,,"/>
+<approved hash="102,1,170.18,353.06,VCC,3V,,,,"/>
+<approved hash="102,1,147.32,363.22,VCC,3V,,,,"/>
 <approved hash="202,1,-40.64,12.7,MS1,!RESET,,,,"/>
-<approved hash="104,1,5.08,398.78,U1,VS,VCC,,,"/>
+<approved hash="104,1,5.08,398.78,U1,VS,3V,,,"/>
 <approved hash="104,1,5.08,396.24,U1,VIN+,N$13,,,"/>
 <approved hash="104,1,5.08,381,U1,VIN-,N$14,,,"/>
-<approved hash="104,1,5.08,350.52,U2,VS,VCC,,,"/>
+<approved hash="104,1,5.08,350.52,U2,VS,3V,,,"/>
 <approved hash="104,1,5.08,347.98,U2,VIN+,N$11,,,"/>
 <approved hash="104,1,5.08,332.74,U2,VIN-,N$12,,,"/>
-<approved hash="104,1,5.08,304.8,U3,VS,VCC,,,"/>
+<approved hash="104,1,5.08,304.8,U3,VS,3V,,,"/>
 <approved hash="104,1,5.08,302.26,U3,VIN+,N$15,,,"/>
 <approved hash="104,1,5.08,287.02,U3,VIN-,N$16,,,"/>
-<approved hash="104,1,5.08,256.54,U4,VS,VCC,,,"/>
+<approved hash="104,1,5.08,256.54,U4,VS,3V,,,"/>
 <approved hash="104,1,5.08,254,U4,VIN+,N$17,,,"/>
 <approved hash="104,1,5.08,238.76,U4,VIN-,N$18,,,"/>
-<approved hash="104,1,5.08,208.28,U5,VS,VCC,,,"/>
+<approved hash="104,1,5.08,208.28,U5,VS,3V,,,"/>
 <approved hash="104,1,5.08,205.74,U5,VIN+,N$19,,,"/>
 <approved hash="104,1,5.08,190.5,U5,VIN-,N$20,,,"/>
 <approved hash="104,1,-27.94,48.26,U10,VO,5V,,,"/>
-<approved hash="104,1,5.08,160.02,U6,VS,VCC,,,"/>
+<approved hash="104,1,5.08,160.02,U6,VS,3V,,,"/>
 <approved hash="104,1,5.08,157.48,U6,VIN+,N$9,,,"/>
 <approved hash="104,1,5.08,142.24,U6,VIN-,VI,,,"/>
 <approved hash="208,1,-48.26,48.26,VI,sup,,,,"/>

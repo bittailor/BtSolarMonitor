@@ -3613,6 +3613,9 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <class number="1" name="power" width="3.81" drill="0.0762">
 <clearance class="1" value="1"/>
 </class>
+<class number="2" name="small" width="0.254" drill="0.508">
+<clearance class="2" value="0.2032"/>
+</class>
 </classes>
 <parts>
 <part name="MS1" library="BtParts" deviceset="FEATHERWING" device="_NODIM" value="FEATHERWING_NODIM"/>
@@ -4322,7 +4325,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="-139.7" y1="-5.08" x2="-119.38" y2="-5.08" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="SD_CS" class="0">
+<net name="SD_CS" class="2">
 <segment>
 <pinref part="U$1" gate="G$1" pin="CS"/>
 <wire x1="-33.02" y1="-66.04" x2="-45.72" y2="-66.04" width="0.1524" layer="91"/>
@@ -4334,7 +4337,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <label x="7.62" y="-12.7" size="1.27" layer="95"/>
 </segment>
 </net>
-<net name="SCK" class="0">
+<net name="SCK" class="2">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SCLK"/>
 <wire x1="-33.02" y1="-63.5" x2="-45.72" y2="-63.5" width="0.1524" layer="91"/>
@@ -4347,7 +4350,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="-40.64" y1="-12.7" x2="-104.14" y2="-12.7" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="MOSI" class="0">
+<net name="MOSI" class="2">
 <segment>
 <pinref part="U$1" gate="G$1" pin="DATA_IN"/>
 <wire x1="-33.02" y1="-60.96" x2="-45.72" y2="-60.96" width="0.1524" layer="91"/>
@@ -4360,7 +4363,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="-40.64" y1="-15.24" x2="-104.14" y2="-15.24" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="MISO" class="0">
+<net name="MISO" class="2">
 <segment>
 <pinref part="U$1" gate="G$1" pin="DATA_OUT"/>
 <wire x1="-33.02" y1="-58.42" x2="-45.72" y2="-58.42" width="0.1524" layer="91"/>

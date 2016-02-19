@@ -4124,7 +4124,7 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="U$1" library="adafruit" deviceset="MICROSD" device=""/>
 <part name="GND14" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="SUPPLY8" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
-<part name="D1" library="SparkFun-DiscreteSemi" deviceset="DIODE-SCHOTTKY" device="-RB751" value="RB751"/>
+<part name="D1" library="SparkFun-DiscreteSemi" deviceset="DIODE-SCHOTTKY" device="-B340A" value="B340A"/>
 <part name="R1" library="resistor-shunt" deviceset="SMV" device="" value="5m"/>
 <part name="R2" library="resistor-shunt" deviceset="SMV" device="" value="5m"/>
 <part name="R3" library="resistor-shunt" deviceset="SMV" device="" value="5m"/>
@@ -4153,16 +4153,16 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="GND20" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND21" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="X6" library="con-phoenix-508" deviceset="MKDSN1,5/8-5,08" device=""/>
-<part name="R11" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R21" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R11" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="15k"/>
+<part name="R21" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="5.1k"/>
 <part name="GND22" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND23" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="K1" library="relay" deviceset="RT?F*" device="314" technology="12"/>
-<part name="R12" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R22" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R12" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="15k"/>
+<part name="R22" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="5.1k"/>
 <part name="GND24" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="R13" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
-<part name="R23" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES"/>
+<part name="R13" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="15k"/>
+<part name="R23" library="SparkFun-Resistors" deviceset="RESISTOR" device="0805-RES" value="5.1k"/>
 <part name="GND25" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="X5" library="con-phoenix-mkds_5" deviceset="MKDS_5/3-" device="7,62"/>
 <part name="J3" library="SparkFun-Connectors" deviceset="M04X2" device="" value="ISP"/>

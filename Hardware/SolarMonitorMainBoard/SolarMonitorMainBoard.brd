@@ -20,8 +20,8 @@
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
@@ -41,8 +41,8 @@
 <layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
-<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="no" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
 <layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
@@ -147,6 +147,39 @@
 <wire x1="100" y1="78.73" x2="0" y2="78.73" width="0" layer="20"/>
 <wire x1="0" y1="78.73" x2="0" y2="0" width="0" layer="20"/>
 <hole x="5" y="16.55" drill="2.8"/>
+<text x="9.652" y="13.589" size="1.016" layer="21">P1in</text>
+<text x="17.145" y="13.589" size="1.016" layer="21">P1out</text>
+<text x="24.892" y="13.589" size="1.016" layer="21">P2in</text>
+<text x="32.385" y="13.589" size="1.016" layer="21">P2out</text>
+<text x="40.132" y="13.589" size="1.016" layer="21">B1in</text>
+<text x="47.879" y="13.716" size="1.016" layer="21">B1out</text>
+<text x="55.245" y="13.589" size="1.016" layer="21">B2in</text>
+<text x="63.5" y="13.589" size="1.016" layer="21">P2out</text>
+<text x="72.39" y="64.77" size="1.016" layer="21" rot="SR0">Lout</text>
+<text x="76.962" y="64.643" size="1.016" layer="21" rot="SR0">L2in</text>
+<text x="81.28" y="64.77" size="1.016" layer="21" rot="SR0">L1in</text>
+<text x="14.732" y="48.133" size="1.6764" layer="21" font="vector">BT SolarMonitor</text>
+<text x="90.17" y="2.54" size="1.016" layer="22" rot="MR0">rev A</text>
+<wire x1="71.755" y1="64.135" x2="84.455" y2="64.135" width="0.127" layer="21"/>
+<wire x1="84.455" y1="64.135" x2="84.455" y2="68.58" width="0.127" layer="21"/>
+<wire x1="84.455" y1="68.58" x2="71.628" y2="68.58" width="0.127" layer="21"/>
+<wire x1="71.628" y1="68.58" x2="71.628" y2="64.135" width="0.127" layer="21"/>
+<wire x1="71.628" y1="64.135" x2="76.073" y2="64.135" width="0.127" layer="21"/>
+<wire x1="76.073" y1="64.135" x2="76.073" y2="68.453" width="0.127" layer="21"/>
+<wire x1="76.073" y1="68.453" x2="80.391" y2="68.453" width="0.127" layer="21"/>
+<wire x1="80.391" y1="68.453" x2="80.391" y2="64.262" width="0.127" layer="21"/>
+<text x="37.084" y="69.215" size="1.016" layer="21" rot="SR0">GND</text>
+<text x="32.385" y="69.215" size="1.016" layer="21" rot="SR0">T1</text>
+<text x="27.305" y="69.215" size="1.016" layer="21" rot="SR0">T2</text>
+<text x="22.352" y="69.215" size="1.016" layer="21" rot="SR0">L1</text>
+<text x="17.526" y="69.215" size="1.016" layer="21" rot="SR0">L2</text>
+<text x="11.684" y="69.215" size="1.016" layer="21" rot="SR0">Lon</text>
+<text x="6.858" y="69.215" size="1.016" layer="21" rot="SR0">IO1</text>
+<text x="1.524" y="69.215" size="1.016" layer="21" rot="SR0">IO2</text>
+<text x="79.121" y="14.351" size="1.016" layer="21">ISP</text>
+<text x="78.74" y="2.413" size="1.016" layer="21">RX</text>
+<text x="81.407" y="2.413" size="1.016" layer="21">Tx</text>
+<text x="70.231" y="13.716" size="1.016" layer="21">GND</text>
 </plain>
 <libraries>
 <library name="SparkFun-Capacitors">
@@ -1196,6 +1229,54 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 </package>
 </packages>
 </library>
+<library name="SparkFun-Aesthetics">
+<description>&lt;h3&gt;SparkFun Electronics' preferred foot prints&lt;/h3&gt;
+In this library you'll find non-functional items- supply symbols, logos, notations, frame blocks, etc.&lt;br&gt;&lt;br&gt;
+We've spent an enormous amount of time creating and checking these footprints and parts, but it is the end user's responsibility to ensure correctness and suitablity for a given componet or application. If you enjoy using this library, please buy one of our products at www.sparkfun.com.
+&lt;br&gt;&lt;br&gt;
+&lt;b&gt;Licensing:&lt;/b&gt; Creative Commons ShareAlike 4.0 International - https://creativecommons.org/licenses/by-sa/4.0/ 
+&lt;br&gt;&lt;br&gt;
+You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
+<packages>
+<package name="OSHW-LOGO-L">
+<polygon width="0.15" layer="21">
+<vertex x="0.9209" y="-2.2231" curve="9.497479"/>
+<vertex x="1.2751" y="-2.0407"/>
+<vertex x="2.1548" y="-2.758"/>
+<vertex x="2.758" y="-2.1548"/>
+<vertex x="2.0407" y="-1.2751" curve="18.998791"/>
+<vertex x="2.3446" y="-0.5413"/>
+<vertex x="3.4739" y="-0.4265"/>
+<vertex x="3.4739" y="0.4265"/>
+<vertex x="2.3446" y="0.5413" curve="18.998791"/>
+<vertex x="2.0407" y="1.2751"/>
+<vertex x="2.758" y="2.1548"/>
+<vertex x="2.1548" y="2.758"/>
+<vertex x="1.2751" y="2.0407" curve="18.998791"/>
+<vertex x="0.5413" y="2.3446"/>
+<vertex x="0.4265" y="3.4739"/>
+<vertex x="-0.4265" y="3.4739"/>
+<vertex x="-0.5413" y="2.3446" curve="18.998791"/>
+<vertex x="-1.2751" y="2.0407"/>
+<vertex x="-2.1548" y="2.758"/>
+<vertex x="-2.758" y="2.1548"/>
+<vertex x="-2.0407" y="1.2751" curve="18.998791"/>
+<vertex x="-2.3446" y="0.5413"/>
+<vertex x="-3.4739" y="0.4265"/>
+<vertex x="-3.4739" y="-0.4265"/>
+<vertex x="-2.3446" y="-0.5413" curve="18.998791"/>
+<vertex x="-2.0407" y="-1.2751"/>
+<vertex x="-2.758" y="-2.1548"/>
+<vertex x="-2.1548" y="-2.758"/>
+<vertex x="-1.2751" y="-2.0407" curve="9.497479"/>
+<vertex x="-0.9209" y="-2.2231"/>
+<vertex x="-0.4186" y="-1.0105" curve="-67.504205"/>
+<vertex x="-1.0938" y="0" curve="-247.497204"/>
+<vertex x="0.4186" y="-1.0105"/>
+</polygon>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1457,8 +1538,8 @@ design rules under a new name.</description>
 </element>
 <element name="U10" library="_traco_tsr-1" package="TSR-1" value="TSR_1-2450" x="6.096" y="64.008" rot="R90"/>
 <element name="U$1" library="adafruit" package="MICROSD" value="MICROSD" x="85.09" y="17.399"/>
-<element name="D1" library="SparkFun-DiscreteSemi" package="SMA-DIODE" value="B340A" x="27.686" y="66.802">
-<attribute name="PROD_ID" value="DIO-09886" x="27.686" y="66.802" size="1.778" layer="27" display="off"/>
+<element name="D1" library="SparkFun-DiscreteSemi" package="SMA-DIODE" value="B340A" x="29.591" y="66.04">
+<attribute name="PROD_ID" value="DIO-09886" x="29.591" y="66.04" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R1" library="resistor-shunt" package="SMV" value="5m" x="13.97" y="18.542">
 <attribute name="OC_FARNELL" value="unknown" x="13.97" y="18.542" size="1.778" layer="27" display="off"/>
@@ -1562,6 +1643,7 @@ design rules under a new name.</description>
 <attribute name="PROD_ID" value="DIO-11284" x="76.835" y="20.066" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R6" library="SparkFun-Resistors" package="0805" value="10k" x="77.343" y="8.509" rot="R90"/>
+<element name="U$2" library="SparkFun-Aesthetics" package="OSHW-LOGO-L" value="" x="95.25" y="3.81" rot="MR0"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -2183,15 +2265,15 @@ design rules under a new name.</description>
 <wire x1="48.895" y1="57.785" x2="47.498" y2="59.69" width="0.6096" layer="16"/>
 <wire x1="47.498" y1="59.69" x2="39.751" y2="59.69" width="0.6096" layer="16"/>
 <wire x1="39.751" y1="59.69" x2="35.433" y2="65.913" width="0.6096" layer="16"/>
-<wire x1="35.433" y1="65.913" x2="32.766" y2="66.802" width="0.6096" layer="16"/>
-<via x="32.766" y="66.802" extent="1-16" drill="0.6" shape="octagon"/>
-<wire x1="32.766" y1="66.802" x2="29.836" y2="66.802" width="0.6096" layer="1"/>
+<wire x1="35.433" y1="65.913" x2="33.274" y2="66.04" width="0.6096" layer="16"/>
+<via x="33.274" y="66.04" extent="1-16" drill="0.6" shape="octagon"/>
+<wire x1="33.274" y1="66.04" x2="31.741" y2="66.04" width="0.6096" layer="1"/>
 </signal>
 <signal name="FONA_BAT">
 <contactref element="D1" pad="A"/>
 <contactref element="J2" pad="7"/>
-<wire x1="27.94" y1="61.849" x2="25.4" y2="67.056" width="0.6096" layer="1"/>
-<wire x1="25.4" y1="67.056" x2="25.536" y2="66.802" width="0.6096" layer="1"/>
+<wire x1="27.94" y1="61.849" x2="27.94" y2="63.881" width="0.6096" layer="1"/>
+<wire x1="27.94" y1="63.881" x2="27.441" y2="66.04" width="0.6096" layer="1"/>
 </signal>
 <signal name="N$11">
 <contactref element="U2" pad="8"/>

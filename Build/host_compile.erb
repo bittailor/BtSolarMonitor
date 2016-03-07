@@ -1,0 +1,11 @@
+<% for source in sources %>
+<% if source.pathmap("%x") == ".c" %>
+build <%= source.pathmap("%{^Firmware,#{target}}X.obj") %>: cc <%= source %>
+   includes = <%= includes.collect{|i| "-I"+i}.join(" ")  %> $include
+   flags = <%= defines.collect{|i| "-D"+i}.join(" ")  %>
+<% else %>
+build <%= source.pathmap("%{^Firmware,#{target}}X.obj") %>: cxx <%= source %>
+   includes = <%= includes.collect{|i| "-I"+i}.join(" ")  %> $includes
+   flags = <%= defines.collect{|i| "-D"+i}.join(" ")  %>
+<% end %>
+<% end %>

@@ -1,0 +1,1 @@
+build <%= "#{target}/lib#{name}.a" %>  : ar <%= sources.pathmap("%{^Firmware,#{target}}X.obj").join(' ') %>

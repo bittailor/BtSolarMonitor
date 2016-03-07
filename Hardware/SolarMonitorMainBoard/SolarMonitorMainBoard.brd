@@ -159,7 +159,7 @@
 <text x="76.962" y="64.643" size="1.016" layer="21" rot="SR0">L2in</text>
 <text x="81.28" y="64.77" size="1.016" layer="21" rot="SR0">L1in</text>
 <text x="14.732" y="48.133" size="1.6764" layer="21" font="vector">BT SolarMonitor</text>
-<text x="90.17" y="2.54" size="1.016" layer="22" rot="MR0">rev A</text>
+<text x="90.17" y="2.54" size="1.016" layer="22" rot="MR0">bittailor - SolarMonitor Main Board - rev A</text>
 <wire x1="71.755" y1="64.135" x2="84.455" y2="64.135" width="0.127" layer="21"/>
 <wire x1="84.455" y1="64.135" x2="84.455" y2="68.58" width="0.127" layer="21"/>
 <wire x1="84.455" y1="68.58" x2="71.628" y2="68.58" width="0.127" layer="21"/>
@@ -177,7 +177,7 @@
 <text x="6.858" y="69.215" size="1.016" layer="21" rot="SR0">IO1</text>
 <text x="1.524" y="69.215" size="1.016" layer="21" rot="SR0">IO2</text>
 <text x="79.121" y="14.351" size="1.016" layer="21">ISP</text>
-<text x="78.74" y="2.413" size="1.016" layer="21">RX</text>
+<text x="78.74" y="2.413" size="1.016" layer="21">Rx</text>
 <text x="81.407" y="2.413" size="1.016" layer="21">Tx</text>
 <text x="70.231" y="13.716" size="1.016" layer="21">GND</text>
 </plain>

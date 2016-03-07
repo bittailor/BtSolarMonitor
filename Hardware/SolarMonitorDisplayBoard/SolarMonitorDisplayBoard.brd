@@ -146,7 +146,7 @@
 <wire x1="100" y1="0" x2="100" y2="57" width="0" layer="20"/>
 <wire x1="100" y1="57" x2="0" y2="57" width="0" layer="20"/>
 <wire x1="0" y1="57" x2="0" y2="0" width="0" layer="20"/>
-<text x="7.62" y="1.27" size="1.778" layer="22" rot="MR0">rev A</text>
+<text x="86.36" y="1.27" size="1.27" layer="22" font="vector" rot="MR0">bittailor - SolarMonitor Display Board - rev A</text>
 <text x="2.54" y="53.34" size="1.778" layer="21" font="vector">BT SolarMonitor Display</text>
 </plain>
 <libraries>
@@ -673,7 +673,7 @@ design rules under a new name.</description>
 <element name="JP1" library="SparkFun-Passives" package="PAD-JUMPER-2-NO_NO_SILK" value="JUMPER-PAD-2-NO" x="7.62" y="33.02" rot="MR90"/>
 <element name="BARO" library="BtParts" package="T5403_BREAKOUT" value="T5403_BREAKOUT" x="97.79" y="54.61" rot="MR270"/>
 <element name="TEMP" library="BtParts" package="MCP9808_BREAKOUT" value="MCP9808_BREAKOUT" x="97.79" y="22.86" rot="MR270"/>
-<element name="U$3" library="SparkFun-Aesthetics" package="OSHW-LOGO-L" value="" x="49.53" y="5.08" rot="MR0"/>
+<element name="U$3" library="SparkFun-Aesthetics" package="OSHW-LOGO-L" value="" x="91.44" y="3.81" rot="MR0"/>
 <element name="R1" library="SparkFun-Electromechanical" package="TRIM_POT_PTH" value="" x="50" y="19.685"/>
 <element name="S1" library="SparkFun-Electromechanical" package="TACTILE-PTH" value="SWITCH-MOMENTARY-2PTH" x="50" y="10.795" rot="R90">
 <attribute name="PROD_ID" value=" SWCH-08441" x="50" y="10.795" size="1.778" layer="27" rot="R90" display="off"/>

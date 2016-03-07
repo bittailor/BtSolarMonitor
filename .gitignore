@@ -1,6 +1,15 @@
 ## Ignore list project specific
 
 Firmware/sketchbook/libraries
+.metadata
+Target
+RemoteSystemsTempFiles
+Scripts/*.dat
+Scripts/*.csv
+
+
+.ninja_deps
+.ninja_log
 
 
 
@@ -54,8 +63,3 @@ eagle.epf
 *.GTS
 
 *.zip
-
-
-
-
-

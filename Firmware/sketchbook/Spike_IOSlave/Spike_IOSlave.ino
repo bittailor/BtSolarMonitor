@@ -3,22 +3,22 @@
 #define CMD_READ_REQUEST_COUNTER  0x01
 #define CMD_DATA_LOOP_BACK  0x02
 
-#define LOOP_LED 6
-#define ERROR_LED 5
+//#define LOOP_LED 6
+//#define ERROR_LED 5
 
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Slave Start");
 
-  pinMode(ERROR_LED, OUTPUT);
-  pinMode(LOOP_LED, OUTPUT);
+  //pinMode(ERROR_LED, OUTPUT);
+  //pinMode(LOOP_LED, OUTPUT);
 
-  digitalWrite(ERROR_LED, HIGH);
-  digitalWrite(LOOP_LED, HIGH);
+  // digitalWrite(ERROR_LED, HIGH);
+  // digitalWrite(LOOP_LED, HIGH);
 
   delay(500);
-  digitalWrite(ERROR_LED, LOW);
+  // digitalWrite(ERROR_LED, LOW);
 
   Wire.begin(0x8);
   Wire.onRequest(requestEvent);
@@ -28,7 +28,7 @@ void setup() {
 
 void loop() {
   static bool loopLed = true;
-  digitalWrite(LOOP_LED, loopLed);
+  //digitalWrite(LOOP_LED, loopLed);
   delay(250);
   loopLed = !loopLed;
 }
@@ -44,7 +44,7 @@ volatile int sCurrentBufferSize = -1;
 void receiveEvent(int numBytes) {
   Serial.println("recv");
   if(numBytes < 1 || (numBytes+1) > sBufferLength) {
-    digitalWrite(ERROR_LED, HIGH);
+    //digitalWrite(ERROR_LED, HIGH);
     return;
   }
 
@@ -53,7 +53,7 @@ void receiveEvent(int numBytes) {
   switch(sCommandBuffer) {
   case CMD_READ_REQUEST_COUNTER: {
     if(numBytes != 1) {
-      digitalWrite(ERROR_LED, HIGH);
+       // digitalWrite(ERROR_LED, HIGH);
     }
     return;
   } break;
@@ -65,7 +65,7 @@ void receiveEvent(int numBytes) {
     sCurrentBufferSize = readSize;
   } break;
   default: {
-    digitalWrite(ERROR_LED, HIGH);
+     // digitalWrite(ERROR_LED, HIGH);
     return;
   }
   }
@@ -84,7 +84,7 @@ void requestEvent() {
   case CMD_DATA_LOOP_BACK: {
     if (sCurrentBufferSize < 0)
     {
-      digitalWrite(ERROR_LED, HIGH);
+      // digitalWrite(ERROR_LED, HIGH);
       return;
     }
     Wire.write((const uint8_t *)sBuffer, sCurrentBufferSize);
@@ -92,7 +92,7 @@ void requestEvent() {
 
   } break;
   default: {
-    digitalWrite(ERROR_LED, HIGH);
+    // digitalWrite(ERROR_LED, HIGH);
     return;
   }
   }

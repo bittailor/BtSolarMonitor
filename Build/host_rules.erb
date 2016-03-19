@@ -1,8 +1,8 @@
 
-ccflags = -Wall -Werror=return-type -g -DBT_PF_OSX -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1 -DUSE_NAMED_SEMAPHORES
-cxxflags = -Wall -Werror=return-type -std=c++11 -g -DBT_PF_OSX -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1
+ccflags = -Wall -Werror=return-type -g -O0 -DBT_PF_OSX -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1 -DUSE_NAMED_SEMAPHORES
+cxxflags = -Wall -Werror=return-type -std=c++11 -g -O0  -DBT_PF_OSX -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1
 global_includes = -I/opt/local/include
-linkflags = -L/opt/local/lib
+linkflags =
 
 rule cc
   command = gcc -MMD -MT $out -MF $out.d $ccflags $flags $global_includes $includes -c $in -o $out

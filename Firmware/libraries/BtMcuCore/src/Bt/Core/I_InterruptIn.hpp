@@ -8,8 +8,12 @@ class I_InterruptIn
 {
    public:
       virtual ~I_InterruptIn() {}
-
       virtual bool read()=0;
+
+      template<typename T>
+      void attach(T*, void (T::*callback)()) {
+
+      }
 
 };
 

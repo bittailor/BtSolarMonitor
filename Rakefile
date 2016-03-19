@@ -2,18 +2,18 @@ require 'uri'
 require 'erb'
 require 'json'
 
-arduino = "/Applications/Arduino.app/Contents/MacOS/Arduino"
-arduino_folder = "/Applications/Arduino.app/Contents/Java"
-builder = "#{arduino_folder}/arduino-builder"
-Target = "Target"
+$arduino = "/Applications/Arduino.app/Contents/MacOS/Arduino"
+$arduino_folder = "/Applications/Arduino.app/Contents/Java"
+$builder = "#{$arduino_folder}/arduino-builder"
+$output_folder = "Firmware/Target"
 
-options = [
-    "-hardware #{arduino_folder}/hardware",
+$options = [
+    "-hardware #{$arduino_folder}/hardware",
     "-hardware #{ENV['HOME']}/Library/Arduino15/packages",
     #"-hardware Firmware/sketchbook/hardware",
 
-    "-tools #{arduino_folder}/tools-builder",
-    "-tools #{arduino_folder}/hardware/tools/avr",
+    "-tools #{$arduino_folder}/tools-builder",
+    "-tools #{$arduino_folder}/hardware/tools/avr",
     "-tools #{ENV['HOME']}/Library/Arduino15/packages",
 
     "-libraries Firmware/sketchbook/libraries",
@@ -22,12 +22,12 @@ options = [
     "-verbose"
 ].join(" ")
 
-boards = [
+$boards = [
     "-fqbn=adafruit:samd:adafruit_feather_m0",
     # "-fqbn=breadboard:avr:atmega328bb",
 ]
 
-libraries = [
+$libraries = [
     ["zip", "http://ftp-stud.fht-esslingen.de/pub/Mirrors/eclipse/paho/arduino_1.0.0.zip"],
 
     ["git", "https://github.com/adafruit/Adafruit_MQTT_Library.git"],
@@ -36,7 +36,8 @@ libraries = [
 
     ["git", "https://github.com/bblanchon/ArduinoJson.git","v5.0.7"],
 
-    ["git", "https://github.com/google/googletest.git"],
+    ["git", "https://github.com/google/googletest.git", "release-1.7.0"],
+    ["git", "https://github.com/google/googlemock.git", "release-1.7.0"],
 ]
 
 def installGit(url , branch = nil)
@@ -69,7 +70,7 @@ task :install do
     rm_r library_path , :force => true
     mkdir library_path
     Dir.chdir(library_path) do
-        libraries.each do |library|
+        $libraries.each do |library|
             installLibrary(library)
         end
     end
@@ -86,10 +87,10 @@ desc "Compile all"
 task :compile do
     sketches = Dir.glob("Firmware/sketchbook/*/*.ino")
     sketches.each do |sketch|
-        boards.each do |board|
+        $boards.each do |board|
             puts "compile #{sketch} ..."
             verbose(false) do
-                sh "#{builder} #{options} #{board} #{sketch}"
+                sh "#{$builder} #{$options} #{board} #{sketch}"
             end
             puts "   ...  #{sketch} done"
         end
@@ -107,12 +108,20 @@ task :default => :compile
 
 # ---
 
+$host_output_folder = "#{$output_folder}/host"
+
 namespace :host do
 
-  task :compile_gtest do
-    gtest_dir = "Firmware/sketchbook/libraries/googletest/googletest"
-    sh "g++ -isystem #{gtest_dir}/include -I#{gtest_dir} -pthread -c #{gtest_dir}/src/gtest-all.cc -o Target/host/gtest-all.o" unless File.exists?("Target/host/gtest-all.o")
-    sh "ar -rv Target/host/libgtest.a Target/host/gtest-all.o" unless File.exists?("Target/host/libgtest.a")
+  directory $host_output_folder
+
+  task :compile_gtest => $host_output_folder do
+    gtest_dir = "Firmware/sketchbook/libraries/googletest"
+    sh "g++ -isystem #{gtest_dir}/include -I#{gtest_dir} -pthread -c #{gtest_dir}/src/gtest-all.cc -o #{$host_output_folder}/gtest-all.o" unless File.exists?("#{$host_output_folder}/gtest-all.o")
+    sh "ar -rv #{$host_output_folder}/libgtest.a #{$host_output_folder}/gtest-all.o" unless File.exists?("#{$host_output_folder}/libgtest.a")
+
+    gmock_dir = "Firmware/sketchbook/libraries/googlemock"
+    sh "g++ -isystem #{gmock_dir}/include -I#{gmock_dir} -I#{gtest_dir}/include -pthread -c #{gmock_dir}/src/gmock-all.cc -o #{$host_output_folder}/gmock-all.o" unless File.exists?("#{$host_output_folder}/gmock-all.o")
+    sh "ar -rv #{$host_output_folder}/libgmock.a #{$host_output_folder}/gmock-all.o" unless File.exists?("#{$host_output_folder}/libgmock.a")
   end
 
   desc "compile all host tests"
@@ -130,7 +139,7 @@ namespace :host do
     puts libraries_with_tests
     libraries_with_tests.collect{|path| path.pathmap('%d')}.each do |library|
         name = library.pathmap('%n')
-        sh "Target/host/#{name}"
+        sh "#{$host_output_folder}/#{name}"
     end
   end
 
@@ -140,7 +149,7 @@ def compile_host_library(library_path)
 
 
   name = library_path.pathmap('%n')
-  target = "#{Target}/host"
+  target = $host_output_folder
   sources = Rake::FileList[library_path + "/src/**/*.cpp",library_path + "/src/**/*.c"]
   includes = [library_path + "/src"]
   defines = []
@@ -168,12 +177,28 @@ end
 
 def compile_host_test(library_path)
   name = library_path.pathmap('%n')
-  target = "#{Target}/host"
+  target = $host_output_folder
   sources = Rake::FileList[library_path + "/test/**/*.cpp",library_path + "/test/**/*.c"]
-  includes = [library_path + "/src", "Firmware/sketchbook/libraries/googletest/googletest/include", "Firmware/sketchbook/libraries/googletest/googlemock/include/gmock"]
+  includes = ["Firmware/sketchbook/libraries/googletest/include", "Firmware/sketchbook/libraries/googlemock/include"]
+  includes << "#{library_path}/src"
+  includes << "#{library_path}/test"
   defines = []
-  libraries = ["Target/host/libgtest.a"]
+  libraries = ["#{$host_output_folder}/libgtest.a" , "#{$host_output_folder}/libgmock.a"]
   external_libraries = []
+
+  json_info_file = "#{library_path}/.library.json"
+  if(File.exists?(json_info_file))
+    info = JSON.parse(IO.read(json_info_file))
+    info["dependencies"].each do |dependency|
+      includes << "Firmware/sketchbook/libraries/#{dependency}/src"
+      includes << "Firmware/sketchbook/libraries/#{dependency}"
+      libraries << "#{$host_output_folder}/lib#{dependency}.a"
+    end
+  end
+
+  libraries << "#{$host_output_folder}/lib#{name}.a"
+
+
 
   ninja_path = library_path.pathmap("%{^Firmware,#{target}}X/test")
   ninja_file = "#{ninja_path}/build.ninja"

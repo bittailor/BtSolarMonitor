@@ -1,32 +1,32 @@
 //*************************************************************************************************
 //
-//  BITTAILOR.CH - Firmware
+//  BITTAILOR.CH - Bt::Core::DigitalOut
 //
 //*************************************************************************************************
 
-#ifndef INC__Bt_Core_DigitalIn__hpp
-#define INC__Bt_Core_DigitalIn__hpp
+#ifndef INC__Bt_Core_DigitalOut__hpp
+#define INC__Bt_Core_DigitalOut__hpp
 
 #include <cstdint>
-#include "Bt/Core/I_DigitalIn.hpp"
+#include "Bt/Core/I_DigitalOut.hpp"
 
 namespace Bt {
 namespace Core {
 
-class DigitalIn : I_DigitalIn
+class DigitalOut : I_DigitalOut
 {
    public:
-      DigitalIn(uint8_t pPin);
-      ~DigitalIn();
+      DigitalOut(uint8_t pPin);
+      ~DigitalOut();
 
-      virtual bool read();
+      virtual void write(bool pValue);
 
    private:
    	  // Constructor to prohibit copy construction.
-      DigitalIn(const DigitalIn&);
+      DigitalOut(const DigitalOut&);
 
       // Operator= to prohibit copy assignment
-      DigitalIn& operator=(const DigitalIn&);
+      DigitalOut& operator=(const DigitalOut&);
 
       uint8_t mPin;
 };
@@ -34,4 +34,4 @@ class DigitalIn : I_DigitalIn
 } // namespace Core
 } // namespace Bt
 
-#endif // INC__Bt_Core_DigitalIn__hpp
+#endif // INC__Bt_Core_DigitalOut__hpp

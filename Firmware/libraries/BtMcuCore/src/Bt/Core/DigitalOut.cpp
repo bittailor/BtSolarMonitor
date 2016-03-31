@@ -1,13 +1,13 @@
 //*************************************************************************************************
 //
-//  BITTAILOR.CH - Firmware     
+//  BITTAILOR.CH - Bt::Core::DigitalOut
 //
 //*************************************************************************************************
 
-#include "Bt/Core/DigitalIn.hpp"
+#include "Bt/Core/DigitalOut.hpp"
 
 #ifdef ARDUINO
-   #include "Bt/Core/DigitalIn.Platform.Arduino.inc"
+   #include "Bt/Core/DigitalOut.Platform.Arduino.inc"
 #else
-   #include "Bt/Core/DigitalIn.Platform.Host.inc"
+   #include "Bt/Core/DigitalOut.Platform.Host.inc"
 #endif

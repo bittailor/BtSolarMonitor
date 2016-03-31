@@ -22,7 +22,6 @@ class I_RelayControllerActionPort {
       virtual void relayBToOff(bool pHigh)=0;
       virtual void relayLoadToOn(bool pHigh)=0;
       virtual void relayLoadToOff(bool pHigh)=0;
-
       virtual void publicState(I_RelayController::PublicState pState)=0;
 
 

@@ -14,7 +14,7 @@ class I_DigitalOut {
    public:
       virtual ~I_DigitalOut() {}
 
-      virtual void write(bool value) = 0;
+      virtual void write(bool pValue) = 0;
 };
 
 } // namespace Core

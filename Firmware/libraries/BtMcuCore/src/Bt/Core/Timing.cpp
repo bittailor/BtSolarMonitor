@@ -19,5 +19,5 @@ namespace Core {
 #ifdef ARDUINO
    #include "Bt/Core/Timing.Platform.Arduino.inc"
 #else
-   #include "Bt/Core/Timing.Platform.HostNative.inc"
+   #include "Bt/Core/Timing.Platform.Host.inc"
 #endif

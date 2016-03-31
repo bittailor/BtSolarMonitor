@@ -4144,7 +4144,6 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <part name="SUPPLY11" library="SparkFun-Aesthetics" deviceset="VCC" device=""/>
 <part name="U8" library="Texas Instruments_By_element14_Batch_1" deviceset="ULN2803ADW" device=""/>
 <part name="GND18" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="GND19" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="R7" library="SparkFun-Resistors" deviceset="RESISTOR" device="2512" value="100m"/>
 <part name="U7" library="SparkFun-DigitalIC" deviceset="ATMEGA328P_TQFP" device="" value="ATMEGA328P_TQFP"/>
 <part name="GND15" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
@@ -4245,7 +4244,6 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <instance part="SUPPLY11" gate="G$1" x="-129.54" y="-2.54" rot="R90"/>
 <instance part="U8" gate="A" x="292.1" y="314.96"/>
 <instance part="GND18" gate="1" x="269.24" y="292.1"/>
-<instance part="GND19" gate="1" x="370.84" y="309.88"/>
 <instance part="R7" gate="G$1" x="-53.34" y="152.4" rot="R90"/>
 <instance part="U7" gate="U$1" x="203.2" y="314.96"/>
 <instance part="GND15" gate="1" x="170.18" y="281.94"/>
@@ -4462,20 +4460,6 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <wire x1="269.24" y1="294.64" x2="269.24" y2="299.72" width="0.1524" layer="91"/>
 <pinref part="U8" gate="A" pin="GND"/>
 <wire x1="269.24" y1="299.72" x2="274.32" y2="299.72" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="GND19" gate="1" pin="GND"/>
-<wire x1="370.84" y1="312.42" x2="370.84" y2="322.58" width="0.1524" layer="91"/>
-<pinref part="K3" gate="1" pin="-"/>
-<wire x1="370.84" y1="322.58" x2="363.22" y2="322.58" width="0.1524" layer="91"/>
-<wire x1="370.84" y1="322.58" x2="370.84" y2="358.14" width="0.1524" layer="91"/>
-<junction x="370.84" y="322.58"/>
-<pinref part="K2" gate="1" pin="-"/>
-<wire x1="370.84" y1="358.14" x2="363.22" y2="358.14" width="0.1524" layer="91"/>
-<pinref part="K1" gate="1" pin="-"/>
-<wire x1="363.22" y1="388.62" x2="370.84" y2="388.62" width="0.1524" layer="91"/>
-<wire x1="370.84" y1="388.62" x2="370.84" y2="358.14" width="0.1524" layer="91"/>
-<junction x="370.84" y="358.14"/>
 </segment>
 <segment>
 <pinref part="C6" gate="G$1" pin="1"/>
@@ -4818,6 +4802,20 @@ Source: http://eshop.phoenixcontact.com .. 1729186.pdf</description>
 <pinref part="U8" gate="A" pin="COM"/>
 <wire x1="309.88" y1="299.72" x2="317.5" y2="299.72" width="0.1524" layer="91"/>
 <label x="314.96" y="299.72" size="1.27" layer="95"/>
+</segment>
+<segment>
+<pinref part="K3" gate="1" pin="-"/>
+<wire x1="370.84" y1="322.58" x2="363.22" y2="322.58" width="0.1524" layer="91"/>
+<wire x1="370.84" y1="322.58" x2="370.84" y2="358.14" width="0.1524" layer="91"/>
+<pinref part="K2" gate="1" pin="-"/>
+<wire x1="370.84" y1="358.14" x2="363.22" y2="358.14" width="0.1524" layer="91"/>
+<pinref part="K1" gate="1" pin="-"/>
+<wire x1="363.22" y1="388.62" x2="370.84" y2="388.62" width="0.1524" layer="91"/>
+<wire x1="370.84" y1="388.62" x2="370.84" y2="358.14" width="0.1524" layer="91"/>
+<junction x="370.84" y="358.14"/>
+<wire x1="370.84" y1="396.24" x2="370.84" y2="388.62" width="0.1524" layer="91"/>
+<junction x="370.84" y="388.62"/>
+<label x="370.84" y="396.24" size="1.27" layer="95"/>
 </segment>
 </net>
 <net name="5V" class="0">

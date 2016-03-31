@@ -1,6 +1,7 @@
 require 'uri'
 require 'erb'
 require 'json'
+require 'rake/clean'
 
 $arduino = "/Applications/Arduino.app/Contents/MacOS/Arduino"
 $arduino_folder = "/Applications/Arduino.app/Contents/Java"
@@ -109,6 +110,8 @@ task :default => :compile
 # ---
 
 $host_output_folder = "#{$output_folder}/host"
+
+CLEAN.include($output_folder)
 
 namespace :host do
 

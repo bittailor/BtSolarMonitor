@@ -97,7 +97,7 @@ task :compile do
         end
     end
     puts "************"
-    puts "compiled #{sketches.count} sketches for #{boards.count} boards"
+    puts "compiled #{sketches.count} sketches for #{$boards.count} boards"
 end
 
 task :upload do

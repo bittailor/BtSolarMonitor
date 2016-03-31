@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include "Bt/Core/I_Time.hpp"
-#include "Bt/Core/Platform.hpp"
+#include "Bt/Core/Logger.hpp"
 
 namespace Bt {
 namespace Core {

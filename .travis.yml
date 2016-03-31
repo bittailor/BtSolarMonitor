@@ -3,8 +3,11 @@ sudo: false
 compiler: gcc
 os:
   - linux
+addons:
+  apt:
+    packages:
+      - ninja-build
 before_install:
-  - apt-get install ninja-build
   - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
 script:
   - rake rake host:test

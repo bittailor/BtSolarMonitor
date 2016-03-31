@@ -21,171 +21,272 @@ namespace SolarMonitor {
 
 
 
-class RelayController : public I_RelayController
+class RelayController : public Core::StateMachine<I_RelayController, RelayController>
 {
    public:
 
-
-
-      RelayController(I_RelayControllerActionPort& pActionPort, I_RelayControllerQueryPort& pQueryPort);
+      RelayController(Core::I_Time& pTime, I_RelayControllerActionPort& pActionPort, I_RelayControllerQueryPort& pQueryPort);
       ~RelayController();
 
+      void begin();
 
+   protected:
+      virtual const char* name();
    
    private:
 
       static const uint32_t RELAY_ENERGIZATION_DURATION = 50;
 
-      class State {
+      class Initial : public StateBase  {
          public:
-            State(RelayController& pController) :mController(&pController){}
-            virtual ~State(){}
-            virtual void onEnter(){}
-            virtual void onExit(){}
+            Initial(RelayController& pController):StateBase(pController){}
 
-            virtual void evToggleOnOff(){}
-            virtual void evToggleAB(){}
-            virtual void evToOn(){}
-            virtual void evToOff(){}
-            virtual void evToA(){}
-            virtual void evToB(){}
-            virtual void evTimeUp(){}
-         protected:
-            RelayController* mController;
+            virtual const char* name() {
+               return "Initial";
+            }
+
+            virtual void onEnter() {
+               if(mController->mQueryPort->loadASense() && mController->mQueryPort->loadBSense()) {
+                  mController->nextState(mController->mOff);
+               } else if (mController->mQueryPort->loadASense()) {
+                  mController->nextState(mController->mOnB);
+               } else {
+                  mController->nextState(mController->mOnA);
+               }
+            }
       };
 
-      class Initial : public State  {
+      class Off : public StateBase  {
          public:
-            Initial(RelayController& pController):State(pController){}
-            virtual void onEnter();
+            Off(RelayController& pController) :StateBase(pController){}
+
+            virtual void onEnter() {
+               mController->mActionPort->publicState(I_RelayController::Off);
+            }
+
+            virtual const char* name() {
+               return "Off";
+            }
+
+            virtual void toggleOnOff(){
+               toOn();
+            }
+
+            virtual void toOn(){
+               if(mController->mQueryPort->isBatteryABetter()){
+                  mController->nextState(mController->mToggleAOn);
+               } else {
+                  mController->nextState(mController->mToggleBOn);
+               }
+            }
       };
 
-      class Off_A : public State  {
+      class OnA : public StateBase {
          public:
-            Off_A(RelayController& pController) :State(pController){}
+            OnA(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "OnA";
+            }
+
+            virtual void onEnter() {
+               if(!mController->mQueryPort->loadOut()){
+                  mController->nextState(mController->mToggleLoadOn);
+               } else {
+                  mController->mActionPort->publicState(I_RelayController::OnA);
+               }
+            }
+
+            virtual void onExit() {
+            }
+
+            virtual void toggleOnOff() {
+               toOff();
+            }
+
+            virtual void toggleAB() {
+               toB();
+            }
+
+            virtual void toOff() {
+               mController->nextState(mController->mToggleAOff);
+            }
+
+            virtual void toB() {
+               mController->nextState(mController->mSwitchToB);
+            }
+
       };
 
-      class Off_B : public State {
+      class OnB : public StateBase {
          public:
-            Off_B(RelayController& pController) :State(pController){}
+            OnB(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "OnB";
+            }
+
+            virtual void onEnter() {
+               if(!mController->mQueryPort->loadOut()){
+                  mController->nextState(mController->mToggleLoadOn);
+               } else {
+                  mController->mActionPort->publicState(I_RelayController::OnB);
+               }
+            }
+
+            virtual void onExit() {
+            }
+
+            virtual void toggleOnOff() {
+               toOff();
+            }
+
+            virtual void toggleAB() {
+               toA();
+            }
+
+            virtual void toOff() {
+               mController->nextState(mController->mToggleBOff);
+            }
+
+            virtual void toA() {
+               mController->nextState(mController->mSwitchToA);
+            }
       };
 
-      class On_A : public State {
+      class ToggleAOn : public StateBase  {
          public:
-            On_A(RelayController& pController) :State(pController){}
-      };
+            ToggleAOn(RelayController& pController) :StateBase(pController){}
 
-      class On_B : public State {
-         public:
-            On_B(RelayController& pController) :State(pController){}
-      };
-
-      class ToggleAOn : public State  {
-         public:
-            ToggleAOn(RelayController& pController) :State(pController){}
+            virtual const char* name() {
+               return "ToggleAOn";
+            }
 
             virtual void onEnter(){
                mController->mActionPort->relayAToOn(true);
-               mController->mStateMachine.setTimer(RELAY_ENERGIZATION_DURATION);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
-            virtual void evTimeUp(){
+            virtual void timeUp(){
                mController->mActionPort->relayAToOn(false);
-               if(mController->mQueryPort->loadOut()) {
-                  mController->mStateMachine.nextState(mController->mOn_B);
-               } else {
-                  mController->mStateMachine.nextState(mController->mOff_B);
-               }
+               mController->nextState(mController->mOnA);
             }
       };
 
-      class ToggleAOff : public State  {
+      class ToggleAOff : public StateBase  {
          public:
-            ToggleAOff(RelayController& pController) :State(pController){}
+            ToggleAOff(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "ToggleAOff";
+            }
 
             virtual void onEnter(){
                mController->mActionPort->relayAToOff(true);
-               mController->mStateMachine.setTimer(RELAY_ENERGIZATION_DURATION);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
-            virtual void evTimeUp(){
+            virtual void timeUp(){
                mController->mActionPort->relayAToOff(false);
-               mController->mStateMachine.nextState(mController->mToggleBOn);
+               mController->nextState(mController->mOff);
             }
       };
 
-      class ToggleBOn : public State  {
+      class SwitchToA : public StateBase  {
          public:
-            ToggleBOn(RelayController& pController) :State(pController){}
+            SwitchToA(RelayController& pController) :StateBase(pController){}
 
-            virtual void onEnter(){
-               mController->mActionPort->relayBToOn(true);
-               mController->mStateMachine.setTimer(RELAY_ENERGIZATION_DURATION);
+            virtual const char* name() {
+               return "SwitchToA";
             }
-
-            virtual void evTimeUp(){
-               mController->mActionPort->relayBToOn(false);
-               if(mController->mQueryPort->loadOut()) {
-                  mController->mStateMachine.nextState(mController->mOn_B);
-               } else {
-                  mController->mStateMachine.nextState(mController->mOff_B);
-               }
-            }
-      };
-
-      class ToggleBOff : public State  {
-         public:
-            ToggleBOff(RelayController& pController) :State(pController){}
 
             virtual void onEnter(){
                mController->mActionPort->relayBToOff(true);
-               mController->mStateMachine.setTimer(RELAY_ENERGIZATION_DURATION);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
-            virtual void evTimeUp(){
+            virtual void timeUp(){
                mController->mActionPort->relayBToOff(false);
-               mController->mStateMachine.nextState(mController->mToggleAOn);
+               mController->nextState(mController->mToggleAOn);
             }
       };
 
-      class ToggleLoadOn : public State  {
+      class ToggleBOn : public StateBase  {
          public:
-            ToggleLoadOn(RelayController& pController) :State(pController){}
+            ToggleBOn(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "ToggleBOn";
+            }
+
+            virtual void onEnter(){
+               mController->mActionPort->relayBToOn(true);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
+            }
+
+            virtual void timeUp(){
+               mController->mActionPort->relayBToOn(false);
+               mController->nextState(mController->mOnB);
+            }
+      };
+
+      class ToggleBOff : public StateBase  {
+         public:
+            ToggleBOff(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "ToggleBOff";
+            }
+
+            virtual void onEnter(){
+               mController->mActionPort->relayBToOff(true);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
+            }
+
+            virtual void timeUp(){
+               mController->mActionPort->relayBToOff(false);
+               mController->nextState(mController->mOff);
+            }
+      };
+
+      class SwitchToB : public StateBase  {
+         public:
+            SwitchToB(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "SwitchToB";
+            }
+
+            virtual void onEnter(){
+               mController->mActionPort->relayAToOff(true);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
+            }
+
+            virtual void timeUp(){
+               mController->mActionPort->relayAToOff(false);
+               mController->nextState(mController->mToggleBOn);
+            }
+      };
+
+      class ToggleLoadOn : public StateBase  {
+         public:
+            ToggleLoadOn(RelayController& pController) :StateBase(pController){}
+
+            virtual const char* name() {
+               return "ToggleLoadOn";
+            }
 
             virtual void onEnter(){
                mController->mActionPort->relayLoadToOn(true);
-               mController->mStateMachine.setTimer(RELAY_ENERGIZATION_DURATION);
+               mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
-            virtual void evTimeUp(){
+            virtual void timeUp(){
                mController->mActionPort->relayLoadToOn(false);
-               if(mController->mQueryPort->loadASense() && mController->mQueryPort->loadBSense()) {
-                  mController->mStateMachine.nextState(mController->mToggleAOn); // TODO decide on voltage
-               } else if (mController->mQueryPort->loadASense()) {
-                  mController->mStateMachine.nextState(mController->mOn_B);
+               if(mController->mQueryPort->loadASense()) {
+                  mController->nextState(mController->mOnB);
                } else {
-                  mController->mStateMachine.nextState(mController->mOn_A);
-               }
-            }
-      };
-
-      class ToggleLoadOff : public State  {
-         public:
-            ToggleLoadOff(RelayController& pController) :State(pController){}
-
-            virtual void onEnter(){
-               mController->mActionPort->relayLoadToOff(true);
-               mController->mStateMachine.setTimer(RELAY_ENERGIZATION_DURATION);
-            }
-
-            virtual void evTimeUp(){
-               mController->mActionPort->relayLoadToOff(false);
-               if(mController->mQueryPort->loadASense() && mController->mQueryPort->loadBSense()) {
-                  mController->mStateMachine.nextState(mController->mToggleAOn); // TODO decide on voltage
-               } else if (mController->mQueryPort->loadASense()) {
-                  mController->mStateMachine.nextState(mController->mOff_B);
-               } else {
-                  mController->mStateMachine.nextState(mController->mOff_A);
+                  mController->nextState(mController->mOnA);
                }
             }
       };
@@ -201,18 +302,18 @@ class RelayController : public I_RelayController
       I_RelayControllerQueryPort* mQueryPort;
 
       Initial mInitial;
-      Off_A mOff_A;
-      Off_B mOff_B;
-      On_A mOn_A;
-      On_B mOn_B;
+      Off mOff;
+      OnA mOnA;
+      OnB mOnB;
       ToggleAOn mToggleAOn;
       ToggleAOff mToggleAOff;
+      SwitchToA mSwitchToA;
       ToggleBOn mToggleBOn;
       ToggleBOff mToggleBOff;
+      SwitchToB mSwitchToB;
       ToggleLoadOn mToggleLoadOn;
-      ToggleLoadOff mToggleLoadOff;
 
-      Core::StateMachine<State> mStateMachine;
+      //Core::StateMachine<State> mStateMachine;
 
 };
 

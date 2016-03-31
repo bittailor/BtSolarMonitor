@@ -7,6 +7,8 @@
 #ifndef INC__Bt_SolarMonitor_I_RelayControllerActionPort__hpp
 #define INC__Bt_SolarMonitor_I_RelayControllerActionPort__hpp
 
+#include "Bt/SolarMonitor/I_RelayController.hpp"
+
 namespace Bt {
 namespace SolarMonitor {
 
@@ -20,6 +22,10 @@ class I_RelayControllerActionPort {
       virtual void relayBToOff(bool pHigh)=0;
       virtual void relayLoadToOn(bool pHigh)=0;
       virtual void relayLoadToOff(bool pHigh)=0;
+
+      virtual void publicState(I_RelayController::PublicState pState)=0;
+
+
 };
 
 } // namespace SolarMonitor

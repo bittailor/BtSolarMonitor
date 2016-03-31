@@ -137,12 +137,19 @@ namespace :host do
   task :test => :compile do
     libraries_with_tests = Rake::FileList["Firmware/libraries/*/test"]
     puts libraries_with_tests
+    failed_tests = []
     libraries_with_tests.collect{|path| path.pathmap('%d')}.each do |library|
         name = library.pathmap('%n')
-        sh "#{$host_output_folder}/#{name}"
+        sh "#{$host_output_folder}/#{name}" do |ok, status|
+          failed_tests << name if status.exitstatus != 0
+        end
+    end
+    if !failed_tests.empty?
+      puts "!!! tests failed !!!"
+      puts failed_tests.join(' ')
+      fail "tests failed: #{failed_tests.join(' ')}"
     end
   end
-
 end
 
 def compile_host_library(library_path)
@@ -182,6 +189,7 @@ def compile_host_test(library_path)
   includes = ["Firmware/sketchbook/libraries/googletest/include", "Firmware/sketchbook/libraries/googlemock/include"]
   includes << "#{library_path}/src"
   includes << "#{library_path}/test"
+  includes << "#{library_path}/mock"
   defines = []
   libraries = ["#{$host_output_folder}/libgtest.a" , "#{$host_output_folder}/libgmock.a"]
   external_libraries = []
@@ -192,6 +200,7 @@ def compile_host_test(library_path)
     info["dependencies"].each do |dependency|
       includes << "Firmware/sketchbook/libraries/#{dependency}/src"
       includes << "Firmware/sketchbook/libraries/#{dependency}"
+      includes << "Firmware/sketchbook/libraries/#{dependency}/mock"
       libraries << "#{$host_output_folder}/lib#{dependency}.a"
     end
   end

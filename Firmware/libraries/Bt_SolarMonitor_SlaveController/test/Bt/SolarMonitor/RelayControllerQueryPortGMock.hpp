@@ -20,6 +20,7 @@ class RelayControllerQueryPortGMock : public I_RelayControllerQueryPort {
       MOCK_METHOD0(loadASense, bool());
       MOCK_METHOD0(loadBSense, bool());
       MOCK_METHOD0(loadOut, bool());
+      MOCK_METHOD0(isBatteryABetter, bool());
 };
 
 } // namespace SolarMonitor

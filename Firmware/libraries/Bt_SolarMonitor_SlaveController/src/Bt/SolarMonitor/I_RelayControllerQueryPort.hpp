@@ -17,6 +17,8 @@ class I_RelayControllerQueryPort {
       virtual bool loadASense()=0;
       virtual bool loadBSense()=0;
       virtual bool loadOut()=0;
+
+      virtual bool isBatteryABetter()=0;
 };
 
 } // namespace SolarMonitor

@@ -1,55 +1,40 @@
 //*************************************************************************************************
 //
-//  BITTAILOR.CH - Firmware     
+//  BITTAILOR.CH - Bt::Core::Timing
 //
 //*************************************************************************************************
 
-#include "RelayController.hpp"
+#include <Arduino.h>
 
 namespace Bt {
-namespace SolarMonitor {
+namespace Core {
 
 
 //-------------------------------------------------------------------------------------------------
 
-RelayController::RelayController(Core::I_Time& pTime, I_RelayControllerActionPort& pActionPort, I_RelayControllerQueryPort& pQueryPort)
-: Core::StateMachine<I_RelayController, RelayController>(pTime)
-, mActionPort(&pActionPort)
-, mQueryPort(&pQueryPort)
-, mInitial(*this)
-, mOff(*this)
-, mOnA(*this)
-, mOnB(*this)
-, mToggleAOn(*this)
-, mToggleAOff(*this)
-, mSwitchToA(*this)
-, mToggleBOn(*this)
-, mToggleBOff(*this)
-, mSwitchToB(*this)
-, mToggleLoadOn(*this)
-{
+void delayInMilliseconds(uint32_t milliseconds) {
+   delay(milliseconds);
 }
 
 //-------------------------------------------------------------------------------------------------
 
-RelayController::~RelayController()
-{
-
+void delayInMicroseconds(uint32_t microseconds) {
+   delayMicroseconds(microseconds);
 }
 
 //-------------------------------------------------------------------------------------------------
 
-const char* RelayController::name() {
-   return "RelayController";
+uint32_t milliseconds() {
+   return ::millis();
 }
 
 //-------------------------------------------------------------------------------------------------
 
-void RelayController::begin() {
-   init(mInitial);
+uint32_t microseconds() {
+   return ::micros();
 }
 
 //-------------------------------------------------------------------------------------------------
 
-} // namespace SolarMonitor
+} // namespace Core
 } // namespace Bt

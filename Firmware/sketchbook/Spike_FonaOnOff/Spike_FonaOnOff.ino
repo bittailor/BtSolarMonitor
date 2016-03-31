@@ -1,5 +1,5 @@
-#define ON_OFF_PIN 9
-#define PS_STATUS 10
+#define ON_OFF_PIN 12
+#define PS_STATUS A0
 
 void setup() {
     pinMode(13, OUTPUT);

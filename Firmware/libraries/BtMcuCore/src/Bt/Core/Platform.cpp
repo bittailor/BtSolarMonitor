@@ -1,12 +1,13 @@
 //*************************************************************************************************
 //
-//  BITTAILOR.CH
+//  BITTAILOR.CH - Bt::Core::Platform
 //
 //*************************************************************************************************
 
-#include <gtest/gtest.h>
+#include "Bt/Core/Platform.hpp"
 
-int main(int argc, char **argv) {
-   ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
-}
+#if ARDUINO
+ #include "Arduino.h"
+#else
+
+#endif

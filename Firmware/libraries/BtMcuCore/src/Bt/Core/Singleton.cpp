@@ -1,12 +1,13 @@
 //*************************************************************************************************
 //
-//  BITTAILOR.CH
+//  BITTAILOR.CH - Bt::Core::Singleton
 //
 //*************************************************************************************************
 
-#include <gtest/gtest.h>
+#include "Bt/Core/Singleton.hpp"
 
-int main(int argc, char **argv) {
-   ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
-}
+namespace Bt {
+namespace Core {
+
+} // namespace Core
+} // namespace Bt

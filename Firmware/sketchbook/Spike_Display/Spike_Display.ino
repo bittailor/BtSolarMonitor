@@ -17,7 +17,7 @@ Adafruit_PCD8544 sDisplay2 = Adafruit_PCD8544(A5, A2, A1);
 void setup()   {
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
-  while (!Serial) {}
+  //while (!Serial) {}
   Serial.begin(115200); 
   Serial.println(F("** DisplayCheck **"));
   digitalWrite(13, LOW);            

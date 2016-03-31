@@ -182,7 +182,7 @@ def compile_host_library(library_path)
     file.write(ERB.new(IO.read("Build/host_library.erb")).result(binding))
   end
 
-  sh "/usr/local/bin/ninja -v -j8 -f #{ninja_file}"
+  sh "ninja -v -j8 -f #{ninja_file}"
 end
 
 def compile_host_test(library_path)
@@ -220,5 +220,5 @@ def compile_host_test(library_path)
     file.write(ERB.new(IO.read("Build/host_compile.erb")).result(binding))
     file.write(ERB.new(IO.read("Build/host_link.erb")).result(binding))
   end
-  sh "/usr/local/bin/ninja -v -j8 -f #{ninja_file}"
+  sh "ninja -v -j8 -f #{ninja_file}"
 end

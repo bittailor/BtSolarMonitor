@@ -18,17 +18,17 @@ StateLeds::~StateLeds() {
 
 }
 
-void StateLeds::show(I_RelayController::PublicState pState) {
+void StateLeds::show(State pState) {
    switch(pState) {
-      case I_RelayController::Off : {
+      case Off : {
          mLedA->write(false);
          mLedB->write(false);
       }break;
-      case I_RelayController::OnA : {
+      case OnA : {
          mLedA->write(true);
          mLedB->write(false);
       }break;
-      case I_RelayController::OnB : {
+      case OnB : {
          mLedA->write(false);
          mLedB->write(true);
       }break;

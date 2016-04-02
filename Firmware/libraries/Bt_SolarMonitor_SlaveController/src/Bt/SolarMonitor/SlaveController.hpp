@@ -10,6 +10,8 @@
 #include "Bt/SolarMonitor/RelayController.hpp"
 
 #include "Bt/Core/Time.hpp"
+#include "Bt/SolarMonitor/LatchingRelay.hpp"
+#include "Bt/SolarMonitor/StateLeds.hpp"
 #include "Bt/SolarMonitor/RelayControllerActionPort.hpp"
 #include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
 
@@ -45,10 +47,16 @@ class SlaveController
       Core::DigitalOut mRelayLoadToOn;
       Core::DigitalOut mRelayLoadToOff;
 
+      Core::DigitalOut mLedA;
+      Core::DigitalOut mLedB;
 
-
-      RelayControllerActionPort mRelayControllerActionPort;
       RelayControllerQueryPort mRelayControllerQueryPort;
+
+      LatchingRelay mRelayA;
+      LatchingRelay mRelayB;
+      LatchingRelay mRelayLoad;
+      StateLeds mStateLeds;
+
       RelayController mRelayController;
 
 

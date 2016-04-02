@@ -13,7 +13,7 @@
 namespace Bt {
 namespace Core {
 
-class DigitalOut : I_DigitalOut
+class DigitalOut : public I_DigitalOut
 {
    public:
       DigitalOut(uint8_t pPin);

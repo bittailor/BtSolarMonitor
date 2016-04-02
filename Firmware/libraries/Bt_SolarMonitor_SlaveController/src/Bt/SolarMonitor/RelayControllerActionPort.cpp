@@ -50,7 +50,7 @@ void RelayControllerActionPort::relayLoadToOn(bool pHigh) {
 void RelayControllerActionPort::relayLoadToOff(bool pHigh) {
 }
 
-void RelayControllerActionPort::publicState(I_RelayController::PublicState pState) {
+void RelayControllerActionPort::publicState(I_StateLeds::State pState) {
 }
 
 } // namespace SolarMonitor

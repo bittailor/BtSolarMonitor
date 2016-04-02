@@ -8,18 +8,19 @@
 #define INC__Bt_SolarMonitor_StateLeds__hpp
 
 #include "Bt/Core/I_DigitalOut.hpp"
+#include "Bt/SolarMonitor/I_StateLeds.hpp"
 #include "Bt/SolarMonitor/I_RelayController.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
 
-class StateLeds
+class StateLeds : public I_StateLeds
 {
    public:
       StateLeds(Core::I_DigitalOut& pLedA, Core::I_DigitalOut& pLedB);
       ~StateLeds();
 
-      void show(I_RelayController::PublicState pState);
+      virtual void show(State pState);
 
    private:
    	  // Constructor to prohibit copy construction.

@@ -26,7 +26,7 @@ class RelayControllerActionPort : public I_RelayControllerActionPort
       virtual void relayBToOff(bool pHigh);
       virtual void relayLoadToOn(bool pHigh);
       virtual void relayLoadToOff(bool pHigh);
-      virtual void publicState(I_RelayController::PublicState pState);
+      virtual void publicState(I_StateLeds::State pState);
 
    private:
    	  // Constructor to prohibit copy construction.

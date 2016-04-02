@@ -12,9 +12,11 @@
 #include <Bt/Core/I_DigitalOut.hpp>
 #include <Bt/Core/StateMachine.hpp>
 
+#include <Bt/SolarMonitor/I_StateLeds.hpp>
+#include <Bt/SolarMonitor/I_LatchingRelay.hpp>
 #include <Bt/SolarMonitor/I_RelayController.hpp>
-#include <Bt/SolarMonitor/I_RelayControllerActionPort.hpp>
 #include <Bt/SolarMonitor/I_RelayControllerQueryPort.hpp>
+
 
 namespace Bt {
 namespace SolarMonitor {
@@ -25,7 +27,13 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
 {
    public:
 
-      RelayController(Core::I_Time& pTime, I_RelayControllerActionPort& pActionPort, I_RelayControllerQueryPort& pQueryPort);
+      RelayController(
+               Core::I_Time& pTime,
+               I_RelayControllerQueryPort& pQueryPort,
+               I_LatchingRelay& pRelayA,
+               I_LatchingRelay& pRelayB,
+               I_LatchingRelay& pRelayLoad,
+               I_StateLeds& pStateLeds);
       ~RelayController();
 
       void begin();
@@ -61,7 +69,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             Off(RelayController& pController) :StateBase(pController){}
 
             virtual void onEnter() {
-               mController->mActionPort->publicState(I_RelayController::Off);
+               mController->mStateLeds->show(I_StateLeds::Off);
             }
 
             virtual const char* name() {
@@ -93,7 +101,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
                if(!mController->mQueryPort->loadOut()){
                   mController->nextState(mController->mToggleLoadOn);
                } else {
-                  mController->mActionPort->publicState(I_RelayController::OnA);
+                  mController->mStateLeds->show(I_StateLeds::OnA);
                }
             }
 
@@ -130,7 +138,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
                if(!mController->mQueryPort->loadOut()){
                   mController->nextState(mController->mToggleLoadOn);
                } else {
-                  mController->mActionPort->publicState(I_RelayController::OnB);
+                  mController->mStateLeds->show(I_StateLeds::OnB);
                }
             }
 
@@ -163,12 +171,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayAToOn(true);
+               mController->mRelayA->onCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayAToOn(false);
+               mController->mRelayA->onCoil(false);
                mController->nextState(mController->mOnA);
             }
       };
@@ -182,12 +190,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayAToOff(true);
+               mController->mRelayA->offCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayAToOff(false);
+               mController->mRelayA->offCoil(false);
                mController->nextState(mController->mOff);
             }
       };
@@ -201,12 +209,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayBToOff(true);
+               mController->mRelayB->offCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayBToOff(false);
+               mController->mRelayB->offCoil(false);
                mController->nextState(mController->mToggleAOn);
             }
       };
@@ -220,12 +228,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayBToOn(true);
+               mController->mRelayB->onCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayBToOn(false);
+               mController->mRelayB->onCoil(false);
                mController->nextState(mController->mOnB);
             }
       };
@@ -239,12 +247,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayBToOff(true);
+               mController->mRelayB->offCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayBToOff(false);
+               mController->mRelayB->offCoil(false);
                mController->nextState(mController->mOff);
             }
       };
@@ -258,12 +266,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayAToOff(true);
+               mController->mRelayA->offCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayAToOff(false);
+               mController->mRelayA->offCoil(false);
                mController->nextState(mController->mToggleBOn);
             }
       };
@@ -277,12 +285,12 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             }
 
             virtual void onEnter(){
-               mController->mActionPort->relayLoadToOn(true);
+               mController->mRelayLoad->onCoil(true);
                mController->setTimer(RELAY_ENERGIZATION_DURATION);
             }
 
             virtual void timeUp(){
-               mController->mActionPort->relayLoadToOn(false);
+               mController->mRelayLoad->onCoil(false);
                if(mController->mQueryPort->loadASense()) {
                   mController->nextState(mController->mOnB);
                } else {
@@ -298,8 +306,13 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
       // Operator= to prohibit copy assignment
       RelayController& operator=(const RelayController&);
 
-      I_RelayControllerActionPort* mActionPort;
+      //I_RelayControllerActionPort* mActionPort;
       I_RelayControllerQueryPort* mQueryPort;
+
+      I_LatchingRelay* mRelayA;
+      I_LatchingRelay* mRelayB;
+      I_LatchingRelay* mRelayLoad;
+      I_StateLeds* mStateLeds;
 
       Initial mInitial;
       Off mOff;

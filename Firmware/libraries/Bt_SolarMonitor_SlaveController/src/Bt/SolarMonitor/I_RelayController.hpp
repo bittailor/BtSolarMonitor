@@ -13,8 +13,6 @@ namespace SolarMonitor {
 class I_RelayController {
    public:
 
-      enum PublicState {Off, OnA, OnB};
-
       class State {
          public:
          virtual ~State() {}

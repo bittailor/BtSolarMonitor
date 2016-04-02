@@ -23,7 +23,7 @@ class RelayControllerActionPortGMock : public I_RelayControllerActionPort {
       MOCK_METHOD1(relayBToOff, void(bool));
       MOCK_METHOD1(relayLoadToOn, void(bool));
       MOCK_METHOD1(relayLoadToOff, void(bool));
-      MOCK_METHOD1(publicState, void(I_RelayController::PublicState));
+      MOCK_METHOD1(publicState, void(I_StateLeds::State));
 };
 
 } // namespace SolarMonitor

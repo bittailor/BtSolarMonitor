@@ -6,13 +6,7 @@
 
 #include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
 
-#ifdef ARDUINO
-   #include <Arduino.h>
-#else
-   #define A0 (14ul)
-   #define A1 (15ul)
-   #define A2 (16ul)
-#endif
+#include "Bt/SolarMonitor/IOSlavePins.hpp"
 
 #define Sense_L A0
 #define Sense_A A1
@@ -22,9 +16,9 @@ namespace Bt {
 namespace SolarMonitor {
 
 RelayControllerQueryPort::RelayControllerQueryPort()
-: mLoadASense(Sense_A)
-, mLoadBSense(Sense_B)
-, mLoadOut(Sense_L) {
+: mLoadASense(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_A)
+, mLoadBSense(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_B)
+, mLoadOut(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_L) {
 
 }
 

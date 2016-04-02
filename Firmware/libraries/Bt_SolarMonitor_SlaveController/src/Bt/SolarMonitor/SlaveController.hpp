@@ -25,6 +25,9 @@ class SlaveController
       void begin();
       void loop();
 
+      void toggleOnOff();
+      void toggleAB();
+
 
    private:
    	  // Constructor to prohibit copy construction.
@@ -34,6 +37,16 @@ class SlaveController
       SlaveController& operator=(const SlaveController&);
 
       Core::Time mTime;
+
+      Core::DigitalOut mRelayAToOn;
+      Core::DigitalOut mRelayAToOff;
+      Core::DigitalOut mRelayBToOn;
+      Core::DigitalOut mRelayBToOff;
+      Core::DigitalOut mRelayLoadToOn;
+      Core::DigitalOut mRelayLoadToOff;
+
+
+
       RelayControllerActionPort mRelayControllerActionPort;
       RelayControllerQueryPort mRelayControllerQueryPort;
       RelayController mRelayController;

@@ -7,7 +7,7 @@
 #ifndef INC__Bt_Core_StateMachine__hpp
 #define INC__Bt_Core_StateMachine__hpp
 
-#include <cstdint>
+#include <stdint.h>
 #include "Bt/Core/I_Time.hpp"
 #include "Bt/Core/Logger.hpp"
 

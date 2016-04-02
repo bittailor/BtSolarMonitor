@@ -7,7 +7,7 @@
 #ifndef INC__Bt_Core_DigitalIn__hpp
 #define INC__Bt_Core_DigitalIn__hpp
 
-#include <cstdint>
+#include <stdint.h>
 #include "Bt/Core/I_DigitalIn.hpp"
 
 namespace Bt {

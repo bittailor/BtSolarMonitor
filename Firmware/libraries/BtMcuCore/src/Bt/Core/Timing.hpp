@@ -7,7 +7,7 @@
 #ifndef INC__Bt_Core_Timing__hpp
 #define INC__Bt_Core_Timing__hpp
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace Bt {
 namespace Core {

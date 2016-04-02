@@ -7,7 +7,7 @@
 #ifndef INC__Bt_Core_DigitalOut__hpp
 #define INC__Bt_Core_DigitalOut__hpp
 
-#include <cstdint>
+#include <stdint.h>
 #include "Bt/Core/I_DigitalOut.hpp"
 
 namespace Bt {

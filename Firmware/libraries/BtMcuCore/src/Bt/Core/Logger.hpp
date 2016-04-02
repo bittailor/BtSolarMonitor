@@ -33,6 +33,9 @@ inline Print &operator <<(Print &stream, Bt::Core::_EndLineCode arg) {
 #define LOG(msg) \
     Serial << "BtLog>" << msg << Bt::Core::endl
 
+#define ERROR(msg) \
+    Serial << "BtError>" << msg << Bt::Core::endl
+
 #else
 
 #include <iostream>
@@ -40,6 +43,10 @@ inline Print &operator <<(Print &stream, Bt::Core::_EndLineCode arg) {
 
 #define LOG(msg) \
     std::cout << "BtLog>" << msg << std::endl
+
+#define ERROR(msg) \
+    std::cerr << "BtError>" << msg << std::endl
+
 #endif
 
 #endif // INC__Bt_Core_Logger__hpp

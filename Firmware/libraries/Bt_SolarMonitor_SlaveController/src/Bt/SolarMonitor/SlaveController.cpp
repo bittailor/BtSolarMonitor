@@ -20,12 +20,21 @@ SlaveController::SlaveController()
 , mRelayLoadToOff(BT_SOLARMONITOR_IOSLAVE_PIN_RELAY_LOAD_OFF)
 , mLedA(BT_SOLARMONITOR_IOSLAVE_PIN_LED_A)
 , mLedB(BT_SOLARMONITOR_IOSLAVE_PIN_LED_B)
+, mOnOff(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_ON_OFF)
+, mAB(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_A_B)
 , mRelayA(mRelayAToOff, mRelayAToOn)
 , mRelayB(mRelayBToOff, mRelayBToOn)
 , mRelayLoad(mRelayLoadToOff, mRelayLoadToOn)
 , mStateLeds(mLedA, mLedB)
 
-, mRelayController(mTime, mRelayControllerQueryPort, mRelayA, mRelayB, mRelayLoad, mStateLeds){
+, mRelayController(mTime, mRelayControllerQueryPort, mRelayA, mRelayB, mRelayLoad, mStateLeds)
+
+, mOnOffButtonListener(*this, &SlaveController::toggleOnOff)
+, mABButtonListener(*this, &SlaveController::toggleAB)
+
+, mOnOffButton(mTime, mOnOff, mOnOffButtonListener)
+, mABButton(mTime, mAB, mABButtonListener)
+{
 }
 
 SlaveController::~SlaveController() {
@@ -34,10 +43,14 @@ SlaveController::~SlaveController() {
 
 void SlaveController::begin() {
    mRelayController.begin();
+   mOnOffButton.begin();
+   mABButton.begin();
 }
 
 void SlaveController::loop() {
    mRelayController.loop();
+   mOnOffButton.loop();
+   mABButton.loop();
 }
 
 void SlaveController::toggleOnOff() {

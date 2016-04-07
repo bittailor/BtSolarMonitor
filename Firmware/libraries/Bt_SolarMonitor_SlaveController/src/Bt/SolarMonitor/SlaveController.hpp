@@ -9,11 +9,14 @@
 
 #include "Bt/SolarMonitor/RelayController.hpp"
 
+#include "Bt/Core/DigitalIn.hpp"
+#include "Bt/Core/DigitalOut.hpp"
 #include "Bt/Core/Time.hpp"
+#include "Bt/Core/PushButton.hpp"
+#include "Bt/Core/PushButtonListener.hpp"
 #include "Bt/SolarMonitor/LatchingRelay.hpp"
-#include "Bt/SolarMonitor/StateLeds.hpp"
-#include "Bt/SolarMonitor/RelayControllerActionPort.hpp"
 #include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
+#include "Bt/SolarMonitor/StateLeds.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
@@ -27,8 +30,8 @@ class SlaveController
       void begin();
       void loop();
 
-      void toggleOnOff();
-      void toggleAB();
+      Core::I_PushButton& getOnOffButton() {return mOnOffButton;}
+      Core::I_PushButton& getABButton() {return mABButton;}
 
 
    private:
@@ -37,6 +40,10 @@ class SlaveController
 
       // Operator= to prohibit copy assignment
       SlaveController& operator=(const SlaveController&);
+
+      void toggleOnOff();
+      void toggleAB();
+
 
       Core::Time mTime;
 
@@ -50,6 +57,9 @@ class SlaveController
       Core::DigitalOut mLedA;
       Core::DigitalOut mLedB;
 
+      Core::DigitalIn mOnOff;
+      Core::DigitalIn mAB;
+
       RelayControllerQueryPort mRelayControllerQueryPort;
 
       LatchingRelay mRelayA;
@@ -58,6 +68,12 @@ class SlaveController
       StateLeds mStateLeds;
 
       RelayController mRelayController;
+
+      Core::PushButtonListener<SlaveController> mOnOffButtonListener;
+      Core::PushButtonListener<SlaveController> mABButtonListener;
+
+      Core::PushButton mOnOffButton;
+      Core::PushButton mABButton;
 
 
 };

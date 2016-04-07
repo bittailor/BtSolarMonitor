@@ -13,7 +13,7 @@
 namespace Bt {
 namespace Core {
 
-class DigitalIn : I_DigitalIn
+class DigitalIn : public I_DigitalIn
 {
    public:
       DigitalIn(uint8_t pPin);

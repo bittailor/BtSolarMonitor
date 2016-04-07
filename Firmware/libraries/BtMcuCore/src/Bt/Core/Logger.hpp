@@ -42,10 +42,10 @@ inline Print &operator <<(Print &stream, Bt::Core::_EndLineCode arg) {
 #include <typeinfo>
 
 #define LOG(msg) \
-    std::cout << "BtLog>" << msg << std::endl
+    std::cout << "BL>" << msg << std::endl
 
 #define ERROR(msg) \
-    std::cerr << "BtError>" << msg << std::endl
+    std::cerr << "BE>" << msg << std::endl
 
 #endif
 

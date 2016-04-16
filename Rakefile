@@ -2,6 +2,7 @@ require 'uri'
 require 'erb'
 require 'json'
 require 'rake/clean'
+require 'digest/sha1'
 
 $arduino = "/Applications/Arduino.app/Contents/MacOS/Arduino"
 $arduino_folder = "/Applications/Arduino.app/Contents/Java"
@@ -20,12 +21,12 @@ $options = [
     "-libraries Firmware/sketchbook/libraries",
 
     #"-warnings default",
-    "-verbose"
+    #"-verbose"
 ].join(" ")
 
 $boards = [
     "-fqbn=adafruit:samd:adafruit_feather_m0",
-    # "-fqbn=breadboard:avr:atmega328bb",
+    "-fqbn=\"Breadboard Arduino:avr:atmega328bb\"",
 ]
 
 $libraries = [
@@ -92,13 +93,34 @@ desc "Compile all"
 task :compile do
     sketches = Dir.glob("Firmware/sketchbook/*/*.ino")
     sketches.each do |sketch|
-        $boards.each do |board|
-            puts "compile #{sketch} ..."
-            verbose(false) do
-                sh "#{$builder} #{$options} #{board} #{sketch}"
-            end
-            puts "   ...  #{sketch} done"
-        end
+      build_info = {};
+      build_info_file = sketch.pathmap("%d") + "/.build.json"
+      if(File.exists?(build_info_file))
+        build_info = JSON.parse(IO.read(build_info_file))
+      end
+      $boards.each do |board|
+          if build_info['boardRegex'] and !Regexp.new(build_info['boardRegex']).match(board)
+            puts ""
+            puts "!!!!!!!"
+            puts "skip #{sketch} for #{board} ... "
+            puts "!!!!!!!"
+            puts ""
+            next
+          end
+
+
+          build_path = File.absolute_path("#{$output_folder}/sketches/"  + Digest::SHA1.hexdigest("#{sketch}-#{board}"))
+          FileUtils.mkdir_p(build_path) unless Dir.exists?(build_path)
+          puts ""
+          puts "****"
+          puts "compile #{sketch} for #{board} ... "
+          verbose(false) do
+              sh "#{$builder} #{$options} -build-path #{build_path} #{board} #{sketch}"
+          end
+          puts "done compile #{sketch} for #{board} done"
+          puts "****"
+          puts ""
+      end
     end
     puts "************"
     puts "compiled #{sketches.count} sketches for #{$boards.count} boards"

@@ -1,7 +1,8 @@
 #include <Wire.h>
 #include <LowPower.h>
-#include <Bt_SolarMonitor_SlaveController.h>
+#include <Bt_SolarMonitor.h>
 #include <Bt/SolarMonitor/IOSlavePins.hpp>
+#include <Bt/SolarMonitor/SlaveController.hpp>
 
 
 Bt::SolarMonitor::SlaveController sSlaveController;
@@ -35,5 +36,3 @@ void loop() {
       LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
    }
 }
-
-

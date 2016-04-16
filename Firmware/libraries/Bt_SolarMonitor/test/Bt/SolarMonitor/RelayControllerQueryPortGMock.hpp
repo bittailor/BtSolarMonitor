@@ -9,7 +9,7 @@
 
 #include <gmock/gmock.h>
 
-#include "Bt/SolarMonitor/I_RelayControllerQueryPort.hpp"
+#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/I_RelayControllerQueryPort.hpp"
 
 namespace Bt {
 namespace SolarMonitor {

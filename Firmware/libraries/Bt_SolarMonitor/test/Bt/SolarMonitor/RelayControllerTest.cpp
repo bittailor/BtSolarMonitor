@@ -4,15 +4,16 @@
 //
 //*************************************************************************************************
 
+#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/RelayController.hpp"
+
 #include <gtest/gtest.h>
+#include "../../../../Bt_SolarMonitor/test/Bt/SolarMonitor/LatchingRelayGMock.hpp"
+#include "../../../../Bt_SolarMonitor/test/Bt/SolarMonitor/RelayControllerQueryPortGMock.hpp"
+#include "../../../../Bt_SolarMonitor/test/Bt/SolarMonitor/StateLedsGMock.hpp"
 
 #include "Bt/Core/TimeGMock.hpp"
 
 
-#include "Bt/SolarMonitor/RelayController.hpp"
-#include "Bt/SolarMonitor/LatchingRelayGMock.hpp"
-#include "Bt/SolarMonitor/StateLedsGMock.hpp"
-#include "Bt/SolarMonitor/RelayControllerQueryPortGMock.hpp"
 
 namespace Bt {
 namespace SolarMonitor {

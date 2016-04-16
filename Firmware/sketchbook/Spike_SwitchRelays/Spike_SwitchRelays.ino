@@ -115,5 +115,6 @@ void checkPin(uint8_t pin) {
       Serial.println("Oops NOT_A_PIN");
       return;
    }
+
    Serial.println("OK");
 }

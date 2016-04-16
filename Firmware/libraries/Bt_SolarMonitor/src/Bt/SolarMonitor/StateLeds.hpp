@@ -7,9 +7,10 @@
 #ifndef INC__Bt_SolarMonitor_StateLeds__hpp
 #define INC__Bt_SolarMonitor_StateLeds__hpp
 
-#include "Bt/Core/I_DigitalOut.hpp"
-#include "Bt/SolarMonitor/I_StateLeds.hpp"
+#include <Bt/Core/I_DigitalOut.hpp>
 #include "Bt/SolarMonitor/I_RelayController.hpp"
+#include "Bt/SolarMonitor/I_StateLeds.hpp"
+
 
 namespace Bt {
 namespace SolarMonitor {

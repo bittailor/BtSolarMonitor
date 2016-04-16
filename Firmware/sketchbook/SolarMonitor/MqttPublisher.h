@@ -1,7 +1,8 @@
 #ifndef INC_MqttPublisher_H
 #define INC_MqttPublisher_H
 
-#include <cstring>
+#include <Arduino.h>
+#include <stddef.h>
 #include <MQTTClient.h>
 #include <Bt_PahoWithFona.h>
 #include "I_Publisher.h"

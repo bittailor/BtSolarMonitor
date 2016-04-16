@@ -1,8 +1,7 @@
 #ifndef INC_I_Publisher_H
 #define INC_I_Publisher_H
 
-#include <cstddef>
-
+#include <Arduino.h>
 #include "MeasurementRecord.h"
 
 #define MAX_TOPIC_LENGTH 100

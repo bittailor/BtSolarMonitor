@@ -4,9 +4,9 @@
 //
 //*************************************************************************************************
 
-#include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
+#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/RelayControllerQueryPort.hpp"
 
-#include "Bt/SolarMonitor/IOSlavePins.hpp"
+#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/IOSlavePins.hpp"
 
 #define Sense_L A0
 #define Sense_A A1

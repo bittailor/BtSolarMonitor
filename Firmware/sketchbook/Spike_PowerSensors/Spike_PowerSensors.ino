@@ -28,10 +28,10 @@ void setup() {
       delay(200);
    }
 
-   sensors[0].setCalibration_load();
-   sensors[1].setCalibration_load();
-   sensors[2].setCalibration_load();
-   sensors[3].setCalibration_load();
+   //sensors[0].setCalibration_load();
+   //sensors[1].setCalibration_load();
+   //sensors[2].setCalibration_load();
+   //sensors[3].setCalibration_load();
 
    delay(1000);
 }
@@ -49,7 +49,7 @@ void measure(Adafruit_INA219& sensor, uint8_t id){
    Serial.print(": ");
 
    float v = sensor.getBusVoltage_V();
-   int16_t iRaw = sensor.getCurrent_raw();
+   //int16_t iRaw = sensor.getCurrent_raw();
    float i = sensor.getCurrent_mA();
    float vs = sensor.getShuntVoltage_mV();
 
@@ -57,8 +57,8 @@ void measure(Adafruit_INA219& sensor, uint8_t id){
    Serial.print(v);
    Serial.print(" i = ");
    Serial.print(i);
-   Serial.print(" i(raw) = ");
-   Serial.print(iRaw);
+   //Serial.print(" i(raw) = ");
+   //Serial.print(iRaw);
    Serial.print(" u(s) = ");
    Serial.print(vs);
    Serial.println();

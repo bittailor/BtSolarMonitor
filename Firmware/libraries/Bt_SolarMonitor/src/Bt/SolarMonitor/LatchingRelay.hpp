@@ -7,9 +7,9 @@
 #ifndef INC__Bt_SolarMonitor_LatchingRelay__hpp
 #define INC__Bt_SolarMonitor_LatchingRelay__hpp
 
+#include <Bt/Core/I_DigitalOut.hpp>
 #include "Bt/SolarMonitor/I_LatchingRelay.hpp"
 
-#include "Bt/Core/I_DigitalOut.hpp"
 
 namespace Bt {
 namespace SolarMonitor {

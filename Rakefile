@@ -31,9 +31,13 @@ $boards = [
 $libraries = [
     ["zip", "http://ftp-stud.fht-esslingen.de/pub/Mirrors/eclipse/paho/arduino_1.0.0.zip"],
 
+
     ["git", "https://github.com/adafruit/Adafruit_MQTT_Library.git"],
     ["git", "https://github.com/adafruit/Adafruit-GFX-Library.git","v1.1.4"],
     ["git", "https://github.com/adafruit/Adafruit_INA219.git"],
+
+    ["git", "https://github.com/rocketscream/Low-Power.git","V1.6"],
+
 
     ["git", "https://github.com/bblanchon/ArduinoJson.git","v5.0.7"],
 

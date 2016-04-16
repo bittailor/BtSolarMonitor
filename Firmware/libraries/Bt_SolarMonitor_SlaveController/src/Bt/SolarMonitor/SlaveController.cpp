@@ -47,10 +47,13 @@ void SlaveController::begin() {
    mABButton.begin();
 }
 
-void SlaveController::loop() {
-   mRelayController.loop();
-   mOnOffButton.loop();
-   mABButton.loop();
+bool SlaveController::loop() {
+   bool needNextLoop = false;
+   needNextLoop = mRelayController.loop() | needNextLoop;
+   needNextLoop = mOnOffButton.loop() | needNextLoop;
+   needNextLoop = mABButton.loop() | needNextLoop;
+   return needNextLoop;
+
 }
 
 void SlaveController::toggleOnOff() {

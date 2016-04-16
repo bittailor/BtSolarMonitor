@@ -40,15 +40,16 @@ class StateMachine : public Interface
 
       }
 
-      void loop() {
+      bool loop() {
          if(mInterval == 0) {
-            return;
+            return false;
          }
          if (mTime->milliseconds() - mStartTime >= mInterval) {
             mInterval = 0;
             mStartTime = 0;
             mCurrentState->timeUp();
          }
+         return true;
       }
 
       virtual void handle(Event pEvent) {

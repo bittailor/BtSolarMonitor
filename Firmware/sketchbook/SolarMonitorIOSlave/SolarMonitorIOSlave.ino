@@ -1,5 +1,8 @@
+#include <Wire.h>
+#include <LowPower.h>
 #include <Bt_SolarMonitor_SlaveController.h>
 #include <Bt/SolarMonitor/IOSlavePins.hpp>
+
 
 Bt::SolarMonitor::SlaveController sSlaveController;
 
@@ -11,8 +14,8 @@ void intAB() {
    sSlaveController.getABButton().handle(&Bt::Core::I_PushButton::State::change);
 }
 
-
 void setup() {
+  Wire.begin(0x8);
   Serial.begin(9600);
   Serial.println("**Solar Monitor IO Slave**");
   sSlaveController.begin();
@@ -26,8 +29,11 @@ void setup() {
 
 void loop() {
    noInterrupts();
-   sSlaveController.loop();
+   bool needNextLoop = sSlaveController.loop();
    interrupts();
+   if(!needNextLoop) {
+      LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+   }
 }
 
 

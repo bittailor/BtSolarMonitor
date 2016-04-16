@@ -28,7 +28,7 @@ class SlaveController
       ~SlaveController();
 
       void begin();
-      void loop();
+      bool loop();
 
       Core::I_PushButton& getOnOffButton() {return mOnOffButton;}
       Core::I_PushButton& getABButton() {return mABButton;}

@@ -7,7 +7,7 @@
 #ifndef INC__Bt_SolarMonitor_I_RelayControllerActionPort__hpp
 #define INC__Bt_SolarMonitor_I_RelayControllerActionPort__hpp
 
-#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/I_StateLeds.hpp"
+#include "Bt/SolarMonitor/I_StateLeds.hpp"
 
 namespace Bt {
 namespace SolarMonitor {

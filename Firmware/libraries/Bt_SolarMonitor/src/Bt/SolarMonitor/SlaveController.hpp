@@ -7,10 +7,10 @@
 #ifndef INC__Bt_SolarMonitor_SlaveController__hpp
 #define INC__Bt_SolarMonitor_SlaveController__hpp
 
-#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/LatchingRelay.hpp"
-#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/RelayController.hpp"
-#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/RelayControllerQueryPort.hpp"
-#include "../../../../Bt_SolarMonitor/src/Bt/SolarMonitor/StateLeds.hpp"
+#include "Bt/SolarMonitor/LatchingRelay.hpp"
+#include "Bt/SolarMonitor/RelayController.hpp"
+#include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
+#include "Bt/SolarMonitor/StateLeds.hpp"
 #include "Bt/Core/DigitalIn.hpp"
 #include "Bt/Core/DigitalOut.hpp"
 #include "Bt/Core/Time.hpp"
@@ -73,7 +73,6 @@ class SlaveController
 
       Core::PushButton mOnOffButton;
       Core::PushButton mABButton;
-
 
 };
 

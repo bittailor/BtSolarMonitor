@@ -53,7 +53,7 @@ bool SlaveController::loop() {
    needNextLoop = mRelayController.loop() | needNextLoop;
    needNextLoop = mOnOffButton.loop() | needNextLoop;
    needNextLoop = mABButton.loop() | needNextLoop;
-   //needNextLoop = mABButton.loop() | needNextLoop;
+   needNextLoop = mWireSlave.loop() | needNextLoop;
 
    return needNextLoop;
 

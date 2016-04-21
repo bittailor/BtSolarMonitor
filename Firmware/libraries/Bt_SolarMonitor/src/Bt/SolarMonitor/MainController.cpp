@@ -93,7 +93,9 @@ bool MainController::loop() {
 //-------------------------------------------------------------------------------------------------
 
 void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
+   static uint32_t counter = 0;
    LOG("");
+   LOG(counter++);
    log("PanelA:  ", pRecord.panelA());
    log("PanelB:  ", pRecord.panelB());
    log("BatteryA:", pRecord.batteryA());

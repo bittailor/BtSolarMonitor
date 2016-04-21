@@ -29,6 +29,12 @@ WireSlave::~WireSlave() {
 
 //-------------------------------------------------------------------------------------------------
 
+bool WireSlave::loop() {
+   return false;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void WireSlave::receiveEvent(int numBytes) {
    LOG("receiveEvent " << numBytes);
    if(numBytes < 1 || (numBytes+1) > WIRESLAVE_BUFFER_LENGTH) {
@@ -52,12 +58,14 @@ void WireSlave::receiveEvent(int numBytes) {
 void WireSlave::requestEvent() {
    LOG("requestEvent " << mCommandBuffer);
    IoSlaveCommand command = mCommandBuffer;
+   mCommandBuffer = IoSlaveCommand::_LastCommand;
    if(0 <= command && command < IoSlaveCommand::_LastCommand) {
       RequestHandler handler = mRequestHandlers[command];
       if(handler){
          (this->*handler)();
       }
    }
+
 }
 
 //-------------------------------------------------------------------------------------------------

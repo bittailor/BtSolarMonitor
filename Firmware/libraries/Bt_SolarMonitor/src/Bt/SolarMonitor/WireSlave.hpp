@@ -23,6 +23,7 @@ class WireSlave
 
       void receiveEvent(int numBytes);
       void requestEvent();
+      bool loop();
 
    private:
       typedef void (WireSlave::*ReceiveHandler)(int);

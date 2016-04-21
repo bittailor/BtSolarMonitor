@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <LowPower.h>
 #include <Bt_SolarMonitor.h>
+#include <Bt/Core/Logger.hpp>
 #include <Bt/SolarMonitor/IOSlavePins.hpp>
 #include <Bt/SolarMonitor/SlaveController.hpp>
 
@@ -28,7 +29,7 @@ void setup() {
   Wire.onRequest(requestEvent);
   Wire.onReceive(receiveEvent);
   Serial.begin(9600);
-  Serial.println("**Solar Monitor IO Slave**");
+  LOG("**Solar Monitor IO Slave**");
   sSlaveController.begin();
 
   pinMode(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_ON_OFF, INPUT_PULLUP);
@@ -38,20 +39,28 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_A_B), intAB, CHANGE);
 }
 
-
+void flush() {
+   Serial.flush();
+   while (!(UCSR0A & (1 << UDRE0))) {
+      // Wait for empty transmit buffer
+      UCSR0A |= 1 << TXC0; // mark transmission not complete
+   }
+   while (!(UCSR0A & (1 << TXC0)))
+      ; // // Wait for the transmission to complete
+}
 
 void loop() {
    static uint32_t sStartTime = millis();
-   static uint32_t sInterval = 50;
+   static uint32_t sInterval = 10;
    noInterrupts();
    bool needNextLoop = sSlaveController.loop();
    interrupts();
    if(!needNextLoop) {
       if (millis() - sStartTime >= sInterval) {
-         Serial.println("**sleep**");
-         delay(10);
+         LOG("->s");
+         flush();
          LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-         Serial.println("**awake**");
+         LOG("->a");
          sStartTime = millis();
       }
    }

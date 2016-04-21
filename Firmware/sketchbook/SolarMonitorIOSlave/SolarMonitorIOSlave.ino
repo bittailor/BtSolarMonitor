@@ -15,8 +15,18 @@ void intAB() {
    sSlaveController.getABButton().handle(&Bt::Core::I_PushButton::State::change);
 }
 
+void receiveEvent(int numBytes) {
+   sSlaveController.getWireSlave().receiveEvent(numBytes);
+}
+
+void requestEvent() {
+   sSlaveController.getWireSlave().requestEvent();
+}
+
 void setup() {
   Wire.begin(0x8);
+  Wire.onRequest(requestEvent);
+  Wire.onReceive(receiveEvent);
   Serial.begin(9600);
   Serial.println("**Solar Monitor IO Slave**");
   sSlaveController.begin();
@@ -28,11 +38,16 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_A_B), intAB, CHANGE);
 }
 
+
+
 void loop() {
    noInterrupts();
    bool needNextLoop = sSlaveController.loop();
    interrupts();
    if(!needNextLoop) {
-      LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+      // TODO: currently I2C wakeup does not work as expected;
+      //LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+
    }
+
 }

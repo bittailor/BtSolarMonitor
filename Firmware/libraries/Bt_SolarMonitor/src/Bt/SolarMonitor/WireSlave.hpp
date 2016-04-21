@@ -1,0 +1,56 @@
+//*************************************************************************************************
+//
+//  BITTAILOR.CH - Bt::SolarMonitor::WireSlave
+//
+//*************************************************************************************************
+
+#ifndef INC__Bt_SolarMonitor_WireSlave__hpp
+#define INC__Bt_SolarMonitor_WireSlave__hpp
+
+#include <Bt/Core/I_Wire.hpp>
+#include <Bt/SolarMonitor/IoSlaveCommand.hpp>
+#include <Bt/SolarMonitor/I_PowerState.hpp>
+
+
+namespace Bt {
+namespace SolarMonitor {
+
+class WireSlave
+{
+   public:
+      WireSlave(Bt::Core::I_Wire& pWire, I_PowerState& pPowerState);
+      ~WireSlave();
+
+      void receiveEvent(int numBytes);
+      void requestEvent();
+
+   private:
+      typedef void (WireSlave::*ReceiveHandler)(int);
+      typedef void (WireSlave::*RequestHandler)();
+
+      enum {WIRESLAVE_BUFFER_LENGTH = 20};
+      enum {NUMBER_OF_COMMANDS = (int)IoSlaveCommand::_LastCommand};
+
+   	  // Constructor to prohibit copy construction.
+      WireSlave(const WireSlave&);
+
+      // Operator= to prohibit copy assignment
+      WireSlave& operator=(const WireSlave&);
+
+      void getPowerState();
+
+      Bt::Core::I_Wire* mWire;
+      I_PowerState* mPowerState;
+
+      volatile IoSlaveCommand mCommandBuffer;
+      volatile uint8_t mBuffer[WIRESLAVE_BUFFER_LENGTH];
+
+      ReceiveHandler mReceiveHandlers[NUMBER_OF_COMMANDS];
+      RequestHandler mRequestHandlers[NUMBER_OF_COMMANDS];
+
+};
+
+} // namespace SolarMonitor
+} // namespace Bt
+
+#endif // INC__Bt_SolarMonitor_WireSlave__hpp

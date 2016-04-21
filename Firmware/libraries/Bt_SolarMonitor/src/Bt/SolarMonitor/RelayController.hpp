@@ -12,7 +12,7 @@
 #include <Bt/Core/I_DigitalOut.hpp>
 #include <Bt/Core/StateMachine.hpp>
 
-#include <Bt/SolarMonitor/I_StateLeds.hpp>
+#include <Bt/SolarMonitor/I_PowerState.hpp>
 #include <Bt/SolarMonitor/I_LatchingRelay.hpp>
 #include <Bt/SolarMonitor/I_RelayController.hpp>
 #include <Bt/SolarMonitor/I_RelayControllerQueryPort.hpp>
@@ -33,7 +33,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
                I_LatchingRelay& pRelayA,
                I_LatchingRelay& pRelayB,
                I_LatchingRelay& pRelayLoad,
-               I_StateLeds& pStateLeds);
+               I_PowerState& pPowerState);
       ~RelayController();
 
       void begin();
@@ -69,7 +69,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
             Off(RelayController& pController) :StateBase(pController){}
 
             virtual void onEnter() {
-               mController->mStateLeds->show(I_StateLeds::Off);
+               mController->mPowerState->state(I_PowerState::Off);
             }
 
             virtual const char* name() {
@@ -101,7 +101,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
                if(!mController->mQueryPort->loadOut()){
                   mController->nextState(mController->mToggleLoadOn);
                } else {
-                  mController->mStateLeds->show(I_StateLeds::OnA);
+                  mController->mPowerState->state(I_PowerState::OnA);
                }
             }
 
@@ -138,7 +138,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
                if(!mController->mQueryPort->loadOut()){
                   mController->nextState(mController->mToggleLoadOn);
                } else {
-                  mController->mStateLeds->show(I_StateLeds::OnB);
+                  mController->mPowerState->state(I_PowerState::OnB);
                }
             }
 
@@ -312,7 +312,7 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
       I_LatchingRelay* mRelayA;
       I_LatchingRelay* mRelayB;
       I_LatchingRelay* mRelayLoad;
-      I_StateLeds* mStateLeds;
+      I_PowerState* mPowerState;
 
       Initial mInitial;
       Off mOff;

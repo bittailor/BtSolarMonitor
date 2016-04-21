@@ -21,6 +21,7 @@ class WireWrapper : public I_Wire
       virtual void beginTransmission(uint8_t pAddress);
       virtual uint8_t endTransmission();
       virtual size_t write(uint8_t pData);
+      virtual size_t write(const uint8_t* pData, size_t pQuantity);
 
       virtual uint8_t requestFrom(uint8_t pAddress, size_t pQuantity);
       virtual int read();

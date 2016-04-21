@@ -1,15 +1,21 @@
-#include <MQTTClient.h>
+#include <Wire.h>
+#include <Bt_SolarMonitor.h>
+#include <Bt/SolarMonitor/MainController.hpp>
+
+Bt::SolarMonitor::MainController sMainController;
 
 int led = 13;
 
 void setup() {                
-  pinMode(led, OUTPUT);     
+   Wire.begin();
+   pinMode(led, OUTPUT);
+   digitalWrite(led, HIGH);
+   Serial.begin(115200);
+   Serial.println("** Solar Monitor Main**");
+   sMainController.begin();
 }
 
 void loop() {
-  digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(500);               // wait for a second
-  digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
-  delay(500);               // wait for a second
- 
+   sMainController.loop();
+   delay(1000);
 }

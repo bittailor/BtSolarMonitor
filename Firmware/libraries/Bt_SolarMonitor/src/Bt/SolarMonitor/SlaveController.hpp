@@ -7,15 +7,18 @@
 #ifndef INC__Bt_SolarMonitor_SlaveController__hpp
 #define INC__Bt_SolarMonitor_SlaveController__hpp
 
-#include "Bt/SolarMonitor/LatchingRelay.hpp"
-#include "Bt/SolarMonitor/RelayController.hpp"
-#include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
-#include "Bt/SolarMonitor/StateLeds.hpp"
+#include "Bt/Core/Wire.hpp"
 #include "Bt/Core/DigitalIn.hpp"
 #include "Bt/Core/DigitalOut.hpp"
 #include "Bt/Core/Time.hpp"
 #include "Bt/Core/PushButton.hpp"
 #include "Bt/Core/PushButtonListener.hpp"
+
+#include "Bt/SolarMonitor/LatchingRelay.hpp"
+#include "Bt/SolarMonitor/RelayController.hpp"
+#include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
+#include "Bt/SolarMonitor/PowerState.hpp"
+#include "Bt/SolarMonitor/WireSlave.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
@@ -31,6 +34,7 @@ class SlaveController
 
       Core::I_PushButton& getOnOffButton() {return mOnOffButton;}
       Core::I_PushButton& getABButton() {return mABButton;}
+      WireSlave& getWireSlave() {return mWireSlave;}
 
 
    private:
@@ -64,7 +68,7 @@ class SlaveController
       LatchingRelay mRelayA;
       LatchingRelay mRelayB;
       LatchingRelay mRelayLoad;
-      StateLeds mStateLeds;
+      PowerState mPowerState;
 
       RelayController mRelayController;
 
@@ -73,6 +77,9 @@ class SlaveController
 
       Core::PushButton mOnOffButton;
       Core::PushButton mABButton;
+
+      Core::WireWrapper mWire;
+      WireSlave mWireSlave;
 
 };
 

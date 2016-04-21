@@ -34,6 +34,11 @@ size_t WireWrapper::write(uint8_t pData) {
    return 1;
 }
 
+size_t WireWrapper::write(const uint8_t* pData, size_t pQuantity) {
+   LOG("HOST-Wire> write " << pData << "," <<pQuantity );
+   return 1;
+}
+
 uint8_t WireWrapper::requestFrom(uint8_t pAddress, size_t pQuantity) {
    LOG("HOST-Wire> requestFrom " << pAddress << " " << pQuantity);
    return pQuantity;

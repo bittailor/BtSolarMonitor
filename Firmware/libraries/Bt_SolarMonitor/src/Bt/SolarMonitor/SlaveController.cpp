@@ -25,15 +25,16 @@ SlaveController::SlaveController()
 , mRelayA(mRelayAToOff, mRelayAToOn)
 , mRelayB(mRelayBToOff, mRelayBToOn)
 , mRelayLoad(mRelayLoadToOff, mRelayLoadToOn)
-, mStateLeds(mLedA, mLedB)
 
-, mRelayController(mTime, mRelayControllerQueryPort, mRelayA, mRelayB, mRelayLoad, mStateLeds)
+, mRelayController(mTime, mRelayControllerQueryPort, mRelayA, mRelayB, mRelayLoad, mPowerState)
 
 , mOnOffButtonListener(*this, &SlaveController::toggleOnOff)
 , mABButtonListener(*this, &SlaveController::toggleAB)
 
 , mOnOffButton(mTime, mOnOff, mOnOffButtonListener)
 , mABButton(mTime, mAB, mABButtonListener)
+
+, mWireSlave(mWire, mPowerState)
 {
 }
 

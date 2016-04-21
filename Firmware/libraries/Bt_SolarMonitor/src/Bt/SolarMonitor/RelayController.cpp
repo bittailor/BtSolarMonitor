@@ -18,13 +18,13 @@ RelayController::RelayController(
          I_LatchingRelay& pRelayA,
          I_LatchingRelay& pRelayB,
          I_LatchingRelay& pRelayLoad,
-         I_StateLeds& pStateLeds)
+         I_PowerState& pPowerState)
 : Core::StateMachine<I_RelayController, RelayController>(pTime)
 , mQueryPort(&pQueryPort)
 , mRelayA(&pRelayA)
 , mRelayB(&pRelayB)
 , mRelayLoad(&pRelayLoad)
-, mStateLeds(&pStateLeds)
+, mPowerState(&pPowerState)
 , mInitial(*this)
 , mOff(*this)
 , mOnA(*this)

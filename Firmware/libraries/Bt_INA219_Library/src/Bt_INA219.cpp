@@ -51,7 +51,7 @@ float INA219::shuntVoltage() {
 
 float INA219::current() {
    float valueDec = rawCurrent();
-   return valueDec / ( 1000 / mCurrentLSB );
+   return valueDec / (( 1000 / mCurrentLSB ) * 1000)  ;
 }
 
 int16_t INA219::rawBusVoltage() {

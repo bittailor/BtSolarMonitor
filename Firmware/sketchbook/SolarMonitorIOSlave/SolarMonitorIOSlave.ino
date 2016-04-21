@@ -41,13 +41,18 @@ void setup() {
 
 
 void loop() {
+   static uint32_t sStartTime = millis();
+   static uint32_t sInterval = 50;
    noInterrupts();
    bool needNextLoop = sSlaveController.loop();
    interrupts();
    if(!needNextLoop) {
-      // TODO: currently I2C wakeup does not work as expected;
-      //LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-
+      if (millis() - sStartTime >= sInterval) {
+         Serial.println("**sleep**");
+         delay(10);
+         LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+         Serial.println("**awake**");
+         sStartTime = millis();
+      }
    }
-
 }

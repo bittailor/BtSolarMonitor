@@ -19,7 +19,10 @@ namespace SolarMonitor {
 
 //-------------------------------------------------------------------------------------------------
 
-IoSlave::IoSlave(Core::I_Wire& pWire) :mWire(&pWire) {
+IoSlave::IoSlave(Core::I_Wire& pWire, Core::I_DigitalIn& pNotify)
+: mWire(&pWire)
+, mNotify(&pNotify)
+, mStateCache() {
 
 }
 
@@ -31,7 +34,30 @@ IoSlave::~IoSlave() {
 
 //-------------------------------------------------------------------------------------------------
 
+void IoSlave::begin() {
+   updatePowerState();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool IoSlave::loop() {
+   if(!mNotify->read()) {
+      updatePowerState();
+      return true;
+   }
+   return false;
+}
+
+
+//-------------------------------------------------------------------------------------------------
+
 I_PowerState::State IoSlave::powerState() {
+   return mStateCache;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void IoSlave::updatePowerState() {
    mWire->beginTransmission(IO_SLAVE_ADDRESS);
    mWire->write(IoSlaveCommand::GetPowerState);
    mWire->endTransmission();
@@ -40,10 +66,11 @@ I_PowerState::State IoSlave::powerState() {
    size_t receivedSize = mWire->requestFrom(IO_SLAVE_ADDRESS, requestSize);
    if(requestSize != receivedSize) {
       ERROR("IoSlave::powerState Size missmatch  " << requestSize << " != " << receivedSize);
-      return I_PowerState::Off;
+      mStateCache = I_PowerState::Off;
+      return;
    }
    uint8_t rawState = mWire->read();
-   return static_cast<I_PowerState::State>(rawState);
+   mStateCache = static_cast<I_PowerState::State>(rawState);
 }
 
 //-------------------------------------------------------------------------------------------------

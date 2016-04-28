@@ -11,11 +11,11 @@ void setup() {
    pinMode(led, OUTPUT);
    digitalWrite(led, HIGH);
    Serial.begin(115200);
-   Serial.println("** Solar Monitor Main**");
+   Serial.println("**Solar Monitor Main**");
    sMainController.begin();
+   digitalWrite(led, LOW);
 }
 
 void loop() {
    sMainController.loop();
-   delay(1000);
 }

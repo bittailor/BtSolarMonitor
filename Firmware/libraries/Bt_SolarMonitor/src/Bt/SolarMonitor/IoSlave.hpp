@@ -8,6 +8,7 @@
 #define INC__Bt_SolarMonitor_IoSlave__hpp
 
 #include "Bt/Core/I_Wire.hpp"
+#include "Bt/Core/I_DigitalIn.hpp"
 
 #include "Bt/SolarMonitor/I_IoSlave.hpp"
 
@@ -17,8 +18,11 @@ namespace SolarMonitor {
 class IoSlave : public I_IoSlave
 {
    public:
-      IoSlave(Core::I_Wire& pWire);
+      IoSlave(Core::I_Wire& pWire, Core::I_DigitalIn& pNotify);
       ~IoSlave();
+
+      void begin();
+      bool loop();
 
       virtual I_PowerState::State powerState();
 
@@ -29,7 +33,11 @@ class IoSlave : public I_IoSlave
       // Operator= to prohibit copy assignment
       IoSlave& operator=(const IoSlave&);
 
+      void updatePowerState();
+
       Core::I_Wire* mWire;
+      Core::I_DigitalIn* mNotify;
+      I_PowerState::State mStateCache;
 
 };
 

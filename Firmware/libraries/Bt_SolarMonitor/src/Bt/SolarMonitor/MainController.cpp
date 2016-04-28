@@ -43,24 +43,26 @@ const uint16_t sConfigurationControl =
 //-------------------------------------------------------------------------------------------------
 
 MainController::MainController()
-:mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
-,mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
-,mSensorBatteryA(mWire,0x41,sConfigurationBattery, 16384,500)
-,mSensorBatteryB(mWire,0x45,sConfigurationBattery, 16384,500)
-,mSensorLoad    (mWire,0x4C,sConfigurationLoad,    16384,500)
-,mSensorControl (mWire,0x48,sConfigurationControl,  8192, 50)
-,mIoSlave(mWire)
-,mMeasureLoop(
-         mSensorPanelA,
-         mSensorPanelB,
-         mSensorBatteryA,
-         mSensorBatteryB,
-         mSensorLoad,
-         mSensorControl)
-,mNokiaScreenOne(A5, A4, A3)
-,mNokiaScreenTwo(A5, A2, A1)
-,mScreens(mNokiaScreenOne, mNokiaScreenTwo) {
-
+: mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
+, mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
+, mSensorBatteryA(mWire,0x41,sConfigurationBattery, 16384,500)
+, mSensorBatteryB(mWire,0x45,sConfigurationBattery, 16384,500)
+, mSensorLoad    (mWire,0x4C,sConfigurationLoad,    16384,500)
+, mSensorControl (mWire,0x48,sConfigurationControl,  8192, 50)
+, mNotify(5)
+, mIoSlave(mWire,mNotify)
+, mMeasureLoop(
+          mSensorPanelA,
+          mSensorPanelB,
+          mSensorBatteryA,
+          mSensorBatteryB,
+          mSensorLoad,
+          mSensorControl)
+, mNokiaScreenOne(A5, A4, A3)
+, mNokiaScreenTwo(A5, A2, A1)
+, mScreens(mNokiaScreenOne, mNokiaScreenTwo)
+, mStartTime(0)
+, mInterval(500) {
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -80,13 +82,23 @@ void MainController::begin() {
    mSensorControl.begin();
    mNokiaScreenOne.begin();
    mNokiaScreenTwo.begin();
+   mIoSlave.begin();
 
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MainController::loop() {
-   mMeasureLoop.measure(MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this));
+   bool doMeasure = false;
+   if (mTime.milliseconds() - mStartTime >= mInterval) {
+      mStartTime = mTime.milliseconds();
+      doMeasure = true;
+   }
+
+   if(mIoSlave.loop() || doMeasure) {
+      mMeasureLoop.measure(MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this));
+   }
+
    return true;
 }
 
@@ -104,10 +116,11 @@ void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
    log("Control: ", pRecord.control());
 
    I_PowerState::State powerState = mIoSlave.powerState();
-
    LOG("PowerState: " << powerState);
-
    mScreens.update(pRecord, powerState);
+
+
+
 }
 
 //-------------------------------------------------------------------------------------------------

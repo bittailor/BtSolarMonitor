@@ -20,11 +20,14 @@ SlaveController::SlaveController()
 , mRelayLoadToOff(BT_SOLARMONITOR_IOSLAVE_PIN_RELAY_LOAD_OFF)
 , mLedA(BT_SOLARMONITOR_IOSLAVE_PIN_LED_A)
 , mLedB(BT_SOLARMONITOR_IOSLAVE_PIN_LED_B)
+, mNotify(BT_SOLARMONITOR_IOSLAVE_PIN_NOTIFY)
 , mOnOff(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_ON_OFF)
 , mAB(BT_SOLARMONITOR_IOSLAVE_PIN_BUTTON_A_B)
 , mRelayA(mRelayAToOff, mRelayAToOn)
 , mRelayB(mRelayBToOff, mRelayBToOn)
 , mRelayLoad(mRelayLoadToOff, mRelayLoadToOn)
+
+, mPowerState(mNotify)
 
 , mRelayController(mTime, mRelayControllerQueryPort, mRelayA, mRelayB, mRelayLoad, mPowerState)
 

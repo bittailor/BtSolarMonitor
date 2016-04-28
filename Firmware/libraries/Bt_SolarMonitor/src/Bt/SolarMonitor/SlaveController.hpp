@@ -59,6 +59,7 @@ class SlaveController
 
       Core::DigitalOut mLedA;
       Core::DigitalOut mLedB;
+      Core::DigitalOut mNotify;
 
       Core::DigitalIn mOnOff;
       Core::DigitalIn mAB;

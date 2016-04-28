@@ -8,6 +8,8 @@
 #define INC__Bt_SolarMonitor_MainController__hpp
 
 #include <Bt/Core/Wire.hpp>
+#include <Bt/Core/DigitalIn.hpp>
+#include <Bt/Core/Time.hpp>
 #include <Bt_INA219.h>
 #include "Bt/SolarMonitor/MeasureLoop.hpp"
 #include "Bt/SolarMonitor/NokiaScreen.hpp"
@@ -37,6 +39,7 @@ class MainController
       void log(const char* pPrefix, const Measurement& pMeasurement);
 
       Bt::Core::WireWrapper mWire;
+      Bt::Core::Time mTime;
 
       INA219 mSensorPanelA;
       INA219 mSensorPanelB;
@@ -44,6 +47,8 @@ class MainController
       INA219 mSensorBatteryB;
       INA219 mSensorLoad;
       INA219 mSensorControl;
+
+      Core::DigitalIn mNotify;
 
       IoSlave mIoSlave;
 
@@ -54,6 +59,9 @@ class MainController
       NokiaScreen mNokiaScreenTwo;
 
       Screens mScreens;
+
+      uint32_t mStartTime;
+      uint32_t mInterval;
 
 
 };

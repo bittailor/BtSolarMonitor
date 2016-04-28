@@ -19,7 +19,7 @@ class PowerStateGMock : public I_PowerState {
 
       MOCK_METHOD0(state, State());
       MOCK_METHOD1(state, void(State));
-
+      MOCK_METHOD0(resetNotify, void());
 };
 
 } // namespace SolarMonitor

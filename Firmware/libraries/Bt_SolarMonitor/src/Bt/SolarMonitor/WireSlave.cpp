@@ -72,6 +72,7 @@ void WireSlave::requestEvent() {
 
 void WireSlave::getPowerState() {
    LOG("PowerState " << mPowerState->state());
+   mPowerState->resetNotify();
    mWire->write(static_cast<uint8_t>(mPowerState->state()));
 }
 

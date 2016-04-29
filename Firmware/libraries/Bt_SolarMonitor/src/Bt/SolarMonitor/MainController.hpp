@@ -10,6 +10,8 @@
 #include <Bt/Core/Wire.hpp>
 #include <Bt/Core/DigitalIn.hpp>
 #include <Bt/Core/Time.hpp>
+#include <Bt/Core/Workcycle.hpp>
+#include <Bt/Core/PeriodicWorkcycle.hpp>
 #include <Bt_INA219.h>
 #include "Bt/SolarMonitor/MeasureLoop.hpp"
 #include "Bt/SolarMonitor/NokiaScreen.hpp"
@@ -40,6 +42,10 @@ class MainController
 
       Bt::Core::WireWrapper mWire;
       Bt::Core::Time mTime;
+
+      Bt::Core::Workcycle mMainWorkcycle;
+      Bt::Core::PeriodicWorkcycle mMeasureWorkcycle;
+      Bt::Core::PeriodicWorkcycle mPublishWorkcycle;
 
       INA219 mSensorPanelA;
       INA219 mSensorPanelB;

@@ -9,6 +9,7 @@
 
 #include <Bt_INA219.h>
 #include <Bt/Core/Function.hpp>
+#include <Bt/Core/I_Runnable.hpp>
 
 #include "Bt/SolarMonitor/MeasurementRecord.hpp"
 
@@ -25,10 +26,12 @@ class MeasureLoop
                   INA219& pSensorBatteryA,
                   INA219& pSensorBatteryB,
                   INA219& pSensorLoad,
-                  INA219& pSensorControl);
+                  INA219& pSensorControl,
+                  Callback pCallback);
+
       ~MeasureLoop();
 
-      void measure(Callback pCallback);
+      void measure();
 
    private:
       enum {NUMBER_OF_SENSORS = 6};
@@ -39,7 +42,10 @@ class MeasureLoop
       // Operator= to prohibit copy assignment
       MeasureLoop& operator=(const MeasureLoop&);
 
+
+
       INA219* mSensors[NUMBER_OF_SENSORS];
+      Callback mCallback;
 };
 
 } // namespace SolarMonitor

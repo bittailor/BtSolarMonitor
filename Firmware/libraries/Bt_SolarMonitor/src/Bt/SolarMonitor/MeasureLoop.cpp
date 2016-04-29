@@ -19,13 +19,15 @@ MeasureLoop::MeasureLoop(INA219& pSensorPanelA,
                          INA219& pSensorBatteryA,
                          INA219& pSensorBatteryB,
                          INA219& pSensorLoad,
-                         INA219& pSensorControl)
+                         INA219& pSensorControl,
+                         Callback pCallback)
 : mSensors{&pSensorPanelA,
            &pSensorPanelB,
            &pSensorBatteryA,
            &pSensorBatteryB,
            &pSensorLoad,
-           &pSensorControl}{
+           &pSensorControl}
+, mCallback(pCallback){
 
 }
 
@@ -37,13 +39,13 @@ MeasureLoop::~MeasureLoop() {
 
 //-------------------------------------------------------------------------------------------------
 
-void MeasureLoop::measure(Callback pCallback) {
+void MeasureLoop::measure() {
    Measurement measurements[NUMBER_OF_SENSORS];
    for (int i = 0; i < NUMBER_OF_SENSORS; ++i) {
       measurements[i] = Measurement(mSensors[i]->current(),mSensors[i]->busVoltage());
    }
 
-   pCallback(MeasurementRecord(measurements[0],
+   mCallback(MeasurementRecord(measurements[0],
                                measurements[1],
                                measurements[2],
                                measurements[3],

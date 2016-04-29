@@ -43,7 +43,9 @@ const uint16_t sConfigurationControl =
 //-------------------------------------------------------------------------------------------------
 
 MainController::MainController()
-: mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
+: mMeasureWorkcycle(500,mTime)
+, mPublishWorkcycle(10000,mTime)
+, mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
 , mSensorBatteryA(mWire,0x41,sConfigurationBattery, 16384,500)
 , mSensorBatteryB(mWire,0x45,sConfigurationBattery, 16384,500)
@@ -57,12 +59,15 @@ MainController::MainController()
           mSensorBatteryA,
           mSensorBatteryB,
           mSensorLoad,
-          mSensorControl)
+          mSensorControl,
+          MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this))
 , mNokiaScreenOne(A5, A4, A3)
 , mNokiaScreenTwo(A5, A2, A1)
 , mScreens(mNokiaScreenOne, mNokiaScreenTwo)
 , mStartTime(0)
 , mInterval(500) {
+   mMainWorkcycle.add(mMeasureWorkcycle);
+   mMainWorkcycle.add(mPublishWorkcycle);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -89,6 +94,9 @@ void MainController::begin() {
 //-------------------------------------------------------------------------------------------------
 
 bool MainController::loop() {
+   mMainWorkcycle.oneWorkcycle();
+
+
    bool doMeasure = false;
    if (mTime.milliseconds() - mStartTime >= mInterval) {
       mStartTime = mTime.milliseconds();
@@ -96,7 +104,7 @@ bool MainController::loop() {
    }
 
    if(mIoSlave.loop() || doMeasure) {
-      mMeasureLoop.measure(MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this));
+      mMeasureLoop.measure();
    }
 
    return true;

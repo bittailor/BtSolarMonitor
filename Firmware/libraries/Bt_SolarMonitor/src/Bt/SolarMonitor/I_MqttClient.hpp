@@ -18,7 +18,8 @@ class I_MqttClient {
       enum QoS { QOS0, QOS1, QOS2 };
 
       virtual ~I_MqttClient() {}
-      virtual bool publish(const char* pTopicName, void* pPayload, size_t pPayloadlen, QoS pQos = QOS0, bool pRetained = false);
+      virtual bool publish(const char* pTopicName, void* pPayload, size_t pPayloadlen, QoS pQos = QOS0, bool pRetained = false) = 0;
+      virtual bool publish(const char* pTopicName, const char* pMessage, QoS pQos = QOS0, bool pRetained = false) = 0;
 };
 
 } // namespace SolarMonitor

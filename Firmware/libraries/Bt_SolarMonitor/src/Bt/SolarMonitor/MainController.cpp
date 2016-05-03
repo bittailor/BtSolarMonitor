@@ -43,8 +43,8 @@ const uint16_t sConfigurationControl =
 //-------------------------------------------------------------------------------------------------
 
 MainController::MainController()
-: mMeasureWorkcycle(500,mTime)
-, mPublishWorkcycle(10000,mTime)
+: mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
+, mPublishCallback(mTime,10000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
 , mSensorBatteryA(mWire,0x41,sConfigurationBattery, 16384,500)
@@ -63,11 +63,9 @@ MainController::MainController()
           MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this))
 , mNokiaScreenOne(A5, A4, A3)
 , mNokiaScreenTwo(A5, A2, A1)
-, mScreens(mNokiaScreenOne, mNokiaScreenTwo)
-, mStartTime(0)
-, mInterval(500) {
-   mMainWorkcycle.add(mMeasureWorkcycle);
-   mMainWorkcycle.add(mPublishWorkcycle);
+, mScreens(mNokiaScreenOne, mNokiaScreenTwo) {
+   mMainWorkcycle.add(mMeasureCallback);
+   mMainWorkcycle.add(mPublishCallback);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -97,17 +95,24 @@ bool MainController::loop() {
    mMainWorkcycle.oneWorkcycle();
 
 
-   bool doMeasure = false;
-   if (mTime.milliseconds() - mStartTime >= mInterval) {
-      mStartTime = mTime.milliseconds();
-      doMeasure = true;
-   }
 
-   if(mIoSlave.loop() || doMeasure) {
+   if(mIoSlave.loop()) {
       mMeasureLoop.measure();
    }
 
    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void MainController::measure() {
+   mMeasureLoop.measure();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void MainController::publish() {
+
 }
 
 //-------------------------------------------------------------------------------------------------

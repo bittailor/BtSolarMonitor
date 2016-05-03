@@ -11,7 +11,7 @@
 #include <Bt/Core/DigitalIn.hpp>
 #include <Bt/Core/Time.hpp>
 #include <Bt/Core/Workcycle.hpp>
-#include <Bt/Core/PeriodicWorkcycle.hpp>
+#include <Bt/Core/PeriodicCallback.hpp>
 #include <Bt_INA219.h>
 #include "Bt/SolarMonitor/MeasureLoop.hpp"
 #include "Bt/SolarMonitor/NokiaScreen.hpp"
@@ -37,6 +37,9 @@ class MainController
       // Operator= to prohibit copy assignment
       MainController& operator=(const MainController&);
 
+      void measure();
+      void publish();
+
       void OnMeasurementRecord(const MeasurementRecord& pRecord);
       void log(const char* pPrefix, const Measurement& pMeasurement);
 
@@ -44,8 +47,8 @@ class MainController
       Bt::Core::Time mTime;
 
       Bt::Core::Workcycle mMainWorkcycle;
-      Bt::Core::PeriodicWorkcycle mMeasureWorkcycle;
-      Bt::Core::PeriodicWorkcycle mPublishWorkcycle;
+      Bt::Core::PeriodicCallback mMeasureCallback;
+      Bt::Core::PeriodicCallback mPublishCallback;
 
       INA219 mSensorPanelA;
       INA219 mSensorPanelB;
@@ -58,7 +61,6 @@ class MainController
 
       IoSlave mIoSlave;
 
-
       MeasureLoop mMeasureLoop;
 
       NokiaScreen mNokiaScreenOne;
@@ -66,10 +68,7 @@ class MainController
 
       Screens mScreens;
 
-      uint32_t mStartTime;
-      uint32_t mInterval;
-
-
+      //Publisher mPublisher;
 };
 
 } // namespace SolarMonitor

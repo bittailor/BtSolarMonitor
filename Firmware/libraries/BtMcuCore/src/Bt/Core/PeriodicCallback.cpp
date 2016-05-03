@@ -12,19 +12,23 @@ namespace Core {
 
 //-------------------------------------------------------------------------------------------------
 
-PeriodicCallbackBase::PeriodicCallbackBase(I_Time& pTime, uint32_t pPeriodInMicroseconds)
-: mTime(&pTime), mPeriodInMicroseconds(pPeriodInMicroseconds), mStartTime(0){
+PeriodicCallback::PeriodicCallback(I_Time& pTime, uint32_t pPeriodInMilliseconds, Function<void()> pCallback)
+: mTime(&pTime), mPeriodInMilliseconds(pPeriodInMilliseconds), mStartTime(mTime->milliseconds()), mCallback(pCallback){
 }
 
 //-------------------------------------------------------------------------------------------------
 
-uint32_t PeriodicCallbackBase::workcycle() {
-   uint32_t diff = mTime->milliseconds() - mStartTime;
-   if (diff >= mPeriodInMicroseconds) {
-      mStartTime = mTime->milliseconds();
-      callback();
+uint32_t PeriodicCallback::workcycle() {
+   uint32_t now = mTime->milliseconds();
+   uint32_t diff = now - mStartTime;
+   if (diff >= mPeriodInMilliseconds) {
+      mStartTime = now;
+      if(mCallback) {
+         mCallback();
+      }
+      return mPeriodInMilliseconds;
    }
-   return diff - mPeriodInMicroseconds;
+   return mPeriodInMilliseconds - diff;
 }
 //-------------------------------------------------------------------------------------------------
 

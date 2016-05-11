@@ -9,6 +9,9 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "Bt/Core/Logger.hpp"
+
+
 namespace Bt {
 namespace SolarMonitor {
 
@@ -59,8 +62,15 @@ void Publisher::publish(Topic pTopics[], const Measurement& pMeasurement) {
 
 void Publisher::publish(Topic pTopic, float pValue) {
    static const size_t LOCAL_BUFFER_SIZE = 10;
+
+   int32_t d1 = pValue;
+   float f2 = pValue - d1;
+   int32_t d2 = round(f2 * 10000);
+
    char buffer[LOCAL_BUFFER_SIZE] = {0};
-   snprintf(buffer, LOCAL_BUFFER_SIZE, "%2.4f", pValue);
+
+   snprintf(buffer, LOCAL_BUFFER_SIZE, "%d.%04d", d1, d2);
+
    mMqttClient->publish(pTopic, buffer);
 }
 

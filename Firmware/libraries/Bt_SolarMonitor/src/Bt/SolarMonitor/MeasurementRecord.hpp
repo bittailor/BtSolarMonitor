@@ -37,11 +37,6 @@ class MeasurementRecord
       const Measurement& control() const {return mControl;}
 
    private:
-      // Constructor to prohibit copy construction.
-      MeasurementRecord(const MeasurementRecord&);
-
-      // Operator= to prohibit copy assignment
-      MeasurementRecord& operator=(const MeasurementRecord&);
 
       Measurement mPanelA;
       Measurement mPanelB;

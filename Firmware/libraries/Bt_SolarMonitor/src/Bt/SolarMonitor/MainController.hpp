@@ -17,6 +17,8 @@
 #include "Bt/SolarMonitor/NokiaScreen.hpp"
 #include "Bt/SolarMonitor/IoSlave.hpp"
 #include "Bt/SolarMonitor/Screens.hpp"
+#include "Bt/SolarMonitor/MqttClient.hpp"
+#include "Bt/SolarMonitor/Publisher.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
@@ -68,7 +70,10 @@ class MainController
 
       Screens mScreens;
 
-      //Publisher mPublisher;
+      MqttClient mMqttClient;
+      Publisher mPublisher;
+
+      MeasurementRecord mRecordToPublish;
 };
 
 } // namespace SolarMonitor

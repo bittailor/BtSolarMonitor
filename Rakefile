@@ -90,49 +90,51 @@ task :install do
 end
 
 
-desc "Compile all"
-task :compile do
-    sketches = Dir.glob("Firmware/sketchbook/*/*.ino")
-    sketches.each do |sketch|
-      build_info = {};
-      build_info_file = sketch.pathmap("%d") + "/.build.json"
-      if(File.exists?(build_info_file))
-        build_info = JSON.parse(IO.read(build_info_file))
-      end
-      $boards.each do |board|
-          if build_info['boardRegex'] and !Regexp.new(build_info['boardRegex']).match(board)
-            puts ""
-            puts "!!!!!!!"
-            puts "skip #{sketch} for #{board} ... "
-            puts "!!!!!!!"
-            puts ""
-            next
-          end
+desc "Compile all arduino sketches"
+task :compile_arduino_all
 
-
-          build_path = File.absolute_path("#{$output_folder}/sketches/"  + Digest::SHA1.hexdigest("#{sketch}-#{board}"))
-          FileUtils.mkdir_p(build_path) unless Dir.exists?(build_path)
-          puts ""
-          puts "****"
-          puts "compile #{sketch} for #{board} ... "
-          verbose(false) do
-              sh "#{$builder} #{$options} -build-path #{build_path} #{board} #{sketch}"
-          end
-          puts "done compile #{sketch} for #{board} done"
-          puts "****"
-          puts ""
-      end
+sketches = Dir.glob("Firmware/sketchbook/*/*.ino")
+sketches.each do |sketch|
+  sketch_name = File.basename(sketch,".ino")
+  desc "compile the #{sketch_name} sketch"
+  task "compile_arduino_#{sketch_name}" do
+    build_info = {};
+    build_info_file = sketch.pathmap("%d") + "/.build.json"
+    if(File.exists?(build_info_file))
+      build_info = JSON.parse(IO.read(build_info_file))
     end
-    puts "************"
-    puts "compiled #{sketches.count} sketches for #{$boards.count} boards"
+    $boards.each do |board|
+        if build_info['boardRegex'] and !Regexp.new(build_info['boardRegex']).match(board)
+          # puts ""
+          # puts "!!! skip #{sketch_name} for #{board} ... "
+          # puts ""
+          next
+        end
+
+
+        build_path = File.absolute_path("#{$output_folder}/sketches/"  + Digest::SHA1.hexdigest("#{sketch}-#{board}"))
+        FileUtils.mkdir_p(build_path) unless Dir.exists?(build_path)
+        puts ""
+        puts "*** compile #{sketch_name} for #{board} ... "
+        verbose(false) do
+            sh "#{$builder} #{$options} -build-path #{build_path} #{board} #{sketch}"
+        end
+        puts ""
+    end
+  end
+
+  task :compile_arduino_all => "compile_arduino_#{sketch_name}"
+
 end
+
+
 
 task :upload do
     sh "#{arduino} --board adafruit:samd:adafruit_feather_m0 --pref sketchbook.path=#{Dir.pwd}/Firmware/sketchbook --upload --port /dev/cu.usbmodem1411 -v Firmware/sketchbook/ResourceCheck/ResourceCheck.ino"
 end
 
 
-task :default => :compile
+task :default => :compile_arduino_all
 
 # ---
 
@@ -163,7 +165,7 @@ namespace :host do
     end
   end
 
-  desc "compile all host tests"
+  desc "run all host tests"
   task :test => :compile do
     libraries_with_tests = Rake::FileList["Firmware/libraries/*/test"]
     puts libraries_with_tests

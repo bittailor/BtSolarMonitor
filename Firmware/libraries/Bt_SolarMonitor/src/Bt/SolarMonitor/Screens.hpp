@@ -20,7 +20,7 @@ class Screens
       Screens(I_Screen& pOne, I_Screen& pTwo);
       ~Screens();
 
-      void update(const MeasurementRecord& pMeasurementRecord, PowerState::State pPowerState);
+      void update(const MeasurementRecord& pMeasurementRecord, PowerState::State pPowerState, bool pConnectionState);
 
    private:
    	  // Constructor to prohibit copy construction.

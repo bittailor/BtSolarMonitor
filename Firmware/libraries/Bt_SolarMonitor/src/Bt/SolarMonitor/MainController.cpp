@@ -44,7 +44,7 @@ const uint16_t sConfigurationControl =
 
 MainController::MainController()
 : mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
-, mPublishCallback(mTime,10000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
+, mPublishCallback(mTime,10 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
 , mSensorBatteryA(mWire,0x41,sConfigurationBattery, 16384,500)
@@ -63,7 +63,15 @@ MainController::MainController()
           MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this))
 , mNokiaScreenOne(A5, A4, A3)
 , mNokiaScreenTwo(A5, A2, A1)
-, mScreens(mNokiaScreenOne, mNokiaScreenTwo) {
+, mScreens(mNokiaScreenOne, mNokiaScreenTwo)
+, mPublisher(mMqttClient)
+, mRecordToPublish(
+         Measurement(0,0),
+         Measurement(0,0),
+         Measurement(0,0),
+         Measurement(0,0),
+         Measurement(0,0),
+         Measurement(0,0)){
    mMainWorkcycle.add(mMeasureCallback);
    mMainWorkcycle.add(mPublishCallback);
 }
@@ -86,6 +94,8 @@ void MainController::begin() {
    mNokiaScreenOne.begin();
    mNokiaScreenTwo.begin();
    mIoSlave.begin();
+   mMqttClient.begin();
+   mMqttClient.connect();
 
 }
 
@@ -107,18 +117,33 @@ bool MainController::loop() {
 
 void MainController::measure() {
    mMeasureLoop.measure();
+
 }
 
 //-------------------------------------------------------------------------------------------------
 
 void MainController::publish() {
+   if(!mMqttClient.isConnected()) {
+      LOG("oops is disconnected lets reconnect");
+      if(!mMqttClient.connect()) {
+         LOG("oops oops reconnect failed let's try next time");
+         return;
+      }
+   }
 
+   LOG("");
+   LOG("publish to cloud ...");
+   mPublisher.publish(mRecordToPublish);
+   LOG(" ... done publish to cloud");
 }
 
 //-------------------------------------------------------------------------------------------------
 
 void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
    static uint32_t counter = 0;
+
+   mRecordToPublish = pRecord;
+
    LOG("");
    LOG(counter++);
    log("PanelA:  ", pRecord.panelA());
@@ -130,8 +155,11 @@ void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
 
    I_PowerState::State powerState = mIoSlave.powerState();
    LOG("PowerState: " << powerState);
-   mScreens.update(pRecord, powerState);
 
+   bool connectionState =  mMqttClient.yield(1);
+   LOG("ConnectionState" << connectionState);
+
+   mScreens.update(pRecord, powerState, connectionState);
 
 
 }

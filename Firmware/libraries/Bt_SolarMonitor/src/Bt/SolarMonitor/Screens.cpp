@@ -26,7 +26,7 @@ Screens::~Screens() {
 
 //-------------------------------------------------------------------------------------------------
 
-void Screens::update(const MeasurementRecord& pMeasurementRecord, PowerState::State pPowerState) {
+void Screens::update(const MeasurementRecord& pMeasurementRecord, PowerState::State pPowerState, bool pConnectionState) {
 
    mScreens[0]->clear();
    mScreens[0]->setTextColor(BLACK);
@@ -59,6 +59,14 @@ void Screens::update(const MeasurementRecord& pMeasurementRecord, PowerState::St
       mScreens[0]->display();
    }
 
+   if(pPowerState != PowerState::OnA) {
+      mScreens[0]->setTextSize(1);
+      mScreens[0]->println("");
+      mScreens[0]->println(pConnectionState? "Connected" : "Disconnected");
+      mScreens[0]->display();
+      mScreens[0]->setTextSize(2);
+   }
+
    mScreens[1]->clear();
    mScreens[1]->setTextColor(BLACK);
    mScreens[1]->print("I");
@@ -89,6 +97,14 @@ void Screens::update(const MeasurementRecord& pMeasurementRecord, PowerState::St
       mScreens[1]->println("A");
       mScreens[1]->display();
    }
+
+   if(pPowerState == PowerState::OnA) {
+        mScreens[1]->setTextSize(1);
+        mScreens[1]->println("");
+        mScreens[1]->println(pConnectionState? "Connected" : "Disconnected");
+        mScreens[1]->display();
+        mScreens[0]->setTextSize(2);
+     }
 
 }
 

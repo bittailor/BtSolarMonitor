@@ -19,7 +19,7 @@ RelayController::RelayController(
          I_LatchingRelay& pRelayB,
          I_LatchingRelay& pRelayLoad,
          I_PowerState& pPowerState)
-: Core::StateMachine<I_RelayController, RelayController>(pTime)
+: Core::StateMachine<RelayControllerState, RelayController>(pTime)
 , mQueryPort(&pQueryPort)
 , mRelayA(&pRelayA)
 , mRelayB(&pRelayB)

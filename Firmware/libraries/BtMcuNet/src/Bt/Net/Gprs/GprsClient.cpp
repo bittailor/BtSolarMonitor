@@ -1,40 +1,53 @@
 //*************************************************************************************************
 //
-//  BITTAILOR.CH - Bt::Core::Timing
+//  BITTAILOR.CH - Bt::Net::Gprs::GprsClient
 //
 //*************************************************************************************************
 
-#include <Arduino.h>
+#include "Bt/Net/Gprs/GprsClient.hpp"
 
 namespace Bt {
-namespace Core {
+namespace Net {
+namespace Gprs {
 
 
 //-------------------------------------------------------------------------------------------------
 
-void delayInMilliseconds(uint32_t milliseconds) {
-   delay(milliseconds);
+GprsClient::GprsClient() {
+
 }
 
 //-------------------------------------------------------------------------------------------------
 
-void delayInMicroseconds(uint32_t microseconds) {
-   delayMicroseconds(microseconds);
+GprsClient::~GprsClient() {
+
 }
 
 //-------------------------------------------------------------------------------------------------
 
-uint32_t milliseconds() {
-   return ::millis();
+int GprsClient::connect(char* pHostname, int pPort) {
+   return -1;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-uint32_t microseconds() {
-   return ::micros();
+int GprsClient::read(unsigned char* bBuffer, int len, int bTimeout) {
+   return -1;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-} // namespace Core
+int GprsClient::write(unsigned char* bBuffer, int len, int bTimeout) {
+   return -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+int GprsClient::disconnect() {
+   return -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+} // namespace Gprs
+} // namespace Net
 } // namespace Bt

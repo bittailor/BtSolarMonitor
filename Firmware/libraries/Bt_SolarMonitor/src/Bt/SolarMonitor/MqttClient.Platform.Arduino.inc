@@ -42,7 +42,7 @@ MqttClient::~MqttClient() {
 //-------------------------------------------------------------------------------------------------
 
 void MqttClient::begin() {
-   FONA_SERIAL.begin(9600);
+   FONA_SERIAL.begin(115200);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ bool MqttClient::publish(const char* pTopicName, void* pPayload, size_t pPayload
 }
 
 bool MqttClient::publish(const char* pTopicName, const char* pMessage, QoS pQos, bool pRetained) {
-   // LOG("MQTT publish " << pTopicName << " - " << pMessage << " [" << strlen(pMessage) << "]" );
+   LOG("MQTT publish " << pTopicName << " - " << pMessage << " [" << strlen(pMessage) << "]" );
    return publish(pTopicName, const_cast<char*>(pMessage), strlen(pMessage), pQos, pRetained);
 }
 
@@ -111,6 +111,10 @@ bool MqttClient::connectGPRS() {
    while (mFona.GPRSstate() != 1) {
       delay(100);
    }
+
+   delay(100);
+   mFona.sendCheckReply("AT+CIPSEND?",F("OK"), 10000);
+   delay(100);
 
    return true;
 }

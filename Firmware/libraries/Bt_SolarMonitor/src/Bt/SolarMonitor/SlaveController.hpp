@@ -13,6 +13,7 @@
 #include "Bt/Core/Time.hpp"
 #include "Bt/Core/PushButton.hpp"
 #include "Bt/Core/PushButtonListener.hpp"
+#include "Bt/Core/Workcycle.hpp"
 
 #include "Bt/SolarMonitor/LatchingRelay.hpp"
 #include "Bt/SolarMonitor/RelayController.hpp"
@@ -30,7 +31,7 @@ class SlaveController
       ~SlaveController();
 
       void begin();
-      bool loop();
+      uint32_t oneWorkcycle();
 
       Core::I_PushButton& getOnOffButton() {return mOnOffButton;}
       Core::I_PushButton& getABButton() {return mABButton;}
@@ -47,6 +48,7 @@ class SlaveController
       void toggleOnOff();
       void toggleAB();
 
+      Core::Workcycle mWorkcycle;
 
       Core::Time mTime;
 

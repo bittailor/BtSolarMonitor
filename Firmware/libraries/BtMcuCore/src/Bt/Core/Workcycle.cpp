@@ -5,6 +5,7 @@
 //*************************************************************************************************
 
 #include "Bt/Core/Workcycle.hpp"
+#include <Arduino.h>
 
 namespace Bt {
 namespace Core {
@@ -36,10 +37,15 @@ void Workcycle::remove(I_Runnable& iRunnable) {
 
 //-------------------------------------------------------------------------------------------------
 
-void Workcycle::oneWorkcycle() {
+uint32_t Workcycle::oneWorkcycle() {
+   uint32_t minDelay = I_Runnable::FOREVER;
    for (Runnables::Iterator iterator = mRunnables.begin(), end = mRunnables.end(); iterator != end; ++iterator) {
-      iterator->workcycle();
+      uint32_t delay = iterator->workcycle();
+      minDelay = min(delay,minDelay);
    }
+   //LOG("min delay = " << minDelay);
+   return minDelay;
+
 }
 
 //-------------------------------------------------------------------------------------------------

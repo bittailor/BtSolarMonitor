@@ -8,6 +8,7 @@
 #define INC__Bt_SolarMonitor_WireSlave__hpp
 
 #include <Bt/Core/I_Wire.hpp>
+#include <Bt/Core/I_Runnable.hpp>
 #include <Bt/SolarMonitor/IoSlaveCommand.hpp>
 #include <Bt/SolarMonitor/I_PowerState.hpp>
 
@@ -15,7 +16,7 @@
 namespace Bt {
 namespace SolarMonitor {
 
-class WireSlave
+class WireSlave : public Core::I_Runnable
 {
    public:
       WireSlave(Bt::Core::I_Wire& pWire, I_PowerState& pPowerState);
@@ -23,7 +24,8 @@ class WireSlave
 
       void receiveEvent(int numBytes);
       void requestEvent();
-      bool loop();
+
+      virtual uint32_t workcycle();
 
    private:
       typedef void (WireSlave::*ReceiveHandler)(int);

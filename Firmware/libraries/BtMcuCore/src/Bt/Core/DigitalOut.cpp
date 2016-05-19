@@ -6,8 +6,23 @@
 
 #include "Bt/Core/DigitalOut.hpp"
 
-#ifdef ARDUINO
-   #include "Bt/Core/DigitalOut.Platform.Arduino.inc"
-#else
-   #include "Bt/Core/DigitalOut.Platform.Host.inc"
-#endif
+#include <Arduino.h>
+
+namespace Bt {
+namespace Core {
+
+DigitalOut::DigitalOut(uint8_t pPin) : mPin(pPin) {
+   pinMode(mPin, OUTPUT);
+}
+
+DigitalOut::~DigitalOut() {
+
+}
+
+void DigitalOut::write(bool pValue) {
+   digitalWrite(mPin,pValue ? HIGH : LOW);
+}
+
+} // namespace Core
+} // namespace Bt
+

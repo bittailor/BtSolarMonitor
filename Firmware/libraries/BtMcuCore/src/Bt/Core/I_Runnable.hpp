@@ -16,8 +16,10 @@ namespace Core {
 
 class I_Runnable : public IntrusiveList<I_Runnable>::Element {
    public:
-      virtual ~I_Runnable() {}
+      static const uint32_t IMMEDIATELY  = 0x0;
+      static const uint32_t FOREVER = 0xFFFFFFFFu;
 
+      virtual ~I_Runnable() {}
       virtual uint32_t workcycle() = 0;
 };
 

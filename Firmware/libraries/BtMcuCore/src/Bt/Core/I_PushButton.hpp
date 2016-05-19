@@ -19,17 +19,11 @@ class I_PushButton {
             virtual void released()=0;
       };
 
-      class State {
-         public:
-         virtual ~State() {}
-         virtual void change(){}
-      };
-      typedef void (State::*Event)();
+
 
       virtual ~I_PushButton() {}
 
-      virtual void handle(Event pEvent) = 0;
-
+      virtual void change()=0;
 };
 
 } // namespace Core

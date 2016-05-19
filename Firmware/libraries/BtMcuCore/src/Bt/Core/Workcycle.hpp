@@ -21,7 +21,7 @@ class Workcycle : public I_Workcycle
       virtual void add(I_Runnable& iRunnable);
       virtual void remove(I_Runnable& iRunnable);
 
-      void oneWorkcycle();
+      uint32_t oneWorkcycle();
 
    private:
         // Constructor to prohibit copy construction.

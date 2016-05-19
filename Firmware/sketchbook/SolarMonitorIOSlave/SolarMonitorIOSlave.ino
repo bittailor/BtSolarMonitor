@@ -9,11 +9,11 @@
 Bt::SolarMonitor::SlaveController sSlaveController;
 
 void intOnOff() {
-   sSlaveController.getOnOffButton().handle(&Bt::Core::I_PushButton::State::change);
+   sSlaveController.getOnOffButton().change();
 }
 
 void intAB() {
-   sSlaveController.getABButton().handle(&Bt::Core::I_PushButton::State::change);
+   sSlaveController.getABButton().change();
 }
 
 void receiveEvent(int numBytes) {
@@ -53,7 +53,8 @@ void loop() {
    static uint32_t sStartTime = millis();
    static uint32_t sInterval = 10;
    noInterrupts();
-   bool needNextLoop = sSlaveController.loop();
+   uint32_t nextLoopDelay = sSlaveController.oneWorkcycle();
+   bool needNextLoop = nextLoopDelay != Bt::Core::I_Runnable::FOREVER;
    interrupts();
    if(!needNextLoop) {
       if (millis() - sStartTime >= sInterval) {

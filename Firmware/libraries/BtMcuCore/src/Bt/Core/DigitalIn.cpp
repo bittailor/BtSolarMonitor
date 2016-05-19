@@ -6,8 +6,22 @@
 
 #include "Bt/Core/DigitalIn.hpp"
 
-#ifdef ARDUINO
-   #include "Bt/Core/DigitalIn.Platform.Arduino.inc"
-#else
-   #include "Bt/Core/DigitalIn.Platform.Host.inc"
-#endif
+#include <Arduino.h>
+
+namespace Bt {
+namespace Core {
+
+DigitalIn::DigitalIn(uint8_t pPin) : mPin(pPin) {
+  pinMode(mPin, INPUT_PULLUP);
+}
+
+DigitalIn::~DigitalIn() {
+
+}
+
+bool DigitalIn::read() {
+   return digitalRead(mPin);
+}
+
+} // namespace Core
+} // namespace Bt

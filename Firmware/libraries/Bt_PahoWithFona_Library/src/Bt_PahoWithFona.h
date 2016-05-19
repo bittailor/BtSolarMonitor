@@ -65,10 +65,11 @@ public:
     }
     
     int write(unsigned char* buffer, int len, int timeout){
-        if(mFona->TCPsend((char*)buffer, len)) {           
-            return len;          
-        }
-        return 0;
+       Serial.print("FN.write - ");Serial.print(len);Serial.print(" :");
+       if(mFona->TCPsend((char*)buffer, len)) {
+          return len;
+       }
+       return 0;
     }
     
     int disconnect() {

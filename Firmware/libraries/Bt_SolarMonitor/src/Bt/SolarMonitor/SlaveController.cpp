@@ -37,8 +37,11 @@ SlaveController::SlaveController()
 , mOnOffButton(mTime, mOnOff, mOnOffButtonListener)
 , mABButton(mTime, mAB, mABButtonListener)
 
-, mWireSlave(mWire, mPowerState)
-{
+, mWireSlave(mWire, mPowerState) {
+   mWorkcycle.add(mRelayController);
+   mWorkcycle.add(mOnOffButton);
+   mWorkcycle.add(mABButton);
+   mWorkcycle.add(mWireSlave);
 }
 
 SlaveController::~SlaveController() {
@@ -51,23 +54,16 @@ void SlaveController::begin() {
    mABButton.begin();
 }
 
-bool SlaveController::loop() {
-   bool needNextLoop = false;
-   needNextLoop = mRelayController.loop() | needNextLoop;
-   needNextLoop = mOnOffButton.loop() | needNextLoop;
-   needNextLoop = mABButton.loop() | needNextLoop;
-   needNextLoop = mWireSlave.loop() | needNextLoop;
-
-   return needNextLoop;
-
+uint32_t SlaveController::oneWorkcycle() {
+   return mWorkcycle.oneWorkcycle();
 }
 
 void SlaveController::toggleOnOff() {
-   mRelayController.handle(&RelayController::State::toggleOnOff);
+   mRelayController.toggleOnOff();
 }
 
 void SlaveController::toggleAB() {
-   mRelayController.handle(&RelayController::State::toggleAB);
+   mRelayController.toggleAB();
 }
 
 

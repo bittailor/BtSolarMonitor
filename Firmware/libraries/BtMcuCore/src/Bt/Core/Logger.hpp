@@ -7,8 +7,9 @@
 #ifndef INC__Bt_Core_Logger__hpp
 #define INC__Bt_Core_Logger__hpp
 
+ #include <Arduino.h>
+
 #if ARDUINO
- #include "Arduino.h"
 
 namespace Bt {
 namespace Core {
@@ -37,9 +38,6 @@ inline Print &operator <<(Print &stream, Bt::Core::_EndLineCode arg) {
     Serial << "BtError>" << msg << Bt::Core::endl
 
 #else
-
-#include <iostream>
-#include <typeinfo>
 
 #define LOG(msg) \
     std::cout << "BL>" << msg << std::endl

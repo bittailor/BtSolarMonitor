@@ -9,17 +9,16 @@
 
 #include <stdint.h>
 #include "Bt/Core/I_Time.hpp"
+#include "Bt/Core/I_Runnable.hpp"
 #include "Bt/Core/Logger.hpp"
 
 namespace Bt {
 namespace Core {
 
-template<typename Interface, typename Implementation>
-class StateMachine : public Interface
+template<typename State, typename Implementation>
+class StateMachine : public Bt::Core::I_Runnable
 {
    public:
-      typedef typename Interface::State State;
-      typedef typename Interface::Event Event;
 
       class StateBase : public State {
          public:
@@ -33,30 +32,42 @@ class StateMachine : public Interface
             Implementation* mController;
       };
 
-      StateMachine(I_Time& pTime):mTime(&pTime), mStartTime(0), mInterval(0) {
+      StateMachine(I_Time& pTime):mTime(&pTime), mTimerActive(false), mStartTime(0), mInterval(0) {
       }
 
       ~StateMachine() {
 
       }
 
-      bool loop() {
-         if(mInterval == 0) {
-            return false;
+      virtual uint32_t workcycle() {
+         if(!mTimerActive) {
+            return FOREVER;
          }
-         if (mTime->milliseconds() - mStartTime >= mInterval) {
+
+         uint32_t diff = mTime->milliseconds() - mStartTime;
+         if (diff >= mInterval) {
+            mTimerActive = false;
             mInterval = 0;
             mStartTime = 0;
             mCurrentState->timeUp();
+            return IMMEDIATELY;
          }
-         return true;
-      }
 
-      virtual void handle(Event pEvent) {
-         (mCurrentState->*pEvent)();
+         return mInterval - diff;
       }
 
    protected:
+
+      void handle(void (State::*pEvent)()) {
+         (mCurrentState->*pEvent)();
+      }
+
+      template<typename Arg>
+      void handle(void (State::*pEvent)(Arg),Arg pArg) {
+         (mCurrentState->*pEvent)(pArg);
+      }
+
+
       void nextState(StateBase& pState) {
          LOG( name() << ": " << mCurrentState->name() << " => " << pState.name());
          mCurrentState->onExit();
@@ -65,8 +76,15 @@ class StateMachine : public Interface
       }
 
       void setTimer(uint32_t pInterval) {
+         mTimerActive = true;
          mStartTime = mTime->milliseconds();
          mInterval = pInterval;
+      }
+
+      void resetTimer() {
+         mTimerActive = false;
+         mStartTime = 0;
+         mInterval = 0;
       }
 
       void init(StateBase& initialState) {
@@ -79,6 +97,7 @@ class StateMachine : public Interface
    private:
       I_Time* mTime;
       StateBase* mCurrentState;
+      bool mTimerActive;
       uint32_t mStartTime;
       uint32_t mInterval;
 

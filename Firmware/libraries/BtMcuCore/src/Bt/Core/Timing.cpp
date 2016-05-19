@@ -6,18 +6,37 @@
 
 #include "Bt/Core/Timing.hpp"
 
+#include <Arduino.h>
+
 namespace Bt {
 namespace Core {
 
+
 //-------------------------------------------------------------------------------------------------
+
+void delayInMilliseconds(uint32_t milliseconds) {
+   delay(milliseconds);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void delayInMicroseconds(uint32_t microseconds) {
+   delayMicroseconds(microseconds);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+uint32_t milliseconds() {
+   return ::millis();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+uint32_t microseconds() {
+   return ::micros();
+}
 
 //-------------------------------------------------------------------------------------------------
 
 } // namespace Core
 } // namespace Bt
-
-#ifdef ARDUINO
-   #include "Bt/Core/Timing.Platform.Arduino.inc"
-#else
-   #include "Bt/Core/Timing.Platform.Host.inc"
-#endif

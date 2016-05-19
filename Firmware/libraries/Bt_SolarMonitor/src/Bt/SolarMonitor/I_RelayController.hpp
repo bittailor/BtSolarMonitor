@@ -12,22 +12,10 @@ namespace SolarMonitor {
 
 class I_RelayController {
    public:
-
-      class State {
-         public:
-         virtual ~State() {}
-         virtual void toggleOnOff(){}
-         virtual void toggleAB(){}
-         virtual void toOn(){}
-         virtual void toOff(){}
-         virtual void toA(){}
-         virtual void toB(){}
-      };
-      typedef void (State::*Event)();
-
       virtual ~I_RelayController() {}
 
-      virtual void handle(Event pEvent) = 0;
+      virtual void toggleOnOff() = 0;
+      virtual void toggleAB() = 0;
 
 };
 

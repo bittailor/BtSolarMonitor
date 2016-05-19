@@ -13,7 +13,7 @@ namespace Core {
 //-------------------------------------------------------------------------------------------------
 
 PushButton::PushButton(Core::I_Time& pTime, I_DigitalIn& pInput, I_Listener& pListener)
-: StateMachine<I_PushButton,PushButton>(pTime)
+: StateMachine<PushButtonState,PushButton>(pTime)
 , mInput(&pInput)
 , mListener(&pListener)
 , mInitial(*this)

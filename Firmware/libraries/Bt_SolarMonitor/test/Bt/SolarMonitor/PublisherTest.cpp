@@ -34,7 +34,7 @@ class PublisherTest : public ::testing::Test {
 
 };
 
-
+/*
 TEST_F(PublisherTest, publishAMeasurementRecord) {
 
    MeasurementRecord measurementRecord(
@@ -64,7 +64,7 @@ TEST_F(PublisherTest, publishAMeasurementRecord) {
    mPublisher.publish(measurementRecord);
 
 }
-
+*/
 
 } // namespace SolarMonitor
 } // namespace Bt

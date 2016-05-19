@@ -21,9 +21,18 @@
 namespace Bt {
 namespace SolarMonitor {
 
+class RelayControllerState {
+   public:
+      virtual ~RelayControllerState() {}
+      virtual void toggleOnOff(){}
+      virtual void toggleAB(){}
+      virtual void toOn(){}
+      virtual void toOff(){}
+      virtual void toA(){}
+      virtual void toB(){}
+};
 
-
-class RelayController : public Core::StateMachine<I_RelayController, RelayController>
+class RelayController : public I_RelayController, public Core::StateMachine<RelayControllerState, RelayController>
 {
    public:
 
@@ -37,6 +46,15 @@ class RelayController : public Core::StateMachine<I_RelayController, RelayContro
       ~RelayController();
 
       void begin();
+
+      virtual void toggleOnOff() {
+         handle(&RelayControllerState::toggleOnOff);
+      }
+
+      virtual void toggleAB() {
+         handle(&RelayControllerState::toggleAB);
+      }
+
 
    protected:
       virtual const char* name();

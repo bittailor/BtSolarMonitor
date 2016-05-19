@@ -44,7 +44,7 @@ class MqttClient : public I_MqttClient
 
       Adafruit_FONA mFona;
       Bt_PahoNetworkFona mNetwork;
-      MQTT::Client<Bt_PahoNetworkFona, Bt_PahoTimer, 500, 1> mMqttClient;
+      MQTT::Client<Bt_PahoNetworkFona, Bt_PahoTimer, 700, 1> mMqttClient;
 
 
 

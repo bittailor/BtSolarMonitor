@@ -44,7 +44,7 @@ const uint16_t sConfigurationControl =
 
 MainController::MainController()
 : mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
-, mPublishCallback(mTime,10 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
+, mPublishCallback(mTime,/*10 * 60 * 1000*/ 2 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
 , mSensorBatteryA(mWire,0x41,sConfigurationBattery, 16384,500)

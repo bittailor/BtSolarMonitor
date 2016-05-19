@@ -8,30 +8,42 @@
 
 #include <string.h>
 #include <stdio.h>
-
 #include "Bt/Core/Logger.hpp"
-
+#include "Bt/Core/StaticStringBuilder.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
 
 namespace {
 
-#define PREFIX "BSM/S/"
+   #define TOPIC "/v2/feeds/838919833.json"
 
-   Publisher::Topic sTopics[] = {
-      PREFIX "PA/I",
-      PREFIX "PA/V",
-      PREFIX "PB/I",
-      PREFIX "PB/V",
-      PREFIX "BA/I",
-      PREFIX "BA/V",
-      PREFIX "BB/I",
-      PREFIX "BB/V",
-      PREFIX "L/I" ,
-      PREFIX "L/V" ,
-      PREFIX "C/I" ,
-      PREFIX "C/V"
+   typedef const char* FeedId;
+
+   void addMeasurement(Print&  pBuilder, FeedId pFeedId, float pValue) {
+      pBuilder.print(pFeedId);
+      pBuilder.print(", ");
+      pBuilder.println(pValue,4);
+   }
+
+   void addMeasurementRecord(Print&  pBuilder, FeedId pFeedIds[], const Measurement& pMeasurement) {
+      addMeasurement(pBuilder, pFeedIds[0], pMeasurement.current());
+      addMeasurement(pBuilder, pFeedIds[1], pMeasurement.voltage());
+   }
+
+   FeedId sFeeds[] = {
+      "PanelA.I",
+      "PanelA.V",
+      "PanelA.I",
+      "PanelA.V",
+      "BatteryA.I",
+      "BatteryA.V",
+      "BatteryB.I",
+      "BatteryB.V",
+      "Load.I" ,
+      "load.V" ,
+      "Control.I" ,
+      "Control.V"
    };
 }
 
@@ -47,32 +59,24 @@ void Publisher::begin() {
 }
 
 void Publisher::publish(const MeasurementRecord& pMeasurementRecord) {
-   publish(&sTopics[0], pMeasurementRecord.panelA());
-   publish(&sTopics[2], pMeasurementRecord.panelB());
-   publish(&sTopics[4], pMeasurementRecord.batteryA());
-   publish(&sTopics[6], pMeasurementRecord.batteryB());
-   publish(&sTopics[8], pMeasurementRecord.load());
-   publish(&sTopics[10], pMeasurementRecord.control());
+
+   char message[500] = {0};
+   Bt::Core::StaticStringBuilder builder(message,sizeof(message)/sizeof(message[0]));
+
+   addMeasurementRecord(builder, &sFeeds[0], pMeasurementRecord.panelA());
+//   addMeasurementRecord(builder, &sFeeds[2], pMeasurementRecord.panelB());
+//   addMeasurementRecord(builder, &sFeeds[4], pMeasurementRecord.batteryA());
+//   addMeasurementRecord(builder, &sFeeds[6], pMeasurementRecord.batteryB());
+//   addMeasurementRecord(builder, &sFeeds[8], pMeasurementRecord.load());
+//   addMeasurementRecord(builder, &sFeeds[10], pMeasurementRecord.control());
+   builder.print('\0');
+
+   LOG("message length = " << strlen(message));
+   LOG("message " << message);
+   mMqttClient->publish(TOPIC, message);
+   //mMqttClient->publish(TOPIC, "HELLO");
 }
 
-void Publisher::publish(Topic pTopics[], const Measurement& pMeasurement) {
-   publish(pTopics[0], pMeasurement.current());
-   publish(pTopics[1], pMeasurement.voltage());
-}
-
-void Publisher::publish(Topic pTopic, float pValue) {
-   static const size_t LOCAL_BUFFER_SIZE = 10;
-
-   int32_t d1 = pValue;
-   float f2 = pValue - d1;
-   int32_t d2 = round(f2 * 10000);
-
-   char buffer[LOCAL_BUFFER_SIZE] = {0};
-
-   snprintf(buffer, LOCAL_BUFFER_SIZE, "%d.%04d", d1, d2);
-
-   mMqttClient->publish(pTopic, buffer);
-}
 
 } // namespace SolarMonitor
 } // namespace Bt

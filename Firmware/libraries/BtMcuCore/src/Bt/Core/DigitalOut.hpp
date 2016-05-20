@@ -19,6 +19,8 @@ class DigitalOut : public I_DigitalOut
       DigitalOut(uint8_t pPin);
       ~DigitalOut();
 
+      void begin();
+
       virtual void write(bool pValue);
 
    private:

@@ -12,11 +12,14 @@ namespace Bt {
 namespace Core {
 
 DigitalIn::DigitalIn(uint8_t pPin) : mPin(pPin) {
-  pinMode(mPin, INPUT_PULLUP);
 }
 
 DigitalIn::~DigitalIn() {
 
+}
+
+void DigitalIn::begin() {
+   pinMode(mPin, INPUT_PULLUP);
 }
 
 bool DigitalIn::read() {

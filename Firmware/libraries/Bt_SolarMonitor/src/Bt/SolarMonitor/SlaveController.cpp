@@ -49,6 +49,21 @@ SlaveController::~SlaveController() {
 }
 
 void SlaveController::begin() {
+   mRelayAToOn.begin();
+   mRelayAToOff.begin();
+   mRelayBToOn.begin();
+   mRelayBToOff.begin();
+   mRelayLoadToOn.begin();
+   mRelayLoadToOff.begin();
+
+   mLedA.begin();
+   mLedB.begin();
+   mNotify.begin();
+
+   mOnOff.begin();
+   mAB.begin();
+
+
    mRelayController.begin();
    mOnOffButton.begin();
    mABButton.begin();

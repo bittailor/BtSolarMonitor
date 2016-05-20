@@ -25,7 +25,10 @@ GprsModule::GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core:
 , mReseting(*this)
 , mWaitForPowerOn(*this)
 , mSyncAt(*this)
-, mConfigure(*this) {
+, mConfigurePin(*this)
+, mAwaitNetworkRegistration(*this)
+, mAwaitGprsAttachment(*this)
+, mDummy(*this) {
 
 }
 
@@ -38,6 +41,8 @@ GprsModule::~GprsModule() {
 //-------------------------------------------------------------------------------------------------
 
 void GprsModule::begin() {
+   mOnOffKey->write(true);
+   mReset->write(true);
    init(mInitial);
 }
 

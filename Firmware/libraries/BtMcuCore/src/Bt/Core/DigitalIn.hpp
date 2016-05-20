@@ -19,6 +19,8 @@ class DigitalIn : public I_DigitalIn
       DigitalIn(uint8_t pPin);
       ~DigitalIn();
 
+      void begin();
+
       virtual bool read();
 
    private:

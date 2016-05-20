@@ -8,8 +8,8 @@
 #define INC__Bt_Net_Gprs_LineReader__hpp
 
 #include <stddef.h>
-
-#include <Bt/Core/Function.hpp>
+#include <Arduino.h>
+#include <Bt/Core/Timer.hpp>
 
 namespace Bt {
 namespace Net {
@@ -22,8 +22,7 @@ class LineReader
       static const char LF = 0x0A;
       static const char CR = 0x0D;
 
-      LineReader(Bt::Core::Function<void(const char*)> pLineHandler)
-      :mBuffer{'\0'}, mLength{0}, mLineHandler(pLineHandler){
+      LineReader() :mBuffer{'\0'}, mLength{0} {
       }
 
       LineReader(const LineReader&)=delete;
@@ -31,26 +30,33 @@ class LineReader
 
       ~LineReader(){}
 
-      void consume(char pCharacter) {
-         if(pCharacter == LF) {
-            if(mLength > 0) {
-               mLineHandler(mBuffer);
-               mLength = 0;
+      const char* readLine(Stream& pStream, Bt::Core::Timer& pTimer) {
+         mLength = 0;
+         mBuffer[mLength] = '\0';
+         while(true){
+            if(pTimer.expired()) {
+               return nullptr;
+            }
+            if (pStream.available()) {
+               char character = pStream.read();
+               if(character == LF) {
+                  if(mLength > 0) {
+                     return mBuffer;
+                  }
+                  continue;
+               }
+               if(character == CR) {
+                  continue;
+               }
+               mBuffer[mLength++] = character;
                mBuffer[mLength] = '\0';
             }
-            return;
          }
-         if(pCharacter == CR) {
-            return;
-         }
-         mBuffer[mLength++] = pCharacter;
-         mBuffer[mLength] = '\0';
       }
 
    private:
       char mBuffer[LINE_BUFFER_SIZE];
       size_t mLength;
-      Bt::Core::Function<void(const char*)> mLineHandler;
 };
 
 } // namespace Gprs

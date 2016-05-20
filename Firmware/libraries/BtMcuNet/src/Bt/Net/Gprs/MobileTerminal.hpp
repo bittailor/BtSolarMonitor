@@ -10,6 +10,7 @@
 #include <Arduino.h>
 #include <Bt/Core/I_Runnable.hpp>
 #include <Bt/Core/Function.hpp>
+#include <Bt/Core/Timer.hpp>
 #include <Bt/Net/Gprs/I_MobileTerminal.hpp>
 #include <Bt/Net/Gprs/LineReader.hpp>
 
@@ -25,7 +26,11 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       MobileTerminal(const MobileTerminal&) = delete;
       MobileTerminal& operator=(const MobileTerminal&) = delete;
 
-      virtual bool checkAtOk(Core::Function<void(bool)> pCallback);
+      virtual bool checkAtOk();
+      virtual bool disableEcho();
+      virtual bool checkAndSetPin(const char *pPin);
+      virtual bool checkNetworkRegistration();
+      virtual bool checkGprsAttachment();
 
       virtual uint32_t workcycle();
 
@@ -35,7 +40,6 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
          public:
             State(MobileTerminal& pContext) : mContext(&pContext) {}
             virtual ~State(){}
-            virtual void consume(char c) = 0;
             virtual uint32_t delay() = 0;
          protected:
             MobileTerminal* mContext;
@@ -44,7 +48,6 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       class Idle : public State {
          public:
             Idle(MobileTerminal& pContext) : State(pContext) {}
-            virtual void consume(char c) {mContext->mLineReader.consume(c);}
             virtual uint32_t delay() {return 500;}
 
       };
@@ -52,28 +55,48 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       class WaitingForResponse : public State {
          public:
             WaitingForResponse(MobileTerminal& pContext) : State(pContext) {}
-            virtual void consume(char c) {mContext->mLineReader.consume(c);}
             virtual uint32_t delay() {return Bt::Core::I_Runnable::IMMEDIATELY;}
       };
 
-      class Command {
+//      class Command {
+//         public:
+//            void run(MobileTerminal& pTerminal);
+//      };
+
+      class AtOkCommand {
          public:
-            virtual ~Command(){}
-            virtual bool handleLine(const char* pLine) = 0;
+            bool run(MobileTerminal& pTerminal);
+         private:
       };
 
-      class AtOkCommand : public Command {
+      class DisableEchoCommand {
          public:
-            void run(MobileTerminal& pTerminal, Core::Function<void(bool)> pCallback);
-            virtual bool handleLine(const char* pLine);
+            bool run(MobileTerminal& pTerminal);
          private:
-            Core::Function<void(bool)> mCallback;
       };
+
+      class CheckAndSetPinCommand {
+         public:
+            bool run(MobileTerminal& pTerminal, const char *pPin);
+         private:
+      };
+
+      class CheckNetworkRegistration {
+         public:
+            bool run(MobileTerminal& pTerminal);
+         private:
+      };
+
+      class CheckGprsAttachment {
+         public:
+            bool run(MobileTerminal& pTerminal);
+         private:
+      };
+
 
       void sendCommand(const char* pCommand);
       void sendLine(const char* pLine);
-      void handleLine(const char* pLine);
-
+      const char* readLine(Bt::Core::Timer& pTimer);
       void flushInput();
 
       Stream* mStream;
@@ -81,12 +104,6 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       Idle mIdle;
       WaitingForResponse mWaitingForResponse;
       State* mCurrentState;
-
-      AtOkCommand mAtOkCommand;
-
-      Command* mCurrentCommand;
-
-
 
 };
 

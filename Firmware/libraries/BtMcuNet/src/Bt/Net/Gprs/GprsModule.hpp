@@ -7,10 +7,11 @@
 #ifndef INC__Bt_Net_Gprs_GprsModule__hpp
 #define INC__Bt_Net_Gprs_GprsModule__hpp
 
+#include <Bt/Core/Logger.hpp>
+#include <Bt/Core/Timer.hpp>
 #include <Bt/Core/I_DigitalOut.hpp>
 #include <Bt/Core/I_DigitalIn.hpp>
 #include <Bt/Core/StateMachine.hpp>
-
 #include "Bt/Net/Gprs/I_MobileTerminal.hpp"
 
 namespace Bt {
@@ -41,7 +42,6 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
          virtual const char* name() {
             return "Initial";
          }
-
          virtual void onEnter() {
             if(mController->mPowerState->read()) {
                mController->nextState(mController->mReseting);
@@ -66,7 +66,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
 
             virtual void onEnter() {
                mController->mOnOffKey->write(false);
-               mController->setTimer(2000);
+               mController->setTimer(3000);
             }
 
             virtual void timeUp(){
@@ -127,50 +127,137 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
             SyncAt(GprsModule& pController):StateBase(pController), mAtOkCounter(0){}
 
             virtual void onEnter() {
+               mCounter = 0;
                mAtOkCounter = 0;
-               mController->mMobileTerminal->checkAtOk(Core::Function<void(bool)>::build<SyncAt,&SyncAt::AtOkCallback>(*this));
-               mController->setTimer(10000);
+               ceckAtOk();
             }
 
             virtual void timeUp(){
-               //mController->nextState(mController->mReseting);
+               ceckAtOk();
             }
 
             virtual const char* name() {
                return "SyncAt";
             }
 
-            void AtOkCallback(bool pOk) {
-               if(pOk) {
+            void ceckAtOk() {
+               mCounter++;
+               if(mController->mMobileTerminal->checkAtOk()) {
                   mAtOkCounter++;
                   if(mAtOkCounter > 3){
-                     mController->resetTimer();
-                     mController->nextState(mController->mConfigure);
+                     mController->mMobileTerminal->disableEcho();
+                     if(!mController->mMobileTerminal->disableEcho()) {
+                        mController->nextState(mController->mReseting);
+                        return;
+                     }
+                     mController->nextState(mController->mConfigurePin);
                      return;
                   }
                }
-               mAtOkCounter = 0;
-               mController->mMobileTerminal->checkAtOk(Core::Function<void(bool)>::build<SyncAt,&SyncAt::AtOkCallback>(*this));
+               if(mCounter > 20) {
+                  mController->nextState(mController->mReseting);
+                  return;
+               }
+               mController->setTimer(10);
             }
 
          private:
+            int mCounter;
             int mAtOkCounter;
       };
 
-      class Configure : public StateBase  {
+      class ConfigurePin : public StateBase  {
          public:
-            Configure(GprsModule& pController):StateBase(pController){}
+            ConfigurePin(GprsModule& pController):StateBase(pController){}
 
             virtual void onEnter() {
+               tryConfigurePin();
+            }
 
+            virtual void timeUp(){
+               tryConfigurePin();
+            }
+
+            void tryConfigurePin() {
+               if(mController->mMobileTerminal->checkAndSetPin("1210")){
+                  mController->nextState(mController->mAwaitNetworkRegistration);
+                  return;
+               }
+               mController->setTimer(100);
             }
 
             virtual const char* name() {
-               return "Configure";
+               return "mConfigurePin";
             }
 
          private:
       };
+
+      class AwaitNetworkRegistration : public StateBase  {
+         public:
+            AwaitNetworkRegistration(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+               checkNetworkRegistration();
+            }
+
+            virtual void timeUp(){
+               checkNetworkRegistration();
+            }
+
+            void checkNetworkRegistration() {
+               if(mController->mMobileTerminal->checkNetworkRegistration()){
+                  mController->nextState(mController->mAwaitGprsAttachment);
+                  return;
+               }
+               mController->setTimer(100);
+            }
+
+            virtual const char* name() {
+               return "AwaitNetworkRegistration";
+            }
+      };
+
+      class AwaitGprsAttachment : public StateBase  {
+         public:
+            AwaitGprsAttachment(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+               checkGprsAttachment();
+            }
+
+            virtual void timeUp(){
+               checkGprsAttachment();
+            }
+
+            void checkGprsAttachment() {
+               if(mController->mMobileTerminal->checkGprsAttachment()){
+                  mController->nextState(mController->mDummy);
+                  return;
+               }
+               mController->setTimer(100);
+            }
+
+            virtual const char* name() {
+               return "AwaitGprsAttachment";
+            }
+      };
+
+      class Dummy : public StateBase  {
+         public:
+            Dummy(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+            }
+
+            virtual void timeUp(){
+            }
+
+            virtual const char* name() {
+               return "Dummy";
+            }
+      };
+
 
       virtual const char* name();
 
@@ -187,7 +274,11 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
       Reseting mReseting;
       WaitForPowerOn mWaitForPowerOn;
       SyncAt mSyncAt;
-      Configure mConfigure;
+      ConfigurePin mConfigurePin;
+      AwaitNetworkRegistration mAwaitNetworkRegistration;
+      AwaitGprsAttachment mAwaitGprsAttachment;
+
+      Dummy mDummy;
 
 
 

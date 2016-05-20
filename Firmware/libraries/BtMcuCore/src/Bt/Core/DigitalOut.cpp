@@ -12,14 +12,18 @@ namespace Bt {
 namespace Core {
 
 DigitalOut::DigitalOut(uint8_t pPin) : mPin(pPin) {
-   pinMode(mPin, OUTPUT);
 }
 
 DigitalOut::~DigitalOut() {
 
 }
 
+void DigitalOut::begin() {
+   pinMode(mPin, OUTPUT);
+}
+
 void DigitalOut::write(bool pValue) {
+   pinMode(mPin, OUTPUT);
    digitalWrite(mPin,pValue ? HIGH : LOW);
 }
 

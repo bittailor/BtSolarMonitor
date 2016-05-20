@@ -40,6 +40,9 @@ void setup() {
     sWorkcycle.add(sMobileTerminal);
     sWorkcycle.add(sGprsModule);
 
+    sOnOffKey.begin();
+    sReset.begin();
+    sPowerState.begin();
     sGprsModule.begin();
 
 }

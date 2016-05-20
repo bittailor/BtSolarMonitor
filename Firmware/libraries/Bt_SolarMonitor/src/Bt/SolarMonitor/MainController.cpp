@@ -91,6 +91,7 @@ void MainController::begin() {
    mSensorBatteryB.begin();
    mSensorLoad.begin();
    mSensorControl.begin();
+   mNotify.begin();
    mNokiaScreenOne.begin();
    mNokiaScreenTwo.begin();
    mIoSlave.begin();

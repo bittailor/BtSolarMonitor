@@ -32,10 +32,10 @@ inline Print &operator <<(Print &stream, Bt::Core::_EndLineCode arg) {
 }
 
 #define LOG(msg) \
-    Serial << "BtLog>" << msg << Bt::Core::endl
+    Serial << "BtLog:" << millis() << ">" << msg << Bt::Core::endl
 
 #define ERROR(msg) \
-    Serial << "BtError>" << msg << Bt::Core::endl
+    Serial << "BtError:" << millis() << ">" << msg << Bt::Core::endl
 
 #else
 

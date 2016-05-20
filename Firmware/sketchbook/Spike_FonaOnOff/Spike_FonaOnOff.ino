@@ -1,3 +1,5 @@
+#define RESET 9
+
 #define ON_OFF_PIN 12
 #define PS_STATUS A0
 
@@ -9,10 +11,22 @@ void setup() {
     Serial.println(F("** FONA ON OFF **"));
     digitalWrite(13, LOW); 
 
+    pinMode(RESET, OUTPUT);
     pinMode(ON_OFF_PIN, OUTPUT);
     pinMode(PS_STATUS, INPUT);
     
-    digitalWrite(ON_OFF_PIN, HIGH); 
+    digitalWrite(ON_OFF_PIN, HIGH);
+
+    Serial.println(F("RESET HIGH"));
+    digitalWrite(RESET, HIGH);
+    delay(10000);
+    Serial.println(F("RESET LOW"));
+    digitalWrite(RESET, LOW);
+    delay(10000);
+    Serial.println(F("RESET HIGH"));
+    digitalWrite(RESET, HIGH);
+
+
 
     Serial.print("Power Status :");
     Serial.println(digitalRead(PS_STATUS));

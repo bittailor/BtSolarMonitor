@@ -16,7 +16,11 @@ namespace Gprs {
 class I_MobileTerminal {
    public:
       virtual ~I_MobileTerminal() {}
-      virtual bool checkAtOk(Core::Function<void(bool)> pCallback) = 0;
+      virtual bool checkAtOk() = 0;
+      virtual bool disableEcho() = 0;
+      virtual bool checkAndSetPin(const char* pPin) = 0;
+      virtual bool checkNetworkRegistration() = 0;
+      virtual bool checkGprsAttachment() = 0;
 };
 
 } // namespace Gprs

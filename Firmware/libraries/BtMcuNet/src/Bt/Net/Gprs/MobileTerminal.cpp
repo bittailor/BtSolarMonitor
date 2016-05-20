@@ -61,6 +61,21 @@ bool MobileTerminal::checkGprsAttachment() {
    return command.run(*this);
 }
 
+bool MobileTerminal::startTaskAndSetAPN(const char* pApn, const char* pUser, const char* pPassword) {
+   StartTaskAndSetAPN command;
+   return command.run(*this, pApn, pUser, pPassword);
+}
+
+bool MobileTerminal::bringUpWirelessConnection() {
+   BringUpWirelessConnection command;
+   return command.run(*this);
+}
+
+bool MobileTerminal::getLocalIp() {
+   GetLocalIp command;
+   return command.run(*this);
+}
+
 void MobileTerminal::sendCommand(const char* pCommand) {
    flushInput();
    mCurrentState = &mWaitingForResponse;
@@ -210,28 +225,20 @@ bool MobileTerminal::CheckAndSetPinCommand::run(MobileTerminal& pTerminal, const
 bool MobileTerminal::CheckNetworkRegistration::run(MobileTerminal& pTerminal) {
    Bt::Core::Timer timer(5000);
    pTerminal.sendCommand("AT+CREG?");
-   const char* prefix = "+CREG: 0,";
 
    bool networkRegistrationOk = false;
 
    while(true){
-      if(timer.expired()) {
-         return false;
-      }
       const char* line = pTerminal.readLine(timer);
-      if(line == nullptr) {
-         return false;
-      }
 
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
 
-
-
-      if(strncmp(prefix,line,strlen(prefix)) == 0) {
-         if(strcmp(line+strlen(prefix),"1") == 0) {
+      int creg;
+      if(sscanf(line,"+CREG: %*d,%d", &creg) == 1) {
+         if (creg == 1) {
             networkRegistrationOk = true;
-            continue;
          }
-         networkRegistrationOk = false;
          continue;
       }
       if (strcmp(line, "OK") == 0) {
@@ -247,32 +254,100 @@ bool MobileTerminal::CheckNetworkRegistration::run(MobileTerminal& pTerminal) {
 bool MobileTerminal::CheckGprsAttachment::run(MobileTerminal& pTerminal) {
    Bt::Core::Timer timer(5000);
    pTerminal.sendCommand("AT+CGATT?");
-   const char* prefix = "+CGATT: ";
 
    bool gprsAttachmentOk = false;
-
    while(true){
-      if(timer.expired()) {
-         return false;
-      }
       const char* line = pTerminal.readLine(timer);
-      if(line == nullptr) {
-         return false;
-      }
-      if(strncmp(prefix,line,strlen(prefix)) == 0) {
-         if(strcmp(line+strlen(prefix),"1") == 0) {
-            gprsAttachmentOk = true;
-            continue;
-         }
-         gprsAttachmentOk = false;
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "+CGATT: 1") == 0) {
+         gprsAttachmentOk = true;
          continue;
       }
       if (strcmp(line, "OK") == 0) {
          return gprsAttachmentOk;
       }
-      int ip[4];
-      if (sscanf(line, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]) == 4)
+
+      return false;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+bool MobileTerminal::StartTaskAndSetAPN::run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword) {
+   Bt::Core::Timer timer(5000);
+
+   char cmd[CMD_BUFFER_SIZE];
+   Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
+   builder.print("AT+CSTT=\"");
+   builder.print(pApn);
+   if(pUser != nullptr) {
+      builder.print("\",\"");
+      builder.print(pUser);
+   }
+   if(pPassword != nullptr) {
+      builder.print("\",\"");
+      builder.print(pPassword);
+   }
+   builder.print("\"");
+   pTerminal.sendCommand(cmd);
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "OK") == 0) {
          return true;
+      }
+
+      return false;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+bool MobileTerminal::BringUpWirelessConnection::run(MobileTerminal& pTerminal) {
+   Bt::Core::Timer timer(85000);
+   pTerminal.sendCommand("AT+CIICR");
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "OK") == 0) {
+         return true;
+      }
+
+      return false;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+bool MobileTerminal::GetLocalIp::run(MobileTerminal& pTerminal) {
+   Bt::Core::Timer timer(5000);
+   pTerminal.sendCommand("AT+CIFSR");
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      int ip[4];
+      if (sscanf(line, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]) == 4){
+         return true;
+      }
+
       return false;
    }
 }

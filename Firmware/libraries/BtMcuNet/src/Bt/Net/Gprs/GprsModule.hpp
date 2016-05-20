@@ -232,7 +232,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
 
             void checkGprsAttachment() {
                if(mController->mMobileTerminal->checkGprsAttachment()){
-                  mController->nextState(mController->mDummy);
+                  mController->nextState(mController->mSetApn);
                   return;
                }
                mController->setTimer(100);
@@ -240,6 +240,57 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
 
             virtual const char* name() {
                return "AwaitGprsAttachment";
+            }
+      };
+
+      class SetApn : public StateBase  {
+         public:
+            SetApn(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+               if(!mController->mMobileTerminal->startTaskAndSetAPN("gprs.swisscom.ch")){
+                  mController->nextState(mController->mReseting);
+                  return;
+               }
+               mController->nextState(mController->mBringUpWirelessConnection);
+            }
+
+            virtual const char* name() {
+               return "SetApn";
+            }
+      };
+
+      class BringUpWirelessConnection : public StateBase  {
+         public:
+            BringUpWirelessConnection(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+               if(!mController->mMobileTerminal->bringUpWirelessConnection()){
+                  mController->nextState(mController->mReseting);
+                  return;
+               }
+               mController->nextState(mController->mGetLocalIp);
+            }
+
+            virtual const char* name() {
+               return "BringUpWirelessConnection";
+            }
+      };
+
+      class GetLocalIp : public StateBase  {
+         public:
+            GetLocalIp(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+               if(!mController->mMobileTerminal->getLocalIp()){
+                  mController->nextState(mController->mReseting);
+                  return;
+               }
+               mController->nextState(mController->mDummy);
+            }
+
+            virtual const char* name() {
+               return "BringUpWirelessConnection";
             }
       };
 
@@ -277,6 +328,9 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>
       ConfigurePin mConfigurePin;
       AwaitNetworkRegistration mAwaitNetworkRegistration;
       AwaitGprsAttachment mAwaitGprsAttachment;
+      SetApn mSetApn;
+      BringUpWirelessConnection mBringUpWirelessConnection;
+      GetLocalIp mGetLocalIp;
 
       Dummy mDummy;
 

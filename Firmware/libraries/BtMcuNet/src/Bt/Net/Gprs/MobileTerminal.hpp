@@ -31,6 +31,9 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       virtual bool checkAndSetPin(const char *pPin);
       virtual bool checkNetworkRegistration();
       virtual bool checkGprsAttachment();
+      virtual bool startTaskAndSetAPN(const char* pApn, const char* pUser, const char* pPassword);
+      virtual bool bringUpWirelessConnection();
+      virtual bool getLocalIp();
 
       virtual uint32_t workcycle();
 
@@ -92,6 +95,25 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
             bool run(MobileTerminal& pTerminal);
          private:
       };
+
+      class StartTaskAndSetAPN {
+         public:
+            bool run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword);
+         private:
+      };
+
+      class BringUpWirelessConnection {
+         public:
+            bool run(MobileTerminal& pTerminal);
+         private:
+      };
+
+      class GetLocalIp {
+         public:
+            bool run(MobileTerminal& pTerminal);
+         private:
+      };
+
 
 
       void sendCommand(const char* pCommand);

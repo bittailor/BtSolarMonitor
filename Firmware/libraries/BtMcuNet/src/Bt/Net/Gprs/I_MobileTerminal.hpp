@@ -21,6 +21,11 @@ class I_MobileTerminal {
       virtual bool checkAndSetPin(const char* pPin) = 0;
       virtual bool checkNetworkRegistration() = 0;
       virtual bool checkGprsAttachment() = 0;
+      virtual bool startTaskAndSetAPN(const char* pApn, const char* pUser = nullptr, const char* pPassword = nullptr)=0;
+      virtual bool bringUpWirelessConnection()=0;
+      virtual bool getLocalIp()=0;
+
+
 };
 
 } // namespace Gprs

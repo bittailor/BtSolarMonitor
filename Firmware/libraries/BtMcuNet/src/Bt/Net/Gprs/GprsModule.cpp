@@ -28,6 +28,9 @@ GprsModule::GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core:
 , mConfigurePin(*this)
 , mAwaitNetworkRegistration(*this)
 , mAwaitGprsAttachment(*this)
+, mSetApn(*this)
+, mBringUpWirelessConnection(*this)
+, mGetLocalIp(*this)
 , mDummy(*this) {
 
 }

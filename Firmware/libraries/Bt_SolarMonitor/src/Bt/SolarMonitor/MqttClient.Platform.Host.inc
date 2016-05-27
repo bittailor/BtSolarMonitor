@@ -11,7 +11,7 @@ namespace SolarMonitor {
 
 //-------------------------------------------------------------------------------------------------
 
-MqttClient::MqttClient()
+MqttClient::MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle)
 {
 
 }

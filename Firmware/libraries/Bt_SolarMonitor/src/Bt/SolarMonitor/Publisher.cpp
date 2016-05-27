@@ -60,6 +60,11 @@ void Publisher::begin() {
 
 void Publisher::publish(const MeasurementRecord& pMeasurementRecord) {
 
+   if(!mMqttClient->isConnected()){
+      LOG("!!! mqtt not connected => skip publish !!!");
+   }
+
+
    char message[500] = {0};
    Bt::Core::StaticStringBuilder builder(message,sizeof(message)/sizeof(message[0]));
 

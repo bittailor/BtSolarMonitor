@@ -20,7 +20,7 @@ class I_MqttClient {
 
       virtual ~I_MqttClient() {}
 
-      virtual bool connect()=0;
+      //virtual bool connect()=0;
       virtual bool isConnected()=0;
 
       virtual bool yield(uint32_t pTimeoutInMilliseconds)=0;

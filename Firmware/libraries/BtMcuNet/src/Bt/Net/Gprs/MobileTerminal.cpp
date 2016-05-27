@@ -16,6 +16,45 @@ namespace Gprs {
 #define LOG_MT(msg) LOG(msg)
 #define CMD_BUFFER_SIZE 256
 
+namespace {
+
+static const char *const sUrcResponses[] = {
+         "+CIPRXGET: 1,",    /* incoming socket data notification */
+         "+FTPGET: 1,",      /* FTP state change notification */
+         "+PDP: DEACT",      /* PDP disconnected */
+         "+SAPBR 1: DEACT",  /* PDP disconnected (for SAPBR apps) */
+         "*PSNWID: ",        /* AT+CLTS network name */
+         "*PSUTTZ: ",        /* AT+CLTS time */
+         "+CTZV: ",          /* AT+CLTS timezone */
+         "DST: ",            /* AT+CLTS dst information */
+         "+CIEV: ",          /* AT+CLTS undocumented indicator */
+         "RDY",              /* Assorted crap on newer firmware releases. */
+         "Call Ready",
+         "SMS Ready",
+         "NORMAL POWER DOWN",
+         "UNDER-VOLTAGE POWER DOWN",
+         "UNDER-VOLTAGE WARNNING",
+         "OVER-VOLTAGE POWER DOWN",
+         "OVER-VOLTAGE WARNNING",
+         NULL
+};
+
+
+
+bool isUrcResponse(const char *line)
+{
+    for (int i=0; sUrcResponses[i] != NULL; i++) {
+       if (!strncmp(line, sUrcResponses[i], strlen(sUrcResponses[i]))) {
+          return true;
+       }
+    }
+    return false;
+}
+
+
+}
+
+
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
@@ -61,19 +100,29 @@ bool MobileTerminal::checkGprsAttachment() {
    return command.run(*this);
 }
 
-bool MobileTerminal::startTaskAndSetAPN(const char* pApn, const char* pUser, const char* pPassword) {
-   StartTaskAndSetAPN command;
+bool MobileTerminal::bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword) {
+   BringUpWirelessConnection command;
    return command.run(*this, pApn, pUser, pPassword);
 }
 
-bool MobileTerminal::bringUpWirelessConnection() {
-   BringUpWirelessConnection command;
+int MobileTerminal::connect(const char* pHostname, int pPort) {
+   Connect command;
+   return command.run(*this, pHostname, pPort);
+}
+
+bool MobileTerminal::checkConnected() {
+   CheckConnected command;
    return command.run(*this);
 }
 
-bool MobileTerminal::getLocalIp() {
-   GetLocalIp command;
-   return command.run(*this);
+int MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout) {
+   Write command;
+   return command.run(*this, pBuffer, pLen, pTimeout);
+}
+
+int MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout) {
+   Read command;
+   return command.run(*this, pBuffer, pLen, pTimeout);
 }
 
 void MobileTerminal::sendCommand(const char* pCommand) {
@@ -88,7 +137,22 @@ void MobileTerminal::sendLine(const char* pLine) {
 }
 
 const char* MobileTerminal::readLine(Bt::Core::Timer& pTimer) {
-   const char* line = mLineReader.readLine(*mStream, pTimer);
+   while(true) {
+      const char* line = mLineReader.readLine(*mStream, pTimer);
+      if(line == nullptr) {
+         LOG_MT("  <-(TIMEOUT)- ");
+         return nullptr;
+      }
+      if(!isUrcResponse(line)) {
+         LOG_MT("  <--- " << line);
+         return line;
+      }
+      LOG_MT("  <-(ignore urc)-- " << line);
+   }
+}
+
+const char* MobileTerminal::readPrompt(Bt::Core::Timer& pTimer) {
+   const char* line = mLineReader.readPrompt(*mStream, pTimer);
    if( line == nullptr) {
       LOG_MT("  <-(TIMEOUT)- ");
    } else {
@@ -99,7 +163,7 @@ const char* MobileTerminal::readLine(Bt::Core::Timer& pTimer) {
 
 void MobileTerminal::flushInput() {
    while(mStream->available()) {
-      mStream->read();
+      LOG_MT(" flush:" << (char)mStream->read());
    }
 }
 
@@ -238,6 +302,8 @@ bool MobileTerminal::CheckNetworkRegistration::run(MobileTerminal& pTerminal) {
       if(sscanf(line,"+CREG: %*d,%d", &creg) == 1) {
          if (creg == 1) {
             networkRegistrationOk = true;
+         } else {
+            networkRegistrationOk = false;
          }
          continue;
       }
@@ -262,6 +328,10 @@ bool MobileTerminal::CheckGprsAttachment::run(MobileTerminal& pTerminal) {
       if(timer.expired()) { return false; }
       if(line == nullptr) {return false;}
 
+      if (strcmp(line, "+CGATT: 0") == 0) {
+         gprsAttachmentOk = false;
+         continue;
+      }
       if (strcmp(line, "+CGATT: 1") == 0) {
          gprsAttachmentOk = true;
          continue;
@@ -277,9 +347,61 @@ bool MobileTerminal::CheckGprsAttachment::run(MobileTerminal& pTerminal) {
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
-bool MobileTerminal::StartTaskAndSetAPN::run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword) {
-   Bt::Core::Timer timer(5000);
+bool MobileTerminal::BringUpWirelessConnection::run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword) {
 
+   Bt::Core::Timer timer(2000);
+   pTerminal.sendCommand("AT+CIPMUX=0");
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "OK") == 0) {
+         break;
+      }
+
+      return false;
+   }
+
+   // ---
+
+   timer = 2000;
+   pTerminal.sendCommand("AT+CIPQSEND=1");
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "OK") == 0) {
+         break;
+      }
+
+      return false;
+   }
+
+   // ---
+
+   timer = 2000;
+   pTerminal.sendCommand("AT+CIPRXGET=1");
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "OK") == 0) {
+         break;
+      }
+
+      return false;
+   }
+
+   // ---
+
+   timer = 5000;
    char cmd[CMD_BUFFER_SIZE];
    Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
    builder.print("AT+CSTT=\"");
@@ -302,39 +424,34 @@ bool MobileTerminal::StartTaskAndSetAPN::run(MobileTerminal& pTerminal, const ch
       if(line == nullptr) {return false;}
 
       if (strcmp(line, "OK") == 0) {
-         return true;
+         break;
       }
 
       return false;
    }
-}
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
+   // ---
 
-bool MobileTerminal::BringUpWirelessConnection::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(85000);
+   timer = 85000;
+
    pTerminal.sendCommand("AT+CIICR");
 
    while(true){
       const char* line = pTerminal.readLine(timer);
 
       if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
+      if(line == nullptr) { return false; }
 
       if (strcmp(line, "OK") == 0) {
-         return true;
+         break;
       }
 
       return false;
    }
-}
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
+   // ---
 
-bool MobileTerminal::GetLocalIp::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(5000);
+   timer = 10000;
    pTerminal.sendCommand("AT+CIFSR");
 
    while(true){
@@ -345,9 +462,112 @@ bool MobileTerminal::GetLocalIp::run(MobileTerminal& pTerminal) {
 
       int ip[4];
       if (sscanf(line, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]) == 4){
-         return true;
+         break;
       }
 
+      return false;
+   }
+
+
+
+   return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+int MobileTerminal::Connect::run(MobileTerminal& pTerminal, const char* pHostname, int pPort) {
+   Bt::Core::Timer timer(160000);
+
+   pTerminal.sendCommand("AT+CIPSTATUS");
+   bool needsCipShut = false;
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return -1; }
+      if(line == nullptr) { return -1; }
+
+      if (strcmp(line, "OK") == 0) {
+         continue;
+      }
+      char state[30];
+      if (sscanf(line, "STATE: %[^\t\n]", state) == 1) {
+         LOG("State is " << state);
+         if(strcmp(state, "IP INITIAL") || strcmp(state, "IP STATUS")){
+            needsCipShut = false;
+         }else {
+            needsCipShut = true;
+         }
+         break;
+      }
+      return -1;
+   }
+
+   if(needsCipShut){
+      pTerminal.sendCommand("AT+CIPSHUT");
+      while(true){
+         const char* line = pTerminal.readLine(timer);
+
+         if(timer.expired()) { return -1; }
+         if(line == nullptr) { return -1; }
+
+         if (strcmp(line, "SHUT OK") == 0) {
+            break;
+         }
+         return -1;
+      }
+   }
+
+   char cmd[CMD_BUFFER_SIZE];
+   Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
+   builder.print("AT+CIPSTART=\"TCP\",\"");
+   builder.print(pHostname);
+   builder.print("\",\"");
+   builder.print(pPort);
+   builder.print("\"");
+   pTerminal.sendCommand(cmd);
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return -1; }
+      if(line == nullptr) { return -1; }
+
+      if (strcmp(line, "OK") == 0) {
+         return 0;
+      }
+      return -1;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+bool MobileTerminal::CheckConnected::run(MobileTerminal& pTerminal) {
+   Bt::Core::Timer timer(5000);
+
+   pTerminal.sendCommand("AT+CIPSTATUS");
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) { return false; }
+
+      if (strcmp(line, "OK") == 0) {
+         continue;
+      }
+      if (strcmp(line, "CONNECT OK") == 0) {
+         continue;
+      }
+      char state[30];
+      if (sscanf(line, "STATE: %[^\t\n]", state) == 1) {
+         LOG("State is " << state);
+         if(strcmp(state, "CONNECT OK") == 0) {
+            return true;
+         }
+         return false;
+      }
       return false;
    }
 }
@@ -355,6 +575,131 @@ bool MobileTerminal::GetLocalIp::run(MobileTerminal& pTerminal) {
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 
+int MobileTerminal::Write::run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout) {
+   LOG_MT("MobileTerminal::Write " << pLen << "...");
+
+   Bt::Core::Timer timer(pTimeout);
+   char cmd[CMD_BUFFER_SIZE];
+   Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
+   builder.print("AT+CIPSEND=");
+   builder.print(pLen);
+   pTerminal.sendCommand(cmd);
+
+   while(true){
+      const char* line = pTerminal.readPrompt(timer);
+
+      if(timer.expired()) { return -1; }
+      if(line == nullptr) { return -1; }
+
+      if (strcmp(line, ">") == 0) {
+         LOG_MT("have > send data " << pLen);
+         break;
+      }
+      return -1;
+   }
+   pTerminal.flushInput();
+   pTerminal.mStream->write(pBuffer,pLen);
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return -1;}
+      if(line == nullptr) { return -1;}
+
+      int acceptedLen = 0;
+      if (sscanf(line, "DATA ACCEPT:%d", &acceptedLen) == 1) {
+         return acceptedLen;
+      }
+      return -1;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+int MobileTerminal::Read::run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout) {
+   LOG_MT("MobileTerminal::Read plen=" << pLen << "  pTimeout=" << pTimeout << "...");
+
+
+
+   if(pTimeout < 200 ) {
+      pTimeout = 200;
+      LOG_MT("increase timeout to " << pTimeout);
+   }
+   Bt::Core::Timer timer(pTimeout);
+
+
+   pTerminal.sendCommand("AT+CIPRXGET=4");
+
+   int available = 0;
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return -1; }
+      if(line == nullptr) { return -1; }
+
+      if(sscanf(line,"+CIPRXGET: %*d,%d", &available) == 1) {
+         LOG_MT("   available = " << available);
+         continue;
+      }
+
+      if (strcmp(line, "OK") == 0) {
+         if (available >= pLen) {
+            LOG_MT("     => ok read " << pLen);
+            break;
+         }
+         return -1;
+      }
+      return -1;
+   }
+
+
+
+   int confirmed = -1;
+   char cmd[CMD_BUFFER_SIZE];
+   Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
+   builder.print("AT+CIPRXGET=2,");
+   builder.print(pLen);
+   pTerminal.sendCommand(cmd);
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if(sscanf(line,"+CIPRXGET: %*d,%d,%*d", &confirmed) == 1) {
+         LOG_MT("  confirmed = " << confirmed);
+         if (confirmed >= pLen) {
+            break;
+         }
+      }
+      return -1;
+   }
+
+   LOG_MT("Read " << pLen << " bytes ...");
+   pTerminal.mStream->readBytes(pBuffer,pLen);
+   LOG_MT("... done");
+
+   while(true){
+      const char* line = pTerminal.readLine(timer);
+
+      if(timer.expired()) { return false; }
+      if(line == nullptr) {return false;}
+
+      if (strcmp(line, "OK") == 0) {
+         return pLen;
+      }
+
+      return -1;
+   }
+
+   return -1;
+
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 } // namespace Gprs
 } // namespace Net

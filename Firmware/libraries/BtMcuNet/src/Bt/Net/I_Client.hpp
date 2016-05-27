@@ -14,9 +14,9 @@ class I_Client {
    public:
       virtual ~I_Client() {}
 
-      virtual int connect(char* pHostname, int pPort)=0;
-      virtual int read(unsigned char* bBuffer, int len, int bTimeout)=0;
-      virtual int write(unsigned char* bBuffer, int len, int bTimeout)=0;
+      virtual int connect(const char* pHostname, int pPort)=0;
+      virtual int read(unsigned char* pBuffer, int pLen, int pTimeout)=0;
+      virtual int write(unsigned char* pBuffer, int pLen, int pTimeout)=0;
       virtual int disconnect()=0;
 
 };

@@ -62,9 +62,29 @@ class StateMachine : public Bt::Core::I_Runnable
          (mCurrentState->*pEvent)();
       }
 
+      template<typename R>
+      R handle(R (State::*pEvent)()) {
+         return (mCurrentState->*pEvent)();
+      }
+
       template<typename Arg>
       void handle(void (State::*pEvent)(Arg),Arg pArg) {
          (mCurrentState->*pEvent)(pArg);
+      }
+
+      template<typename Arg1, typename Arg2>
+      void handle(void (State::*pEvent)(Arg1,Arg2), Arg1 pArg1, Arg2 pArg2) {
+         (mCurrentState->*pEvent)(pArg1, pArg2);
+      }
+
+      template<typename R, typename Arg1, typename Arg2>
+      R handle(R (State::*pEvent)(Arg1,Arg2), Arg1 pArg1, Arg2 pArg2) {
+         return (mCurrentState->*pEvent)(pArg1, pArg2);
+      }
+
+      template<typename R, typename Arg1, typename Arg2, typename Arg3>
+      R handle(R (State::*pEvent)(Arg1,Arg2,Arg3), Arg1 pArg1, Arg2 pArg2, Arg3 pArg3) {
+         return (mCurrentState->*pEvent)(pArg1, pArg2, pArg3);
       }
 
 
@@ -87,9 +107,17 @@ class StateMachine : public Bt::Core::I_Runnable
          mInterval = 0;
       }
 
-      void init(StateBase& initialState) {
-         mCurrentState = &initialState;
+      void init(StateBase& pInitialState) {
+         mCurrentState = &pInitialState;
          mCurrentState->onEnter();
+      }
+
+      bool checkState(StateBase& pState) {
+         return mCurrentState ==  &pState;
+      }
+
+      StateBase& currentState() {
+         return *mCurrentState;
       }
 
       virtual const char* name() =0;

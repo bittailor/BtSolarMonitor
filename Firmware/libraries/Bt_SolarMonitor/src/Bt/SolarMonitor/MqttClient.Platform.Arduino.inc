@@ -10,6 +10,8 @@
 namespace Bt {
 namespace SolarMonitor {
 
+#define FONA_KEY 12
+#define FONA_PS A0
 #define FONA_RST 9
 #define FONA_APN "gprs.swisscom.ch"
 
@@ -25,10 +27,14 @@ namespace SolarMonitor {
 
 //-------------------------------------------------------------------------------------------------
 
-MqttClient::MqttClient()
-: mFona(FONA_RST)
-, mNetwork(mFona)
-, mMqttClient(mNetwork)
+MqttClient::MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle)
+: mWorkcycle(&pWorkcycle)
+, mOnOffKey(FONA_KEY)
+, mReset(FONA_RST)
+, mPowerState(FONA_PS)
+, mMobileTerminal(FONA_SERIAL)
+, mGprsModule(pTime, mOnOffKey, mReset, mPowerState, mMobileTerminal)
+, mMqttClient(mGprsModule)
 {
 
 }
@@ -43,6 +49,15 @@ MqttClient::~MqttClient() {
 
 void MqttClient::begin() {
    FONA_SERIAL.begin(115200);
+   mWorkcycle->add(mMobileTerminal);
+   mWorkcycle->add(mGprsModule);
+   mOnOffKey.begin();
+   mReset.begin();
+   mPowerState.begin();
+   mGprsModule.begin(*this);
+
+
+
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -64,97 +79,65 @@ bool MqttClient::publish(const char* pTopicName, const char* pMessage, QoS pQos,
 }
 
 
+
+//-------------------------------------------------------------------------------------------------
+
+void MqttClient::onReady() {
+   const char * url = "broker.shiftr.io";
+   //const char * url = "iot.eclipse.org";
+
+   while(int rc = mGprsModule.connect(url,1883) != 0) {
+      LOG("tcp connect failed with " << rc);
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void MqttClient::onConnected() {
+   MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
+   data.MQTTVersion = 3;
+   data.clientID.cstring = (char*)"bt-resource-check";
+   data.keepAliveInterval = 120;
+   data.willFlag = true;
+   data.will.topicName.cstring = (char*)"BSM/Status";
+   data.will.message.cstring = (char*)"offline";
+   data.will.retained = true;
+   data.will.qos = MQTT::QOS1;
+   data.username.cstring = (char*)"f64edae4";
+   data.password.cstring = (char*)"eea9554c6e05c108";
+
+   int rc = mMqttClient.connect(data);
+   if (rc != 0)
+   {
+      LOG("connect returned"  << rc);
+      return;
+   }
+   LOG("MQTT connected");
+
+   publish("BSM/Status", "online", QoS::QOS1, "online");
+}
+
 //-------------------------------------------------------------------------------------------------
 
 bool MqttClient::connect() {
-   if(connectGPRS()){
-      return connectMQTT();
-   }
-   LOG("GPRS failed !");
-   return false;
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MqttClient::isConnected() {
-   return mMqttClient.isConnected();
+   if(mGprsModule.isConnected()) {
+      return mMqttClient.isConnected();
+   }
+   return false;
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MqttClient::yield(uint32_t pTimeoutInMilliseconds) {
-   return mMqttClient.yield(pTimeoutInMilliseconds);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-bool MqttClient::connectGPRS() {
-   if (! mFona.begin(FONA_SERIAL)) {
-      LOG("Fona.begin failed !");
-      return false;
+   if(mGprsModule.isConnected()) {
+      return mMqttClient.yield(pTimeoutInMilliseconds);
    }
-
-   FONA_SERIAL.println("AT+CMEE=2");
-   mFona.unlockSIM("1210");
-
-   while (mFona.getNetworkStatus() != 1) {
-      delay(100);
-   }
-
-   mFona.setGPRSNetworkSettings(F(FONA_APN));
-
-   if (!mFona.enableGPRS(true)) {
-      LOG("Fona.enableGPRS failed !");
-      return false;
-   }
-
-   while (mFona.GPRSstate() != 1) {
-      delay(100);
-   }
-
-   delay(100);
-   mFona.sendCheckReply("AT+CIPSEND?",F("OK"), 10000);
-   delay(100);
-
-   return true;
-}
-
-
-//-------------------------------------------------------------------------------------------------
-
-bool MqttClient::connectMQTT() {
-    char hostname[] = "broker.shiftr.io";
-    int port = 1883;
-
-
-    int rc = mNetwork.connect(hostname, port);
-    if (rc != 0)
-    {
-    }
-
-    MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
-    data.MQTTVersion = 3;
-    data.clientID.cstring = (char*)"bt-resource-check";
-    data.keepAliveInterval = 120;
-    data.willFlag = true;
-    data.will.topicName.cstring = (char*)"BSM/Status";
-    data.will.message.cstring = (char*)"offline";
-    data.will.retained = true;
-    data.will.qos = MQTT::QOS1;
-    data.username.cstring = (char*)"f64edae4";
-    data.password.cstring = (char*)"eea9554c6e05c108";
-
-
-    rc = mMqttClient.connect(data);
-    if (rc != 0)
-    {
-       LOG("connect returned"  << rc);
-    }
-    LOG("MQTT connected");
-
-    publish("BSM/Status","online",QOS1,"online");
-
-    return true;
+   return false;
 }
 
 //-------------------------------------------------------------------------------------------------

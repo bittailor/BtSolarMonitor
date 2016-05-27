@@ -9,6 +9,9 @@
 
 #include "Bt/SolarMonitor/I_MqttClient.hpp"
 
+#include "Bt/Core/I_Time.hpp"
+#include "Bt/Core/I_Workcycle.hpp"
+
 #ifdef ARDUINO
    #include "Bt/SolarMonitor/MqttClient.Platform.Arduino.hpp"
 #else

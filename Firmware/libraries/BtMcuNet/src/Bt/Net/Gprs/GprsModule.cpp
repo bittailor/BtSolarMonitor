@@ -6,6 +6,8 @@
 
 #include "Bt/Net/Gprs/GprsModule.hpp"
 
+#include <Bt/Core/Logger.hpp>
+
 namespace Bt {
 namespace Net {
 namespace Gprs {
@@ -28,10 +30,12 @@ GprsModule::GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core:
 , mConfigurePin(*this)
 , mAwaitNetworkRegistration(*this)
 , mAwaitGprsAttachment(*this)
-, mSetApn(*this)
 , mBringUpWirelessConnection(*this)
-, mGetLocalIp(*this)
-, mDummy(*this) {
+, mReady(*this)
+, mConnecting(*this)
+, mConnected(*this)
+, mDummy(*this)
+, mListener(nullptr){
 
 }
 
@@ -43,7 +47,8 @@ GprsModule::~GprsModule() {
 
 //-------------------------------------------------------------------------------------------------
 
-void GprsModule::begin() {
+void GprsModule::begin(I_Listener& pListener) {
+   mListener = &pListener;
    mOnOffKey->write(true);
    mReset->write(true);
    init(mInitial);
@@ -51,8 +56,57 @@ void GprsModule::begin() {
 
 //-------------------------------------------------------------------------------------------------
 
+bool GprsModule::isConnected() {
+   return handle(&GprsModuleState::isConnected);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+int GprsModule::connect(const char* pHostname, int pPort) {
+   return handle(&GprsModuleState::connect,pHostname,pPort);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+int GprsModule::read(unsigned char* pBuffer, int pLen, int pTimeout) {
+   int rc = handle(&GprsModuleState::read,pBuffer, pLen, pTimeout);
+   LOG("GprsModule::read " << pLen << " => " <<  rc);
+   return rc;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+int GprsModule::write(unsigned char* pBuffer, int pLen, int pTimeout) {
+   int rc = handle(&GprsModuleState::write,pBuffer, pLen, pTimeout);
+   LOG("GprsModule::write " << pLen << " => " <<  rc);
+   return rc;
+}
+//-------------------------------------------------------------------------------------------------
+
+int GprsModule::disconnect() {
+   return -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 const char* GprsModule::name() {
    return "GM";
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void GprsModule::readyCallback() {
+   if(mListener != nullptr) {
+      mListener->onReady();
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void GprsModule::connectedCallback() {
+   if(mListener != nullptr) {
+      mListener->onConnected();
+   }
 }
 
 //-------------------------------------------------------------------------------------------------

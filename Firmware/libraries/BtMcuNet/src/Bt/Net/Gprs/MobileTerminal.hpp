@@ -31,9 +31,12 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       virtual bool checkAndSetPin(const char *pPin);
       virtual bool checkNetworkRegistration();
       virtual bool checkGprsAttachment();
-      virtual bool startTaskAndSetAPN(const char* pApn, const char* pUser, const char* pPassword);
-      virtual bool bringUpWirelessConnection();
-      virtual bool getLocalIp();
+      virtual bool bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword);
+
+      virtual int connect(const char* pHostname, int pPort);
+      virtual bool checkConnected();
+      virtual int write(unsigned char* pBuffer, int pLen, int pTimeout);
+      virtual int read(unsigned char* pBuffer, int pLen, int pTimeout);
 
       virtual uint32_t workcycle();
 
@@ -60,11 +63,6 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
             WaitingForResponse(MobileTerminal& pContext) : State(pContext) {}
             virtual uint32_t delay() {return Bt::Core::I_Runnable::IMMEDIATELY;}
       };
-
-//      class Command {
-//         public:
-//            void run(MobileTerminal& pTerminal);
-//      };
 
       class AtOkCommand {
          public:
@@ -96,29 +94,40 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
          private:
       };
 
-      class StartTaskAndSetAPN {
+      class BringUpWirelessConnection {
          public:
             bool run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword);
          private:
       };
 
-      class BringUpWirelessConnection {
+      class Connect {
+         public:
+            int run(MobileTerminal& pTerminal, const char* pHostname, int pPort);
+         private:
+      };
+
+      class CheckConnected {
          public:
             bool run(MobileTerminal& pTerminal);
          private:
       };
 
-      class GetLocalIp {
+      class Write {
          public:
-            bool run(MobileTerminal& pTerminal);
+            int run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout);
          private:
       };
 
-
+      class Read {
+         public:
+            int run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout);
+         private:
+      };
 
       void sendCommand(const char* pCommand);
       void sendLine(const char* pLine);
       const char* readLine(Bt::Core::Timer& pTimer);
+      const char* readPrompt(Bt::Core::Timer& pTimer);
       void flushInput();
 
       Stream* mStream;

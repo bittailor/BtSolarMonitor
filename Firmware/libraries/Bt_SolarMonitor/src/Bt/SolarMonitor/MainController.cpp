@@ -64,6 +64,7 @@ MainController::MainController()
 , mNokiaScreenOne(A5, A4, A3)
 , mNokiaScreenTwo(A5, A2, A1)
 , mScreens(mNokiaScreenOne, mNokiaScreenTwo)
+, mMqttClient(mTime,mMainWorkcycle)
 , mPublisher(mMqttClient)
 , mRecordToPublish(
          Measurement(0,0),

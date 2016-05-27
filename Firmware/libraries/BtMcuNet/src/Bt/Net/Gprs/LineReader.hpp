@@ -54,6 +54,35 @@ class LineReader
          }
       }
 
+      const char* readPrompt(Stream& pStream, Bt::Core::Timer& pTimer) {
+         mLength = 0;
+         mBuffer[mLength] = '\0';
+         while(true){
+            if(pTimer.expired()) {
+               return nullptr;
+            }
+            if (pStream.available()) {
+               char character = pStream.read();
+               if(character == LF) {
+                  if(mLength > 0) {
+                     return mBuffer;
+                  }
+                  continue;
+               }
+               if(character == CR) {
+                  continue;
+               }
+               mBuffer[mLength++] = character;
+               mBuffer[mLength] = '\0';
+               if(character == '>' && mLength == 1) {
+                  return mBuffer;
+               }
+            }
+         }
+      }
+
+
+
    private:
       char mBuffer[LINE_BUFFER_SIZE];
       size_t mLength;

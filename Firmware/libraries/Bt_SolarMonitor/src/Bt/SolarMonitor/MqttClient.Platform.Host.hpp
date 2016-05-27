@@ -8,13 +8,14 @@
 #define INC__Bt_SolarMonitor_MqttClient_Platform_Host__hpp
 
 
+
 namespace Bt {
 namespace SolarMonitor {
 
 class MqttClient : public I_MqttClient
 {
    public:
-      MqttClient();
+      MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle);
       ~MqttClient();
 
       void begin();

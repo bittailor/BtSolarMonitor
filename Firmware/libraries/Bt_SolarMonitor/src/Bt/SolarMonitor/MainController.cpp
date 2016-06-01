@@ -44,6 +44,7 @@ const uint16_t sConfigurationControl =
 
 MainController::MainController()
 : mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
+, mYieldCallback(mTime,10*1000,Bt::Core::Function<void()>::build<MainController,&MainController::yield>(*this))
 , mPublishCallback(mTime,/*10 * 60 * 1000*/ 2 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
@@ -74,6 +75,7 @@ MainController::MainController()
          Measurement(0,0),
          Measurement(0,0)){
    mMainWorkcycle.add(mMeasureCallback);
+   mMainWorkcycle.add(mYieldCallback);
    mMainWorkcycle.add(mPublishCallback);
 }
 
@@ -124,7 +126,19 @@ void MainController::measure() {
 
 //-------------------------------------------------------------------------------------------------
 
+
+void MainController::yield() {
+   if(!mMqttClient.isConnected()) {
+      mMqttClient.yield(1);
+   } else {
+      mMqttClient.connect();
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void MainController::publish() {
+
    if(!mMqttClient.isConnected()) {
       LOG("oops is disconnected lets reconnect");
       if(!mMqttClient.connect()) {
@@ -146,6 +160,7 @@ void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
 
    mRecordToPublish = pRecord;
 
+   /*
    LOG("");
    LOG(counter++);
    log("PanelA:  ", pRecord.panelA());
@@ -154,14 +169,15 @@ void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
    log("BatteryB:", pRecord.batteryB());
    log("Load:    ", pRecord.load());
    log("Control: ", pRecord.control());
+   */
 
    I_PowerState::State powerState = mIoSlave.powerState();
-   LOG("PowerState: " << powerState);
+   //LOG("PowerState: " << powerState);
 
-   bool connectionState =  mMqttClient.yield(1);
-   LOG("ConnectionState" << connectionState);
+   //bool connectionState =  mMqttClient.yield(1);
+   //LOG("ConnectionState" << connectionState);
 
-   mScreens.update(pRecord, powerState, connectionState);
+   mScreens.update(pRecord, powerState, true);
 
 
 }

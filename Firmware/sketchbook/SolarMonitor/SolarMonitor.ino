@@ -11,7 +11,9 @@ void setup() {
    pinMode(led, OUTPUT);
    digitalWrite(led, HIGH);
    Serial.begin(115200);
+   delay(1000);
    Serial.println("**Solar Monitor Main**");
+   Serial.print("FONA_SERIAL.bufferCapacity() = ");Serial.println(Serial1.bufferCapacity());
    sMainController.begin();
    digitalWrite(led, LOW);
 }

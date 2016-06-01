@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "Bt/Core/Logger.hpp"
+#include "Bt/Core/Timing.hpp"
 #include "Bt/Core/StaticStringBuilder.hpp"
 
 namespace Bt {
@@ -16,13 +17,14 @@ namespace SolarMonitor {
 
 namespace {
 
-   #define TOPIC "/v2/feeds/838919833.json"
+//   #define TOPIC "BT/BSM/v2/feeds/838919833.json"
+   #define TOPIC "/v2/feeds/838919833.csv"
 
    typedef const char* FeedId;
 
    void addMeasurement(Print&  pBuilder, FeedId pFeedId, float pValue) {
       pBuilder.print(pFeedId);
-      pBuilder.print(", ");
+      pBuilder.print(",");
       pBuilder.println(pValue,4);
    }
 
@@ -34,8 +36,8 @@ namespace {
    FeedId sFeeds[] = {
       "PanelA.I",
       "PanelA.V",
-      "PanelA.I",
-      "PanelA.V",
+      "PanelB.I",
+      "PanelB.V",
       "BatteryA.I",
       "BatteryA.V",
       "BatteryB.I",
@@ -69,12 +71,14 @@ void Publisher::publish(const MeasurementRecord& pMeasurementRecord) {
    Bt::Core::StaticStringBuilder builder(message,sizeof(message)/sizeof(message[0]));
 
    addMeasurementRecord(builder, &sFeeds[0], pMeasurementRecord.panelA());
-//   addMeasurementRecord(builder, &sFeeds[2], pMeasurementRecord.panelB());
-//   addMeasurementRecord(builder, &sFeeds[4], pMeasurementRecord.batteryA());
-//   addMeasurementRecord(builder, &sFeeds[6], pMeasurementRecord.batteryB());
-//   addMeasurementRecord(builder, &sFeeds[8], pMeasurementRecord.load());
-//   addMeasurementRecord(builder, &sFeeds[10], pMeasurementRecord.control());
-   builder.print('\0');
+   addMeasurementRecord(builder, &sFeeds[2], pMeasurementRecord.panelB());
+   addMeasurementRecord(builder, &sFeeds[4], pMeasurementRecord.batteryA());
+   addMeasurementRecord(builder, &sFeeds[6], pMeasurementRecord.batteryB());
+   addMeasurementRecord(builder, &sFeeds[8], pMeasurementRecord.load());
+   addMeasurementRecord(builder, &sFeeds[10], pMeasurementRecord.control());
+   builder.print("tick");
+   builder.print(",");
+   builder.print(Core::milliseconds());
 
    LOG("message length = " << strlen(message));
    LOG("message " << message);

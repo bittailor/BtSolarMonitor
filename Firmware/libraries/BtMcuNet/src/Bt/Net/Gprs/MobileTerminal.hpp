@@ -18,7 +18,7 @@ namespace Bt {
 namespace Net {
 namespace Gprs {
 
-class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
+class MobileTerminal : public I_MobileTerminal
 {
    public:
       MobileTerminal(Stream& pStream);
@@ -26,116 +26,27 @@ class MobileTerminal : public I_MobileTerminal, public Bt::Core::I_Runnable
       MobileTerminal(const MobileTerminal&) = delete;
       MobileTerminal& operator=(const MobileTerminal&) = delete;
 
-      virtual bool checkAtOk();
-      virtual bool disableEcho();
-      virtual bool checkAndSetPin(const char *pPin);
-      virtual bool checkNetworkRegistration();
-      virtual bool checkGprsAttachment();
-      virtual bool bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword);
-
-      virtual int connect(const char* pHostname, int pPort);
-      virtual bool checkConnected();
-      virtual int write(unsigned char* pBuffer, int pLen, int pTimeout);
-      virtual int read(unsigned char* pBuffer, int pLen, int pTimeout);
-
-      virtual uint32_t workcycle();
+      virtual Return<bool> checkAtOk();
+      virtual Return<void> disableEcho();
+      virtual Return<void> checkAndSetPin(const char* pPin);
+      virtual Return<bool> checkNetworkRegistration();
+      virtual Return<bool> checkGprsAttachment();
+      virtual Return<void> bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword);
+      virtual Return<void> connect(const char* pHostname, int pPort);
+      virtual Return<ConnectionStatus> getConnectionStatus();
+      virtual Return<int> write(unsigned char* pBuffer, int pLen, int pTimeout);
+      virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout);
 
    private:
 
-      class State {
-         public:
-            State(MobileTerminal& pContext) : mContext(&pContext) {}
-            virtual ~State(){}
-            virtual uint32_t delay() = 0;
-         protected:
-            MobileTerminal* mContext;
-      };
-
-      class Idle : public State {
-         public:
-            Idle(MobileTerminal& pContext) : State(pContext) {}
-            virtual uint32_t delay() {return 500;}
-
-      };
-
-      class WaitingForResponse : public State {
-         public:
-            WaitingForResponse(MobileTerminal& pContext) : State(pContext) {}
-            virtual uint32_t delay() {return Bt::Core::I_Runnable::IMMEDIATELY;}
-      };
-
-      class AtOkCommand {
-         public:
-            bool run(MobileTerminal& pTerminal);
-         private:
-      };
-
-      class DisableEchoCommand {
-         public:
-            bool run(MobileTerminal& pTerminal);
-         private:
-      };
-
-      class CheckAndSetPinCommand {
-         public:
-            bool run(MobileTerminal& pTerminal, const char *pPin);
-         private:
-      };
-
-      class CheckNetworkRegistration {
-         public:
-            bool run(MobileTerminal& pTerminal);
-         private:
-      };
-
-      class CheckGprsAttachment {
-         public:
-            bool run(MobileTerminal& pTerminal);
-         private:
-      };
-
-      class BringUpWirelessConnection {
-         public:
-            bool run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword);
-         private:
-      };
-
-      class Connect {
-         public:
-            int run(MobileTerminal& pTerminal, const char* pHostname, int pPort);
-         private:
-      };
-
-      class CheckConnected {
-         public:
-            bool run(MobileTerminal& pTerminal);
-         private:
-      };
-
-      class Write {
-         public:
-            int run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout);
-         private:
-      };
-
-      class Read {
-         public:
-            int run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout);
-         private:
-      };
-
       void sendCommand(const char* pCommand);
       void sendLine(const char* pLine);
-      const char* readLine(Bt::Core::Timer& pTimer);
-      const char* readPrompt(Bt::Core::Timer& pTimer);
+      Return<const char*> readLine(Bt::Core::Timer& pTimer);
+      Return<const char*> readPrompt(Bt::Core::Timer& pTimer);
       void flushInput();
 
       Stream* mStream;
       LineReader<> mLineReader;
-      Idle mIdle;
-      WaitingForResponse mWaitingForResponse;
-      State* mCurrentState;
-
 };
 
 } // namespace Gprs

@@ -40,6 +40,7 @@ class MainController
       MainController& operator=(const MainController&);
 
       void measure();
+      void yield();
       void publish();
 
       void OnMeasurementRecord(const MeasurementRecord& pRecord);
@@ -50,6 +51,7 @@ class MainController
 
       Bt::Core::Workcycle mMainWorkcycle;
       Bt::Core::PeriodicCallback mMeasureCallback;
+      Bt::Core::PeriodicCallback mYieldCallback;
       Bt::Core::PeriodicCallback mPublishCallback;
 
       INA219 mSensorPanelA;

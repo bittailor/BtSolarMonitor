@@ -71,8 +71,8 @@ Core::Workcycle sWorkcycle;
 class Listener : public Net::Gprs::GprsModule::I_Listener {
    public:
       virtual void onReady() {
-         const char * url = "broker.shiftr.io";
-         //const char * url = "iot.eclipse.org";
+         //const char * url = "broker.shiftr.io";
+         const char * url = "iot.eclipse.org";
 
          int rc = sGprsModule.connect(url,1883);
          if(rc!= 0) {
@@ -86,12 +86,12 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
          data.clientID.cstring = (char*)"bt-resource-check";
          data.keepAliveInterval = 120;
          data.willFlag = true;
-         data.will.topicName.cstring = (char*)"GprsModule/Status";
+         data.will.topicName.cstring = (char*)"BT/GprsModule/Status";
          data.will.message.cstring = (char*)"offline";
          data.will.retained = true;
-         data.will.qos = MQTT::QOS1;
-         data.username.cstring = (char*)"f64edae4";
-         data.password.cstring = (char*)"eea9554c6e05c108";
+         data.will.qos = MQTT::QOS0;
+         //data.username.cstring = (char*)"f64edae4";
+         //data.password.cstring = (char*)"eea9554c6e05c108";
 
 
          int rc = sMqttClient.connect(data);
@@ -102,7 +102,7 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
          }
          LOG("MQTT connected");
 
-         rc = publish("GprsModule/Status","online",MQTT::QOS0,true);
+         rc = publish("BT/GprsModule/Status","online",MQTT::QOS0,true);
          LOG("MQTT publish returned " << rc);
          mConnected = true;
       }
@@ -135,7 +135,7 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
             char msg[30];
             Core::StaticStringBuilder builder(msg,30);
             builder.print(millis());
-            int rc = publish("GprsModule/Msg",msg, MQTT::QOS0);
+            int rc = publish("BT/GprsModule/Msg",msg, MQTT::QOS0);
             if(rc != 0) {
                LOG("!!!");
                LOG("!!! MQTT publish failed " << rc);
@@ -170,7 +170,6 @@ void setup() {
    delay(1000);
 
 
-   sWorkcycle.add(sMobileTerminal);
    sWorkcycle.add(sGprsModule);
    sWorkcycle.add(sYield);
    sWorkcycle.add(sPublish);

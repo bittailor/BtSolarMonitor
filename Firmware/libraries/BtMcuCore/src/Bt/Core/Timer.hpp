@@ -24,6 +24,10 @@ class Timer {
          return (milliseconds() - mStart) >= mInterval;
       }
 
+      void expand(int ms) {
+         mInterval = mInterval + ms;
+      }
+
    private:
       uint32_t mInterval;
       uint32_t mStart;

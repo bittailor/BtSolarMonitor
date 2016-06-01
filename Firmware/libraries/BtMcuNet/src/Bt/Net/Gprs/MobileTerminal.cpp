@@ -15,11 +15,14 @@ namespace Gprs {
 
 #define LOG_MT(msg) LOG(msg)
 #define CMD_BUFFER_SIZE 256
+#define DEFAULT_QUERY_CMD_TIMEOUT 500
+#define FIVE_SECOND_TIMEOUT 5000
+
 
 namespace {
 
 static const char *const sUrcResponses[] = {
-         "+CIPRXGET: 1,",    /* incoming socket data notification */
+         "+CIPRXGET: 1",    /* incoming socket data notification */
          "+FTPGET: 1,",      /* FTP state change notification */
          "+PDP: DEACT",      /* PDP disconnected */
          "+SAPBR 1: DEACT",  /* PDP disconnected (for SAPBR apps) */
@@ -36,23 +39,62 @@ static const char *const sUrcResponses[] = {
          "UNDER-VOLTAGE WARNNING",
          "OVER-VOLTAGE POWER DOWN",
          "OVER-VOLTAGE WARNNING",
-         NULL
+         nullptr
 };
-
-
 
 bool isUrcResponse(const char *line)
 {
-    for (int i=0; sUrcResponses[i] != NULL; i++) {
-       if (!strncmp(line, sUrcResponses[i], strlen(sUrcResponses[i]))) {
-          return true;
-       }
-    }
-    return false;
+   for (int i=0; sUrcResponses[i] != nullptr; i++) {
+      if (!strncmp(line, sUrcResponses[i], strlen(sUrcResponses[i]))) {
+         return true;
+      }
+   }
+   return false;
 }
+
+struct ConnectionStatusRecord {
+      const char * text;
+      ConnectionStatus state;
+};
+
+static ConnectionStatusRecord sConnectionStatusRecords[] = {
+         {"IP INITIAL"       , IP_INITIAL},
+         {"IP START"         , IP_START},
+         {"IP CONFIG"        , IP_CONFIG},
+         {"IP GPRSACT"       , IP_GPRSACT},
+         {"IP STATUS"        , IP_STATUS},
+         {"TCP CONNECTING"   , CONNECTING},
+         {"UDP CONNECTING"   , CONNECTING},
+         {"SERVER LISTENING" , CONNECTING},
+         {"CONNECT OK"       , CONNECT_OK},
+         {"TCP CLOSING"      , CLOSING},
+         {"UDP CLOSING"      , CLOSING},
+         {"TCP CLOSED"       , CLOSED},
+         {"UDP CLOSED"       , CLOSED},
+         {"PDP DEACT"        , PDP_DEACT},
+         { nullptr           , IP_INITIAL}
+};
+
+Return<ConnectionStatus> covertFromString(const char * statusString) {
+   for (int i=0; sConnectionStatusRecords[i].text != nullptr; i++) {
+      if (strcmp(statusString, sConnectionStatusRecords[i].text) == 0) {
+         return sConnectionStatusRecords[i].state;
+      }
+   }
+   return ReturnCode::RC_ERROR;
+}
+
+#define checkLine(line)                              \
+         if(line.state() != ReturnCode::RC_SUCCESS) {   \
+            return line.state();                        \
+         }                                              \
+         if (strcmp(line.value(), "ERROR") == 0) {      \
+            return ReturnCode::RC_ERROR;                \
+         }
 
 
 }
+
 
 
 //-------------------------------------------------------------------------------------------------
@@ -60,10 +102,7 @@ bool isUrcResponse(const char *line)
 
 MobileTerminal::MobileTerminal(Stream& pStream)
 : mStream(&pStream)
-, mLineReader()
-, mIdle(*this)
-, mWaitingForResponse(*this)
-, mCurrentState(&mIdle) {
+, mLineReader() {
 
 }
 
@@ -71,235 +110,109 @@ MobileTerminal::~MobileTerminal() {
 
 }
 
-uint32_t MobileTerminal::workcycle() {
-   return FOREVER;
-}
+Return<bool> MobileTerminal::checkAtOk() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT");
+   while(true){
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-bool MobileTerminal::checkAtOk() {
-   AtOkCommand command;
-   return command.run(*this);
-}
-
-bool MobileTerminal::disableEcho() {
-   DisableEchoCommand command;
-   return command.run(*this);
-}
-
-bool MobileTerminal::checkAndSetPin(const char *pPin) {
-   CheckAndSetPinCommand command;
-   return command.run(*this, pPin);
-}
-
-bool MobileTerminal::checkNetworkRegistration() {
-   CheckNetworkRegistration command;
-   return command.run(*this);
-}
-
-bool MobileTerminal::checkGprsAttachment() {
-   CheckGprsAttachment command;
-   return command.run(*this);
-}
-
-bool MobileTerminal::bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword) {
-   BringUpWirelessConnection command;
-   return command.run(*this, pApn, pUser, pPassword);
-}
-
-int MobileTerminal::connect(const char* pHostname, int pPort) {
-   Connect command;
-   return command.run(*this, pHostname, pPort);
-}
-
-bool MobileTerminal::checkConnected() {
-   CheckConnected command;
-   return command.run(*this);
-}
-
-int MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout) {
-   Write command;
-   return command.run(*this, pBuffer, pLen, pTimeout);
-}
-
-int MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout) {
-   Read command;
-   return command.run(*this, pBuffer, pLen, pTimeout);
-}
-
-void MobileTerminal::sendCommand(const char* pCommand) {
-   flushInput();
-   mCurrentState = &mWaitingForResponse;
-   sendLine(pCommand);
-}
-
-void MobileTerminal::sendLine(const char* pLine) {
-   LOG_MT("  ---> " << pLine );
-   mStream->println(pLine);
-}
-
-const char* MobileTerminal::readLine(Bt::Core::Timer& pTimer) {
-   while(true) {
-      const char* line = mLineReader.readLine(*mStream, pTimer);
-      if(line == nullptr) {
-         LOG_MT("  <-(TIMEOUT)- ");
-         return nullptr;
-      }
-      if(!isUrcResponse(line)) {
-         LOG_MT("  <--- " << line);
-         return line;
-      }
-      LOG_MT("  <-(ignore urc)-- " << line);
-   }
-}
-
-const char* MobileTerminal::readPrompt(Bt::Core::Timer& pTimer) {
-   const char* line = mLineReader.readPrompt(*mStream, pTimer);
-   if( line == nullptr) {
-      LOG_MT("  <-(TIMEOUT)- ");
-   } else {
-      LOG_MT("  <--- " << line);
-   }
-   return line;
-}
-
-void MobileTerminal::flushInput() {
-   while(mStream->available()) {
-      LOG_MT(" flush:" << (char)mStream->read());
-   }
-}
-
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-bool MobileTerminal::AtOkCommand::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(5000);
-   pTerminal.sendCommand("AT");
-
-   while(!timer.expired()){
-      const char* line = pTerminal.readLine(timer);
-      if(line == nullptr) {
-         return false;
-      }
-      if (strcmp(line, "AT") == 0) {
+      if (strcmp(line.value(), "AT") == 0) {
          continue;
       }
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          return true;
       }
       return false;
    }
-   return false;
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-bool MobileTerminal::DisableEchoCommand::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(5000);
-   pTerminal.sendCommand("ATE0");
-
-   while(!timer.expired()){
-      const char* line = pTerminal.readLine(timer);
-      if(line == nullptr) {
-         return false;
-      }
-      if (strcmp(line, "ATE0") == 0) {
-         continue;
-      }
-      if (strcmp(line, "OK") == 0) {
-         return true;
-      }
-      return false;
-   }
-   return false;
-}
-
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-bool MobileTerminal::CheckAndSetPinCommand::run(MobileTerminal& pTerminal, const char *pPin) {
-   Bt::Core::Timer timer(5000);
-   pTerminal.sendCommand("AT+CPIN?");
-   const char* prefix = "+CPIN: ";
-   bool needPin = true;
+Return<void> MobileTerminal::disableEcho() {
+   /*
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("ATE0");
 
    while(true){
-      if(timer.expired()) {
-         return false;
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+
+      if (strcmp(line.value(), "ATE0") == 0) {
+         continue;
       }
-      const char* line = pTerminal.readLine(timer);
-      if(line == nullptr) {
-         return false;
+      if (strcmp(line.value(), "OK") == 0) {
+         return ReturnCode::RC_SUCCESS;
       }
-      if(strncmp(prefix,line,strlen(prefix)) == 0) {
-         if(strcmp(line+strlen(prefix),"SIM PIN") == 0) {
+      return ReturnCode::RC_FAILURE;
+   }
+   */
+   return ReturnCode::RC_SUCCESS;
+}
+
+Return<void> MobileTerminal::checkAndSetPin(const char* pPin) {
+   Bt::Core::Timer timer(FIVE_SECOND_TIMEOUT);
+   sendCommand("AT+CPIN?");
+
+   bool needPin = true;
+   while(true) {
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+
+      char code[30];
+      if (sscanf(line.value(), "+CPIN: %[^\t\n]", code) == 1) {
+         if(strcmp(code, "SIM PIN") == 0) {
             needPin = true;
             continue;
          }
-         if(strcmp(line+strlen(prefix),"READY") == 0) {
+         if(strcmp(code, "READY") == 0) {
             needPin = false;
             continue;
          }
+
       }
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          break;
       }
-      return false;
+
+      return ReturnCode::RC_FAILURE;
    }
 
    if(!needPin) {
-      return true;
+      return ReturnCode::RC_SUCCESS;
    }
 
    char cmd[CMD_BUFFER_SIZE];
    Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
    builder.print("AT+CPIN=");
    builder.print(pPin);
-   pTerminal.sendCommand(cmd);
+   sendCommand(cmd);
 
-   timer = 5000;
+   timer = FIVE_SECOND_TIMEOUT;
 
    while(true){
-      if(timer.expired()) {
-         return false;
-      }
-      const char* line = pTerminal.readLine(timer);
-      if(line == nullptr) {
-         return false;
-      }
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if (strcmp(line, "+CPIN: READY") == 0) {
-         return true;
+      if (strcmp(line.value(), "+CPIN: READY") == 0) {
+         return ReturnCode::RC_SUCCESS;
       }
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          continue;
       }
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
-
-   return false;
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-bool MobileTerminal::CheckNetworkRegistration::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(5000);
-   pTerminal.sendCommand("AT+CREG?");
+Return<bool> MobileTerminal::checkNetworkRegistration() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CREG?");
 
    bool networkRegistrationOk = false;
-
    while(true){
-      const char* line = pTerminal.readLine(timer);
-
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
       int creg;
-      if(sscanf(line,"+CREG: %*d,%d", &creg) == 1) {
+      if(sscanf(line.value(),"+CREG: %*d,%d", &creg) == 1) {
          if (creg == 1) {
             networkRegistrationOk = true;
          } else {
@@ -307,101 +220,82 @@ bool MobileTerminal::CheckNetworkRegistration::run(MobileTerminal& pTerminal) {
          }
          continue;
       }
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          return networkRegistrationOk;
       }
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-bool MobileTerminal::CheckGprsAttachment::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(5000);
-   pTerminal.sendCommand("AT+CGATT?");
+Return<bool> MobileTerminal::checkGprsAttachment() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CGATT?");
 
    bool gprsAttachmentOk = false;
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if (strcmp(line, "+CGATT: 0") == 0) {
+      if (strcmp(line.value(), "+CGATT: 0") == 0) {
          gprsAttachmentOk = false;
          continue;
       }
-      if (strcmp(line, "+CGATT: 1") == 0) {
+      if (strcmp(line.value(), "+CGATT: 1") == 0) {
          gprsAttachmentOk = true;
          continue;
       }
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          return gprsAttachmentOk;
       }
-
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
 
-bool MobileTerminal::BringUpWirelessConnection::run(MobileTerminal& pTerminal, const char* pApn, const char* pUser, const char* pPassword) {
-
-   Bt::Core::Timer timer(2000);
-   pTerminal.sendCommand("AT+CIPMUX=0");
-
+Return<void> MobileTerminal::bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword) {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CIPMUX=0");
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          break;
       }
-
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 
    // ---
 
-   timer = 2000;
-   pTerminal.sendCommand("AT+CIPQSEND=1");
+   timer = DEFAULT_QUERY_CMD_TIMEOUT;
+   sendCommand("AT+CIPQSEND=1");
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          break;
       }
-
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 
    // ---
 
-   timer = 2000;
-   pTerminal.sendCommand("AT+CIPRXGET=1");
+   timer = DEFAULT_QUERY_CMD_TIMEOUT;
+   sendCommand("AT+CIPRXGET=1");
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          break;
       }
-
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 
    // ---
 
-   timer = 5000;
+   timer = DEFAULT_QUERY_CMD_TIMEOUT;
    char cmd[CMD_BUFFER_SIZE];
    Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
    builder.print("AT+CSTT=\"");
@@ -415,109 +309,77 @@ bool MobileTerminal::BringUpWirelessConnection::run(MobileTerminal& pTerminal, c
       builder.print(pPassword);
    }
    builder.print("\"");
-   pTerminal.sendCommand(cmd);
-
+   sendCommand(cmd);
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          break;
       }
-
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 
    // ---
 
    timer = 85000;
-
-   pTerminal.sendCommand("AT+CIICR");
-
+   sendCommand("AT+CIICR");
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) { return false; }
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          break;
       }
-
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 
    // ---
 
-   timer = 10000;
-   pTerminal.sendCommand("AT+CIFSR");
+   timer = FIVE_SECOND_TIMEOUT;
+   sendCommand("AT+CIFSR");
 
    while(true){
-      const char* line = pTerminal.readLine(timer);
-
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
       int ip[4];
-      if (sscanf(line, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]) == 4){
+      if (sscanf(line.value(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]) == 4){
          break;
       }
 
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 
-
-
-   return true;
+   return ReturnCode::RC_SUCCESS;
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-int MobileTerminal::Connect::run(MobileTerminal& pTerminal, const char* pHostname, int pPort) {
-   Bt::Core::Timer timer(160000);
-
-   pTerminal.sendCommand("AT+CIPSTATUS");
-   bool needsCipShut = false;
-   while(true){
-      const char* line = pTerminal.readLine(timer);
-
-      if(timer.expired()) { return -1; }
-      if(line == nullptr) { return -1; }
-
-      if (strcmp(line, "OK") == 0) {
-         continue;
-      }
-      char state[30];
-      if (sscanf(line, "STATE: %[^\t\n]", state) == 1) {
-         LOG("State is " << state);
-         if(strcmp(state, "IP INITIAL") || strcmp(state, "IP STATUS")){
-            needsCipShut = false;
-         }else {
-            needsCipShut = true;
-         }
-         break;
-      }
-      return -1;
+Return<void> MobileTerminal::connect(const char* pHostname, int pPort) {
+   Return<ConnectionStatus> connectionStatus = getConnectionStatus();
+   if(!connectionStatus) {
+      return connectionStatus.state();
+   }
+   bool needsCipShut = true;
+   if (connectionStatus.value() == ConnectionStatus::IP_INITIAL ||
+            connectionStatus.value() == ConnectionStatus::IP_STATUS) {
+      needsCipShut = false;
    }
 
+   Core::Timer timer = 65000;
    if(needsCipShut){
-      pTerminal.sendCommand("AT+CIPSHUT");
+      sendCommand("AT+CIPSHUT");
       while(true){
-         const char* line = pTerminal.readLine(timer);
+         Return<const char*> line = readLine(timer);
+         checkLine(line);
 
-         if(timer.expired()) { return -1; }
-         if(line == nullptr) { return -1; }
-
-         if (strcmp(line, "SHUT OK") == 0) {
+         if (strcmp(line.value(), "SHUT OK") == 0) {
             break;
          }
-         return -1;
+         return ReturnCode::RC_FAILURE;
       }
    }
 
+   timer = 5000;
    char cmd[CMD_BUFFER_SIZE];
    Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
    builder.print("AT+CIPSTART=\"TCP\",\"");
@@ -525,57 +387,42 @@ int MobileTerminal::Connect::run(MobileTerminal& pTerminal, const char* pHostnam
    builder.print("\",\"");
    builder.print(pPort);
    builder.print("\"");
-   pTerminal.sendCommand(cmd);
+   sendCommand(cmd);
 
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return -1; }
-      if(line == nullptr) { return -1; }
-
-      if (strcmp(line, "OK") == 0) {
-         return 0;
+      if (strcmp(line.value(), "OK") == 0) {
+         return ReturnCode::RC_SUCCESS;
       }
-      return -1;
+      return ReturnCode::RC_FAILURE;
    }
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-bool MobileTerminal::CheckConnected::run(MobileTerminal& pTerminal) {
-   Bt::Core::Timer timer(5000);
-
-   pTerminal.sendCommand("AT+CIPSTATUS");
+Return<ConnectionStatus> MobileTerminal::getConnectionStatus() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CIPSTATUS");
 
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) { return false; }
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          continue;
       }
-      if (strcmp(line, "CONNECT OK") == 0) {
+      if (strcmp(line.value(), "CONNECT OK") == 0) {
          continue;
       }
       char state[30];
-      if (sscanf(line, "STATE: %[^\t\n]", state) == 1) {
-         LOG("State is " << state);
-         if(strcmp(state, "CONNECT OK") == 0) {
-            return true;
-         }
-         return false;
+      if (sscanf(line.value(), "STATE: %[^\t\n]", state) == 1) {
+         return covertFromString(state);
       }
-      return false;
+      return ReturnCode::RC_FAILURE;
    }
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-int MobileTerminal::Write::run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout) {
+Return<int> MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout) {
    LOG_MT("MobileTerminal::Write " << pLen << "...");
 
    Bt::Core::Timer timer(pTimeout);
@@ -583,44 +430,73 @@ int MobileTerminal::Write::run(MobileTerminal& pTerminal, unsigned char* pBuffer
    Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
    builder.print("AT+CIPSEND=");
    builder.print(pLen);
-   pTerminal.sendCommand(cmd);
+   sendCommand(cmd);
 
    while(true){
-      const char* line = pTerminal.readPrompt(timer);
+      Return<const char*> line= readPrompt(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return -1; }
-      if(line == nullptr) { return -1; }
-
-      if (strcmp(line, ">") == 0) {
+      if (strcmp(line.value(), ">") == 0) {
          LOG_MT("have > send data " << pLen);
          break;
       }
-      return -1;
+      return ReturnCode::RC_FAILURE;
    }
-   pTerminal.flushInput();
-   pTerminal.mStream->write(pBuffer,pLen);
+   flushInput();
+   mStream->write(pBuffer,pLen);
+   mStream->readBytes(pBuffer,pLen);
 
+   int acceptedLen = 0;
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return -1;}
-      if(line == nullptr) { return -1;}
+      if (sscanf(line.value(), "DATA ACCEPT:%d", &acceptedLen) == 1) {
+         break;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
 
-      int acceptedLen = 0;
-      if (sscanf(line, "DATA ACCEPT:%d", &acceptedLen) == 1) {
+   Core::delayInMilliseconds(100);
+
+   while(true) {
+      Core::Timer queryTimer(5000);
+      if(timer.expired()) {
+         LOG_MT("CIPACK send check timeout");
+         return ReturnCode::RC_TIMEOUT;
+      }
+      Core::delayInMilliseconds(10);
+      sendCommand("AT+CIPACK");
+      Return<const char*> line = readLine(queryTimer);
+      if(line.state() == ReturnCode::RC_TIMEOUT) {
+         sendCommand("AT");
+         flushInput();
+         sendCommand("AT");
+         flushInput();
+         continue;
+      }
+      int txlen = 0;
+      int acklen = 0;
+      int nacklen = 0;
+      if (sscanf(line.value(), "+CIPACK: %d,%d,%d", &txlen, &acklen , &nacklen ) != 3) {
+         return ReturnCode::RC_FAILURE;
+      }
+      line = readLine(queryTimer);
+      if(line.state() == ReturnCode::RC_TIMEOUT) {
+         continue;
+      }
+      if (strcmp(line.value(), "OK") != 0) {
+         return ReturnCode::RC_FAILURE;
+      }
+      LOG_MT("txlen=" << txlen << " acklen=" << acklen <<" nacklen=" << nacklen);
+      if(nacklen == 0) {
          return acceptedLen;
       }
-      return -1;
    }
 }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-
-int MobileTerminal::Read::run(MobileTerminal& pTerminal, unsigned char* pBuffer, int pLen, int pTimeout) {
+Return<int> MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout) {
    LOG_MT("MobileTerminal::Read plen=" << pLen << "  pTimeout=" << pTimeout << "...");
-
-
 
    if(pTimeout < 200 ) {
       pTimeout = 200;
@@ -628,29 +504,25 @@ int MobileTerminal::Read::run(MobileTerminal& pTerminal, unsigned char* pBuffer,
    }
    Bt::Core::Timer timer(pTimeout);
 
-
-   pTerminal.sendCommand("AT+CIPRXGET=4");
-
+   sendCommand("AT+CIPRXGET=4");
    int available = 0;
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return -1; }
-      if(line == nullptr) { return -1; }
-
-      if(sscanf(line,"+CIPRXGET: %*d,%d", &available) == 1) {
+      if(sscanf(line.value(),"+CIPRXGET: %*d,%d", &available) == 1) {
          LOG_MT("   available = " << available);
          continue;
       }
 
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          if (available >= pLen) {
             LOG_MT("     => ok read " << pLen);
             break;
          }
-         return -1;
+         return ReturnCode::RC_FAILURE;
       }
-      return -1;
+      return ReturnCode::RC_FAILURE;
    }
 
 
@@ -660,45 +532,112 @@ int MobileTerminal::Read::run(MobileTerminal& pTerminal, unsigned char* pBuffer,
    Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
    builder.print("AT+CIPRXGET=2,");
    builder.print(pLen);
-   pTerminal.sendCommand(cmd);
+   sendCommand(cmd);
 
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if(sscanf(line,"+CIPRXGET: %*d,%d,%*d", &confirmed) == 1) {
+      if(sscanf(line.value(),"+CIPRXGET: %*d,%d,%*d", &confirmed) == 1) {
          LOG_MT("  confirmed = " << confirmed);
          if (confirmed >= pLen) {
             break;
          }
       }
-      return -1;
+      return ReturnCode::RC_FAILURE;
    }
 
    LOG_MT("Read " << pLen << " bytes ...");
-   pTerminal.mStream->readBytes(pBuffer,pLen);
+   mStream->readBytes(pBuffer,pLen);
    LOG_MT("... done");
 
    while(true){
-      const char* line = pTerminal.readLine(timer);
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
 
-      if(timer.expired()) { return false; }
-      if(line == nullptr) {return false;}
-
-      if (strcmp(line, "OK") == 0) {
+      if (strcmp(line.value(), "OK") == 0) {
          return pLen;
       }
 
-      return -1;
+      return ReturnCode::RC_FAILURE;
    }
 
-   return -1;
-
+   return ReturnCode::RC_FAILURE;
 }
 
 //-------------------------------------------------------------------------------------------------
+
+void MobileTerminal::sendCommand(const char* pCommand) {
+   int retry = 0;
+   while(retry < 2) {
+      flushInput();
+      sendLine(pCommand);
+      Core::Timer timer(500);
+      Return<const char*> line = readLine(timer);
+      if(line.state() == ReturnCode::RC_SUCCESS) {
+         if(strcmp(line.value(), pCommand) != 0) {
+            LOG( " oops echo mismatch: '" << pCommand << "' [vs] '" <<  line.value() << "'");
+         }
+         return;
+      }
+      retry++;
+      Core::delayInMilliseconds(20);
+      mStream->println("");
+      mStream->println("");
+      mStream->println("");
+      flushInput();
+      Core::delayInMilliseconds(20);
+      sendLine("AT");
+      timer = 500;
+      readLine(timer);
+      timer = 500;
+      readLine(timer);
+      Core::delayInMilliseconds(20);
+   }
+}
+
+void MobileTerminal::sendLine(const char* pLine) {
+   LOG_MT("  ---> " << pLine );
+   mStream->println(pLine);
+}
+
+Return<const char*> MobileTerminal::readLine(Bt::Core::Timer& pTimer) {
+   while(true) {
+      Return<const char*> line = mLineReader.readLine(*mStream, pTimer);
+      if(line.state() == ReturnCode::RC_TIMEOUT) {
+         LOG_MT("  <-(TIMEOUT)- ");
+         return line;
+      }
+      if(!isUrcResponse(line.value())) {
+         LOG_MT("  <--- " << line.value());
+         return line;
+      }
+      LOG_MT("  <-(ignore urc)-- " << line.value());
+   }
+}
+
+Return<const char*> MobileTerminal::readPrompt(Bt::Core::Timer& pTimer) {
+   Return<const char*> line = mLineReader.readPrompt(*mStream, pTimer);
+   if( line.state() == ReturnCode::RC_TIMEOUT ) {
+      LOG_MT("  <-(TIMEOUT)- ");
+   } else {
+      LOG_MT("  <--- " << line.value());
+   }
+   return line;
+}
+
+void MobileTerminal::flushInput() {
+   Core::Timer timer(10);
+   Return<const char*> line = mLineReader.readLine(*mStream, timer);
+   while(line.state() == ReturnCode::RC_SUCCESS) {
+      LOG_MT("  <-(FLUSH)- " << line.value());
+      line = mLineReader.readLine(*mStream, timer);
+   }
+   while(mStream->available()) {
+      LOG_MT(" flush:" << (char)mStream->read());
+   }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 } // namespace Gprs

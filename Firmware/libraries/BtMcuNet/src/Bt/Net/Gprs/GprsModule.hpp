@@ -170,7 +170,8 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
 
             void ceckAtOk() {
                mCounter++;
-               if(mController->mMobileTerminal->checkAtOk()) {
+               Return<bool> atOk = mController->mMobileTerminal->checkAtOk();
+               if(atOk && atOk.value()) {
                   mAtOkCounter++;
                   if(mAtOkCounter > 3){
                      mController->mMobileTerminal->disableEcho();
@@ -241,7 +242,8 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             void checkNetworkRegistration() {
-               if(mController->mMobileTerminal->checkNetworkRegistration()){
+               Return<bool> networkRegistration = mController->mMobileTerminal->checkNetworkRegistration();
+               if(networkRegistration && networkRegistration.value()){
                   mController->nextState(mController->mAwaitGprsAttachment);
                   return;
                }
@@ -273,7 +275,8 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             void checkGprsAttachment() {
-               if(mController->mMobileTerminal->checkGprsAttachment()){
+               Return<bool> gprsAttachment = mController->mMobileTerminal->checkGprsAttachment();
+               if(gprsAttachment && gprsAttachment.value()){
                   mController->nextState(mController->mBringUpWirelessConnection);
                   return;
                }
@@ -318,11 +321,12 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
 
             int connect(const char* pHostname, int pPort) {
                LOG("Ready::connect " << pHostname <<  " " <<  pPort);
-               int rc = mController->mMobileTerminal->connect(pHostname, pPort);
-               if(rc == 0) {
+               Return<void> rc = mController->mMobileTerminal->connect(pHostname, pPort);
+               if(rc) {
                   mController->nextState(mController->mConnecting);
+                  return 0;
                }
-               return rc;
+               return -1;
             }
 
             virtual void timeUp(){
@@ -352,7 +356,8 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             void checkConnected() {
-               if(mController->mMobileTerminal->checkConnected()){
+               Return<ConnectionStatus> connectionStatus = mController->mMobileTerminal->getConnectionStatus();
+               if(connectionStatus && connectionStatus.value() == ConnectionStatus::CONNECT_OK){
                   mController->nextState(mController->mConnected);
                   return;
                }
@@ -377,21 +382,33 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             virtual bool isConnected() {
-               return mController->mMobileTerminal->checkConnected();
+               Return<ConnectionStatus> connectionStatus = mController->mMobileTerminal->getConnectionStatus();
+               if(connectionStatus.state() == ReturnCode::RC_TIMEOUT) {
+                  connectionStatus = mController->mMobileTerminal->getConnectionStatus();
+               }
+               if(connectionStatus && connectionStatus.value() == ConnectionStatus::CONNECT_OK){
+                  return true;
+               }
+               mController->nextState(mController->mDisconnected);
+               return false;
             }
 
             virtual int write(unsigned char* pBuffer, int pLen, int pTimeout) {
-               int rc = mController->mMobileTerminal->write(pBuffer, pLen, pTimeout);
-               if(rc < 0) {
-                  if(!isConnected()){
-                     //mController->nextState(mController->mR);
-                  }
+               Return<int> rc = mController->mMobileTerminal->write(pBuffer, pLen, pTimeout);
+               if(rc) {
+                  return rc.value();
                }
-               return rc;
+               isConnected();
+               return -1;
             }
 
             virtual int read(unsigned char* pBuffer, int pLen, int pTimeout) {
-               return mController->mMobileTerminal->read(pBuffer, pLen, pTimeout);
+               Return<int> rc = mController->mMobileTerminal->read(pBuffer, pLen, pTimeout);
+               if(rc) {
+                  return rc.value();
+               }
+               isConnected();
+               return -1;
             }
 
             virtual void timeUp(){
@@ -402,6 +419,30 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                return "Connected";
             }
       };
+
+      class Disconnected : public StateBase  {
+         public:
+            Disconnected(GprsModule& pController):StateBase(pController){}
+
+            virtual void onEnter() {
+               mController->setTimer(0);
+            }
+
+            virtual void timeUp(){
+               Return<bool> atOk = mController->mMobileTerminal->checkAtOk();
+               if(atOk && atOk.value()) {
+                  mController->nextState(mController->mReady);
+               } else {
+                  mController->nextState(mController->mReseting);
+               }
+            }
+
+            virtual const char* name() {
+               return "Disconnected";
+            }
+      };
+
+
 
       class Dummy : public StateBase  {
          public:
@@ -442,6 +483,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       Ready mReady;
       Connecting mConnecting;
       Connected mConnected;
+      Disconnected mDisconnected;
 
       Dummy mDummy;
 

@@ -34,6 +34,7 @@ GprsModule::GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core:
 , mReady(*this)
 , mConnecting(*this)
 , mConnected(*this)
+, mDisconnected(*this)
 , mDummy(*this)
 , mListener(nullptr){
 

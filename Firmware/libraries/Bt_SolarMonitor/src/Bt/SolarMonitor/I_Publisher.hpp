@@ -7,6 +7,7 @@
 #ifndef INC__Bt_SolarMonitor_I_Publisher__hpp
 #define INC__Bt_SolarMonitor_I_Publisher__hpp
 
+#include <stdint.h>
 #include "Bt/SolarMonitor/MeasurementRecord.hpp"
 
 namespace Bt {
@@ -16,7 +17,7 @@ class I_Publisher {
    public:
       virtual ~I_Publisher() {}
 
-      virtual void publish(const MeasurementRecord& pMeasurementRecord) = 0;
+      virtual void publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter) = 0;
 };
 
 } // namespace SolarMonitor

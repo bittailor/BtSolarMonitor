@@ -17,6 +17,7 @@ namespace Gprs {
 
 GprsModule::GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core::I_DigitalOut& pReset, Core::I_DigitalIn& pPowerState, I_MobileTerminal& pMobileTerminal)
 : Core::StateMachine<GprsModuleState,GprsModule>(pTime)
+, mConnectFailureCounter(0)
 , mOnOffKey(&pOnOffKey)
 , mReset(&pReset)
 , mPowerState(&pPowerState)
@@ -71,7 +72,7 @@ int GprsModule::connect(const char* pHostname, int pPort) {
 
 int GprsModule::read(unsigned char* pBuffer, int pLen, int pTimeout) {
    int rc = handle(&GprsModuleState::read,pBuffer, pLen, pTimeout);
-   LOG("GprsModule::read " << pLen << " => " <<  rc);
+   //LOG("GprsModule::read " << pLen << " => " <<  rc);
    return rc;
 }
 
@@ -79,13 +80,19 @@ int GprsModule::read(unsigned char* pBuffer, int pLen, int pTimeout) {
 
 int GprsModule::write(unsigned char* pBuffer, int pLen, int pTimeout) {
    int rc = handle(&GprsModuleState::write,pBuffer, pLen, pTimeout);
-   LOG("GprsModule::write " << pLen << " => " <<  rc);
+   //LOG("GprsModule::write " << pLen << " => " <<  rc);
    return rc;
 }
 //-------------------------------------------------------------------------------------------------
 
 int GprsModule::disconnect() {
    return -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+const char* GprsModule::state() {
+   return currentState().name();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -107,6 +114,14 @@ void GprsModule::readyCallback() {
 void GprsModule::connectedCallback() {
    if(mListener != nullptr) {
       mListener->onConnected();
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void GprsModule::disconnectedCallback() {
+   if(mListener != nullptr) {
+      mListener->onDisconnected();
    }
 }
 

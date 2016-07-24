@@ -48,15 +48,14 @@ MqttClient::~MqttClient() {
 //-------------------------------------------------------------------------------------------------
 
 void MqttClient::begin() {
-   FONA_SERIAL.begin(115200);
-   mWorkcycle->add(mMobileTerminal);
+   //FONA_SERIAL.begin(115200);
+   //FONA_SERIAL.begin(57600);
+   FONA_SERIAL.begin(9600);
    mWorkcycle->add(mGprsModule);
    mOnOffKey.begin();
    mReset.begin();
    mPowerState.begin();
    mGprsModule.begin(*this);
-
-
 
 }
 
@@ -83,11 +82,17 @@ bool MqttClient::publish(const char* pTopicName, const char* pMessage, QoS pQos,
 //-------------------------------------------------------------------------------------------------
 
 void MqttClient::onReady() {
-   const char * url = "broker.shiftr.io";
-   //const char * url = "iot.eclipse.org";
+   LOG("MqttClient::onReady()");
 
-   while(int rc = mGprsModule.connect(url,1883) != 0) {
+   const char * url = "broker.shiftr.io";
+   //const char * url = "bittailor.cloudapp.net";
+   //const char * url = "api.xively.com";
+   //const char * url = "iot.eclipse.org";
+   //const char * url = "test.mosquitto.org";
+
+   if(int rc = mGprsModule.connect(url,1883) != 0) {
       LOG("tcp connect failed with " << rc);
+      LOG(" => state is " << mGprsModule.state());
    }
 }
 
@@ -96,11 +101,11 @@ void MqttClient::onReady() {
 void MqttClient::onConnected() {
    MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
    data.MQTTVersion = 3;
-   data.clientID.cstring = (char*)"bt-resource-check";
-   data.keepAliveInterval = 120;
+   data.clientID.cstring = (char*)"bt-solar";
+   data.keepAliveInterval = 10 * 60;
    data.willFlag = true;
-   data.will.topicName.cstring = (char*)"BSM/Status";
-   data.will.message.cstring = (char*)"offline";
+   data.will.topicName.cstring = (char*)"BT/Solar/status";
+   data.will.message.cstring = (char*)"0";
    data.will.retained = true;
    data.will.qos = MQTT::QOS1;
    data.username.cstring = (char*)"f64edae4";
@@ -114,21 +119,31 @@ void MqttClient::onConnected() {
    }
    LOG("MQTT connected");
 
-   publish("BSM/Status", "online", QoS::QOS1, "online");
+   publish("BT/Solar/status", "1", QoS::QOS1, true);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void MqttClient::onDisconnected() {
+   mMqttClient.disconnect();
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MqttClient::connect() {
+   if(mGprsModule.isConnected() && !mMqttClient.isConnected()) {
+      LOG("--> reconnect MQTT !");
+      onConnected();
+   }
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MqttClient::isConnected() {
-   if(mGprsModule.isConnected()) {
-      return mMqttClient.isConnected();
-   }
-   return false;
+   bool gprsIsConnected = mGprsModule.isConnected();
+   bool mqttIsConnected = mMqttClient.isConnected();
+   LOG("GPRS connected = "  << gprsIsConnected << "MQTT connected = "  << mqttIsConnected );
+   return gprsIsConnected && mqttIsConnected;
 }
 
 //-------------------------------------------------------------------------------------------------

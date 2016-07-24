@@ -107,6 +107,9 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
          mConnected = true;
       }
 
+      virtual void onDisconnected() {
+      }
+
       void yield(){
          bool gprsConnected = sGprsModule.isConnected();
          bool mqttConnected = sMqttClient.isConnected();

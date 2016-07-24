@@ -46,6 +46,8 @@ class MainController
       void OnMeasurementRecord(const MeasurementRecord& pRecord);
       void log(const char* pPrefix, const Measurement& pMeasurement);
 
+      uint32_t mReconnectCounter = 0;
+
       Bt::Core::WireWrapper mWire;
       Bt::Core::Time mTime;
 

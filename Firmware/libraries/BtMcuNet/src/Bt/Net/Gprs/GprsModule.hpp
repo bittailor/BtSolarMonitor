@@ -36,6 +36,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             virtual ~I_Listener(){}
             virtual void onReady()=0;
             virtual void onConnected()=0;
+            virtual void onDisconnected()=0;
       };
 
 
@@ -52,6 +53,8 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       virtual int read(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual int write(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual int disconnect();
+
+      virtual const char* state();
 
    private:
 
@@ -217,7 +220,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                   mController->nextState(mController->mReseting);
                   return;
                }
-               mController->setTimer(100);
+               mController->setTimer(500);
             }
 
             virtual const char* name() {
@@ -251,7 +254,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                   mController->nextState(mController->mReseting);
                   return;
                }
-               mController->setTimer(100);
+               mController->setTimer(500);
             }
 
             virtual const char* name() {
@@ -284,7 +287,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                   mController->nextState(mController->mReseting);
                   return;
                }
-               mController->setTimer(100);
+               mController->setTimer(500);
             }
 
             virtual const char* name() {
@@ -326,6 +329,12 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                   mController->nextState(mController->mConnecting);
                   return 0;
                }
+               Return<bool> atOk = mController->mMobileTerminal->checkAtOk();
+               if(atOk && atOk.value()) {
+                  mController->nextState(mController->mReady);
+               } else {
+                  mController->nextState(mController->mReseting);
+               }
                return -1;
             }
 
@@ -358,14 +367,31 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             void checkConnected() {
                Return<ConnectionStatus> connectionStatus = mController->mMobileTerminal->getConnectionStatus();
                if(connectionStatus && connectionStatus.value() == ConnectionStatus::CONNECT_OK){
+                  mController->mConnectFailureCounter = 0;
                   mController->nextState(mController->mConnected);
                   return;
                }
-               if(mTimer.expired()) {
-                  mController->nextState(mController->mReady);
+               if(connectionStatus && connectionStatus.value() != ConnectionStatus::CONNECTING){
+                  mController->mConnectFailureCounter++;
+                  if(mController->mConnectFailureCounter > 5) {
+                     mController->mConnectFailureCounter = 0;
+                     mController->nextState(mController->mReseting);
+                  } else {
+                     mController->nextState(mController->mDisconnected);
+                  }
                   return;
                }
-               mController->setTimer(100);
+               if(mTimer.expired()) {
+                  mController->mConnectFailureCounter++;
+                  if(mController->mConnectFailureCounter > 5) {
+                     mController->mConnectFailureCounter = 0;
+                     mController->nextState(mController->mReseting);
+                  } else {
+                     mController->nextState(mController->mDisconnected);
+                  }
+                  return;
+               }
+               mController->setTimer(500);
             }
 
          private:
@@ -429,6 +455,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             virtual void timeUp(){
+               mController->disconnectedCallback();
                Return<bool> atOk = mController->mMobileTerminal->checkAtOk();
                if(atOk && atOk.value()) {
                   mController->nextState(mController->mReady);
@@ -463,6 +490,9 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       virtual const char* name();
       void readyCallback();
       void connectedCallback();
+      void disconnectedCallback();
+
+      uint32_t mConnectFailureCounter;
 
       Core::I_DigitalOut* mOnOffKey;
       Core::I_DigitalOut* mReset;

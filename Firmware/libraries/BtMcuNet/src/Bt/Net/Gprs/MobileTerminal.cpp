@@ -7,6 +7,7 @@
 #include "Bt/Net/Gprs/MobileTerminal.hpp"
 
 #include "Bt/Core/Logger.hpp"
+#include "Bt/Core/Timing.hpp"
 #include "Bt/Core/StaticStringBuilder.hpp"
 
 namespace Bt {
@@ -128,7 +129,6 @@ Return<bool> MobileTerminal::checkAtOk() {
 }
 
 Return<void> MobileTerminal::disableEcho() {
-   /*
    Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
    sendCommand("ATE0");
 
@@ -144,7 +144,6 @@ Return<void> MobileTerminal::disableEcho() {
       }
       return ReturnCode::RC_FAILURE;
    }
-   */
    return ReturnCode::RC_SUCCESS;
 }
 
@@ -424,10 +423,12 @@ Return<ConnectionStatus> MobileTerminal::getConnectionStatus() {
 
 Return<int> MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout) {
    LOG_MT("MobileTerminal::Write " << pLen << "...");
+   Bt::Core::Timer writeTimer(pTimeout);
 
-   Bt::Core::Timer timer(pTimeout);
+
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
    char cmd[CMD_BUFFER_SIZE];
-   Core::StaticStringBuilder builder(cmd,CMD_BUFFER_SIZE);
+   Core::StaticStringBuilder builder(cmd, CMD_BUFFER_SIZE);
    builder.print("AT+CIPSEND=");
    builder.print(pLen);
    sendCommand(cmd);
@@ -436,7 +437,7 @@ Return<int> MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout
       Return<const char*> line= readPrompt(timer);
       checkLine(line);
 
-      if (strcmp(line.value(), ">") == 0) {
+      if (strcmp(line.value(), "> ") == 0) {
          LOG_MT("have > send data " << pLen);
          break;
       }
@@ -444,8 +445,9 @@ Return<int> MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout
    }
    flushInput();
    mStream->write(pBuffer,pLen);
-   mStream->readBytes(pBuffer,pLen);
+   //mStream->readBytes(pBuffer,pLen);
 
+   timer = DEFAULT_QUERY_CMD_TIMEOUT;
    int acceptedLen = 0;
    while(true){
       Return<const char*> line = readLine(timer);
@@ -460,15 +462,15 @@ Return<int> MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout
    Core::delayInMilliseconds(100);
 
    while(true) {
-      Core::Timer queryTimer(5000);
-      if(timer.expired()) {
-         LOG_MT("CIPACK send check timeout");
-         return ReturnCode::RC_TIMEOUT;
-      }
+      timer = DEFAULT_QUERY_CMD_TIMEOUT;
       Core::delayInMilliseconds(10);
       sendCommand("AT+CIPACK");
-      Return<const char*> line = readLine(queryTimer);
+      Return<const char*> line = readLine(timer);
       if(line.state() == ReturnCode::RC_TIMEOUT) {
+         if(writeTimer.expired()) {
+            LOG_MT("CIPACK send check timeout");
+            return ReturnCode::RC_TIMEOUT;
+         }
          sendCommand("AT");
          flushInput();
          sendCommand("AT");
@@ -481,51 +483,47 @@ Return<int> MobileTerminal::write(unsigned char* pBuffer, int pLen, int pTimeout
       if (sscanf(line.value(), "+CIPACK: %d,%d,%d", &txlen, &acklen , &nacklen ) != 3) {
          return ReturnCode::RC_FAILURE;
       }
-      line = readLine(queryTimer);
+      timer = DEFAULT_QUERY_CMD_TIMEOUT;
+      line = readLine(timer);
       if(line.state() == ReturnCode::RC_TIMEOUT) {
+         sendCommand("AT");
+         flushInput();
+         sendCommand("AT");
+         flushInput();
          continue;
       }
+
       if (strcmp(line.value(), "OK") != 0) {
          return ReturnCode::RC_FAILURE;
       }
+
       LOG_MT("txlen=" << txlen << " acklen=" << acklen <<" nacklen=" << nacklen);
+
       if(nacklen == 0) {
          return acceptedLen;
+      }
+
+      if(writeTimer.expired()) {
+         LOG_MT("CIPACK send check timeout");
+         return ReturnCode::RC_TIMEOUT;
       }
    }
 }
 
 Return<int> MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout) {
    LOG_MT("MobileTerminal::Read plen=" << pLen << "  pTimeout=" << pTimeout << "...");
+   Bt::Core::Timer readTimer(pTimeout);
 
-   if(pTimeout < 200 ) {
-      pTimeout = 200;
-      LOG_MT("increase timeout to " << pTimeout);
-   }
-   Bt::Core::Timer timer(pTimeout);
-
-   sendCommand("AT+CIPRXGET=4");
-   int available = 0;
-   while(true){
-      Return<const char*> line = readLine(timer);
-      checkLine(line);
-
-      if(sscanf(line.value(),"+CIPRXGET: %*d,%d", &available) == 1) {
-         LOG_MT("   available = " << available);
-         continue;
+   while(true) {
+      Return<int> available = this->available();
+      if (available && (available.value() >= pLen)) {
+         break;
       }
-
-      if (strcmp(line.value(), "OK") == 0) {
-         if (available >= pLen) {
-            LOG_MT("     => ok read " << pLen);
-            break;
-         }
-         return ReturnCode::RC_FAILURE;
+      if(readTimer.expired()) {
+         return ReturnCode::RC_TIMEOUT;
       }
-      return ReturnCode::RC_FAILURE;
+      Core::delayInMilliseconds(100);
    }
-
-
 
    int confirmed = -1;
    char cmd[CMD_BUFFER_SIZE];
@@ -533,11 +531,10 @@ Return<int> MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout)
    builder.print("AT+CIPRXGET=2,");
    builder.print(pLen);
    sendCommand(cmd);
-
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
    while(true){
       Return<const char*> line = readLine(timer);
       checkLine(line);
-
       if(sscanf(line.value(),"+CIPRXGET: %*d,%d,%*d", &confirmed) == 1) {
          LOG_MT("  confirmed = " << confirmed);
          if (confirmed >= pLen) {
@@ -551,6 +548,7 @@ Return<int> MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout)
    mStream->readBytes(pBuffer,pLen);
    LOG_MT("... done");
 
+   timer = DEFAULT_QUERY_CMD_TIMEOUT;
    while(true){
       Return<const char*> line = readLine(timer);
       checkLine(line);
@@ -567,7 +565,32 @@ Return<int> MobileTerminal::read(unsigned char* pBuffer, int pLen, int pTimeout)
 
 //-------------------------------------------------------------------------------------------------
 
+Return<int> MobileTerminal::available() {
+   Bt::Core::Timer readTimer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CIPRXGET=4");
+   int available = 0;
+   while(true){
+      Return<const char*> line = readLine(readTimer);
+      checkLine(line);
+
+      if(sscanf(line.value(),"+CIPRXGET: %*d,%d", &available) == 1) {
+         LOG_MT("   available = " << available);
+         continue;
+      }
+
+      if (strcmp(line.value(), "OK") == 0) {
+         return available;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void MobileTerminal::sendCommand(const char* pCommand) {
+   flushInput();
+   sendLine(pCommand);
+   /*
    int retry = 0;
    while(retry < 2) {
       flushInput();
@@ -594,6 +617,7 @@ void MobileTerminal::sendCommand(const char* pCommand) {
       readLine(timer);
       Core::delayInMilliseconds(20);
    }
+   */
 }
 
 void MobileTerminal::sendLine(const char* pLine) {
@@ -627,6 +651,20 @@ Return<const char*> MobileTerminal::readPrompt(Bt::Core::Timer& pTimer) {
 }
 
 void MobileTerminal::flushInput() {
+   uint16_t timeoutloop = 0;
+
+   while (timeoutloop++ < 40) {
+      while(mStream->available()) {
+         char c = mStream->read();
+         LOG_MT("  <-(F)- " << c);
+         timeoutloop = 0;  // If char was received reset the timer
+      }
+      Bt::Core::delayInMilliseconds(1);
+   }
+
+
+
+   /*
    Core::Timer timer(10);
    Return<const char*> line = mLineReader.readLine(*mStream, timer);
    while(line.state() == ReturnCode::RC_SUCCESS) {
@@ -636,6 +674,7 @@ void MobileTerminal::flushInput() {
    while(mStream->available()) {
       LOG_MT(" flush:" << (char)mStream->read());
    }
+   */
 }
 
 //-------------------------------------------------------------------------------------------------

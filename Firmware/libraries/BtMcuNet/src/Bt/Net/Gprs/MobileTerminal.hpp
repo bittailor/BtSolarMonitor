@@ -36,6 +36,7 @@ class MobileTerminal : public I_MobileTerminal
       virtual Return<ConnectionStatus> getConnectionStatus();
       virtual Return<int> write(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout);
+      virtual Return<int> available();
 
    private:
 

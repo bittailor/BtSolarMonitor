@@ -24,7 +24,7 @@ class Publisher : public I_Publisher
 
       void begin();
 
-      virtual void publish(const MeasurementRecord& pMeasurementRecord);
+      virtual void publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter);
 
    private:
 
@@ -35,6 +35,7 @@ class Publisher : public I_Publisher
       Publisher& operator=(const Publisher&);
 
       I_MqttClient* mMqttClient;
+      uint32_t mPublishCounter = 0;
 
 };
 

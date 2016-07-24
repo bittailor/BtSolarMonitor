@@ -78,6 +78,8 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
 
       virtual void onReady();
       virtual void onConnected();
+      virtual void onDisconnected();
+
 
    private:
    	  // Constructor to prohibit copy construction.

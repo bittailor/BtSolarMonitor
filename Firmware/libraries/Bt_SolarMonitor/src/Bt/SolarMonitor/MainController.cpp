@@ -44,7 +44,7 @@ const uint16_t sConfigurationControl =
 
 MainController::MainController()
 : mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
-, mYieldCallback(mTime,10*1000,Bt::Core::Function<void()>::build<MainController,&MainController::yield>(*this))
+, mYieldCallback(mTime,10 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::yield>(*this))
 , mPublishCallback(mTime,/*10 * 60 * 1000*/ 2 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
@@ -128,11 +128,13 @@ void MainController::measure() {
 
 
 void MainController::yield() {
-   if(!mMqttClient.isConnected()) {
+   /*
+   if(mMqttClient.isConnected()) {
       mMqttClient.yield(1);
    } else {
       mMqttClient.connect();
    }
+   */
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -141,15 +143,15 @@ void MainController::publish() {
 
    if(!mMqttClient.isConnected()) {
       LOG("oops is disconnected lets reconnect");
-      if(!mMqttClient.connect()) {
-         LOG("oops oops reconnect failed let's try next time");
-         return;
-      }
+      mMqttClient.connect();
+      mReconnectCounter++;
+      return;
    }
 
    LOG("");
    LOG("publish to cloud ...");
-   mPublisher.publish(mRecordToPublish);
+   mPublisher.publish(mRecordToPublish,mReconnectCounter);
+   mMqttClient.yield(10);
    LOG(" ... done publish to cloud");
 }
 

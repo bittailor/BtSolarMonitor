@@ -95,9 +95,10 @@ class LineReader
                if(character == CR) {
                   continue;
                }
+               //LOG("     << LR ["<< mLength<< "] = " << character);
                mBuffer[mLength++] = character;
                mBuffer[mLength] = '\0';
-               if(character == '>' && mLength == 1) {
+               if( strcmp(mBuffer,"> ") == 0) {
                   return mBuffer;
                }
             }

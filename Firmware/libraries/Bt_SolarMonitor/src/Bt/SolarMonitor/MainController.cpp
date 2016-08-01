@@ -6,8 +6,10 @@
 
 #include "Bt/SolarMonitor/MainController.hpp"
 
+#include <Arduino.h>
+
 #include "Bt/Core/Logger.hpp"
-#include "Bt/SolarMonitor/IOPins.hpp"
+
 
 namespace Bt {
 namespace SolarMonitor {

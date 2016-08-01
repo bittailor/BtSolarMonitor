@@ -7,12 +7,10 @@
 #ifndef INC__Bt_SolarMonitor_NokiaScreen__hpp
 #define INC__Bt_SolarMonitor_NokiaScreen__hpp
 
-#include "Bt/SolarMonitor/I_Screen.hpp"
+#include <Adafruit_GFX.h>
+#include <Adafruit_PCD8544.h>
 
-#ifdef ARDUINO
-   #include <Adafruit_GFX.h>
-   #include <Adafruit_PCD8544.h>
-#endif
+#include "Bt/SolarMonitor/I_Screen.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
@@ -48,11 +46,7 @@ class NokiaScreen : public I_Screen
       // Operator= to prohibit copy assignment
       NokiaScreen& operator=(const NokiaScreen&);
 
-#ifdef ARDUINO
       Adafruit_PCD8544 mPCD8544;
-#endif
-
-
 };
 
 } // namespace SolarMonitor

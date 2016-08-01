@@ -116,6 +116,7 @@ sketches.each do |sketch|
         FileUtils.mkdir_p(build_path) unless Dir.exists?(build_path)
         puts ""
         puts "*** compile #{sketch_name} for #{board} ... "
+        puts "#{$builder} #{$options} -build-path #{build_path} #{board} #{sketch}"
         verbose(false) do
             sh "#{$builder} #{$options} -build-path #{build_path} #{board} #{sketch}"
         end
@@ -185,8 +186,6 @@ namespace :host do
 end
 
 def compile_host_library(library_path)
-
-
   name = library_path.pathmap('%n')
   target = $host_output_folder
   sources = Rake::FileList[library_path + "/src/**/*.cpp",library_path + "/src/**/*.c"]
@@ -194,13 +193,24 @@ def compile_host_library(library_path)
   defines = []
 
   json_info_file = "#{library_path}/.library.json"
-  if(File.exists?(json_info_file))
-    info = JSON.parse(IO.read(json_info_file))
-    info["dependencies"].each do |dependency|
-      includes << "Firmware/sketchbook/libraries/#{dependency}/src"
-      includes << "Firmware/sketchbook/libraries/#{dependency}"
-    end
+
+  Dir.glob('Firmware/sketchbook/libraries/*').select{|f| File.directory? f}.each do |other|
+    includes << "#{other}"
+    includes << "#{other}/src"
   end
+
+  Dir.glob('Firmware/sketchbook/libraries/*').select{|f| File.directory? f}.each do |other|
+    includes << "#{other}"
+    includes << "#{other}/src"
+  end
+
+  #if(File.exists?(json_info_file))
+  #  info = JSON.parse(IO.read(json_info_file))
+  #  info["dependencies"].each do |dependency|
+  #    includes << "Firmware/sketchbook/libraries/#{dependency}/src"
+  #    includes << "Firmware/sketchbook/libraries/#{dependency}"
+  #  end
+  #end
 
   ninja_path = library_path.pathmap("%{^Firmware,#{target}}X/src")
   ninja_file = "#{ninja_path}/build.ninja"

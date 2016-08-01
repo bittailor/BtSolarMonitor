@@ -7,7 +7,7 @@
 #ifndef INC__Bt_SolarMonitor_IOSlavePins__hpp
 #define INC__Bt_SolarMonitor_IOSlavePins__hpp
 
-#include "Bt/SolarMonitor/IOPins.hpp"
+#include <Arduino.h>
 
 // BT_SOLARMONITOR_IOSLAVE_PIN
 

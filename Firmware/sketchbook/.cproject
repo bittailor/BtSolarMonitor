@@ -200,7 +200,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="Firmware.null.677697956" name="Firmware"/>
+		<project id="sketchbook.null.677697956" name="sketchbook"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
@@ -208,8 +208,9 @@
 		<configuration configurationName="arduino"/>
 		<configuration configurationName="host"/>
 		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/Firmware"/>
+			<resource resourceType="PROJECT" workspacePath="/sketchbook"/>
 		</configuration>
+		<configuration configurationName="target-no-spike"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">

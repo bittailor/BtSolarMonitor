@@ -6,7 +6,7 @@
 
 #include "Bt/SolarMonitor/RelayControllerQueryPort.hpp"
 
-#include "Bt/SolarMonitor/IOSlavePins.hpp"
+#include "IoSlavePins.hpp"
 
 #define Sense_L A0
 #define Sense_A A1

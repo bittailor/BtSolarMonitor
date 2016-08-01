@@ -6,7 +6,7 @@
 
 #include "Bt/SolarMonitor/SlaveController.hpp"
 
-#include "Bt/SolarMonitor/IOSlavePins.hpp"
+#include "IoSlavePins.hpp"
 
 namespace Bt {
 namespace SolarMonitor {

@@ -1,8 +1,10 @@
 #include <Wire.h>
 #include <LowPower.h>
+#include <BtMcuCore.h>
 #include <Bt_SolarMonitor.h>
+
 #include <Bt/Core/Logger.hpp>
-#include <Bt/SolarMonitor/IOSlavePins.hpp>
+#include <Bt/SolarMonitor/IoSlavePins.hpp>
 #include <Bt/SolarMonitor/SlaveController.hpp>
 
 

@@ -53,6 +53,12 @@ void NokiaScreen::setTextColor(uint16_t pColor) {
 
 //-------------------------------------------------------------------------------------------------
 
+void NokiaScreen::setCursor(int16_t pX, int16_t pY) {
+   mPCD8544.setCursor(pX, pY);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 size_t NokiaScreen::print(const char* pString) {
    return mPCD8544.print(pString);
 }
@@ -97,6 +103,12 @@ size_t NokiaScreen::println(int pInt) {
 
 size_t NokiaScreen::println(double pDouble, int pDigits) {
    return mPCD8544.println(pDouble, pDigits);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void NokiaScreen::drawXBitmap(int16_t pX, int16_t pY, const uint8_t *pBitmap, int16_t pW, int16_t pH, uint16_t color) {
+   mPCD8544.drawXBitmap(pX, pY, pBitmap, pW, pH, color);
 }
 
 //-------------------------------------------------------------------------------------------------

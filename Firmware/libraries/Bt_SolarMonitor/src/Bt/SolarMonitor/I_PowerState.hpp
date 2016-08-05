@@ -16,7 +16,6 @@ class I_PowerState {
       virtual ~I_PowerState() {}
       virtual State state() = 0;
       virtual void state(State pState) = 0;
-
       virtual void resetNotify() = 0;
 };
 

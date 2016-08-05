@@ -226,6 +226,25 @@ Return<bool> MobileTerminal::checkNetworkRegistration() {
    }
 }
 
+Return<int>  MobileTerminal::getRSSI() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+
+   int rssi = -1;
+   int ber = -1;
+   while(true){
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+      if(sscanf(line.value(),"+CREG: %d,%d", &rssi, &ber ) == 2) {
+         continue;
+      }
+      if (strcmp(line.value(), "OK") == 0) {
+         return rssi;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
+}
+
+
 Return<bool> MobileTerminal::checkGprsAttachment() {
    Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
    sendCommand("AT+CGATT?");

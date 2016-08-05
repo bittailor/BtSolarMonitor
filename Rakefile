@@ -160,7 +160,7 @@ namespace :host do
   desc "compile all host tests"
   task :compile => :compile_gtest do
     libraries_with_tests = Rake::FileList["Firmware/libraries/*/test"]
-    libraries_with_tests.collect{|path| path.pathmap('%d')}.each do |library|
+    libraries_with_tests.collect{|path| path.gsub('Firmware/libraries','Firmware/sketchbook/libraries').pathmap('%d')}.each do |library|
       compile_host_library(library)
       compile_host_test(library)
     end
@@ -261,3 +261,6 @@ def compile_host_test(library_path)
   end
   sh "ninja -v -j8 -f #{ninja_file}"
 end
+
+
+task :quick => ["host:test", :compile_arduino_Spike_Screens]

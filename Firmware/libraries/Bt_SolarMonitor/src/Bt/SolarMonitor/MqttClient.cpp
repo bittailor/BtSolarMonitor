@@ -118,7 +118,6 @@ void MqttClient::onConnected() {
       return;
    }
    LOG("MQTT connected");
-
    publish("BT/Solar/status", "1", QoS::QOS1, true);
 }
 

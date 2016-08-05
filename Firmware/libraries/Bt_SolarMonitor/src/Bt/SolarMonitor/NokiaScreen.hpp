@@ -28,6 +28,7 @@ class NokiaScreen : public I_Screen
 
       virtual void setTextSize(uint8_t pSize);
       virtual void setTextColor(uint16_t pColor);
+      virtual void setCursor(int16_t pX, int16_t pY);
 
       virtual size_t print(const char* pString);
       virtual size_t print(char pChar);
@@ -38,6 +39,9 @@ class NokiaScreen : public I_Screen
       virtual size_t println(char pChar);
       virtual size_t println(int pInt);
       virtual size_t println(double pDouble, int pDigits= 2);
+
+      virtual void drawXBitmap(int16_t pX, int16_t pY, const uint8_t *pBitmap, int16_t pW, int16_t pH, uint16_t color);
+
 
    private:
    	  // Constructor to prohibit copy construction.

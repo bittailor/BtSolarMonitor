@@ -30,6 +30,7 @@ class MobileTerminal : public I_MobileTerminal
       virtual Return<void> disableEcho();
       virtual Return<void> checkAndSetPin(const char* pPin);
       virtual Return<bool> checkNetworkRegistration();
+      virtual Return<int>  getRSSI();
       virtual Return<bool> checkGprsAttachment();
       virtual Return<void> bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword);
       virtual Return<void> connect(const char* pHostname, int pPort);

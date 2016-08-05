@@ -175,13 +175,15 @@ void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
    log("Control: ", pRecord.control());
    */
 
-   I_PowerState::State powerState = mIoSlave.powerState();
+   //I_PowerState::State powerState = mIoSlave.powerState();
    //LOG("PowerState: " << powerState);
 
    //bool connectionState =  mMqttClient.yield(1);
    //LOG("ConnectionState" << connectionState);
 
-   mScreens.update(pRecord, powerState, true);
+
+   mScreens.updateMeasurementRecord(pRecord);
+   //mScreens.update(pRecord, powerState, true);
 
 
 }

@@ -36,9 +36,11 @@ class I_MobileTerminal {
       virtual Return<void> disableEcho() = 0;
       virtual Return<void> checkAndSetPin(const char* pPin) = 0;
       virtual Return<bool> checkNetworkRegistration() = 0;
+      virtual Return<int>  getRSSI() = 0;
       virtual Return<bool> checkGprsAttachment() = 0;
       virtual Return<void> bringUpWirelessConnection(const char* pApn, const char* pUser = nullptr, const char* pPassword = nullptr) = 0;
       virtual Return<void> connect(const char* pHostname, int pPort) = 0;
+      virtual Return<void> close() =0 ;
       virtual Return<ConnectionStatus> getConnectionStatus() = 0;
       virtual Return<int> write(unsigned char* pBuffer, int pLen, int pTimeout) = 0;
       virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout) = 0;

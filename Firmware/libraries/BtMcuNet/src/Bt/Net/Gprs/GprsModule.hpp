@@ -23,7 +23,9 @@ class GprsModuleState {
    public:
       virtual ~GprsModuleState(){}
       virtual bool isConnected() {return false;}
+      virtual int getRSSI() {return -1;}
       virtual int connect(const char* pHostname, int pPort){return -1;}
+      virtual int disconnect(){return -1;}
       virtual int write(unsigned char* pBuffer, int pLen, int pTimeout){return -1;}
       virtual int read(unsigned char* pBuffer, int pLen, int pTimeout){return -1;}
 };
@@ -48,6 +50,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       void begin(I_Listener& pListener);
 
       virtual bool isConnected();
+      virtual int getRSSI();
 
       virtual int connect(const char* pHostname, int pPort);
       virtual int read(unsigned char* pBuffer, int pLen, int pTimeout);
@@ -235,6 +238,14 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
          public:
             AwaitNetworkRegistration(GprsModule& pController):StateBase(pController){}
 
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
+
             virtual void onEnter() {
                mTimer = 60000;
                checkNetworkRegistration();
@@ -267,6 +278,14 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       class AwaitGprsAttachment : public StateBase  {
          public:
             AwaitGprsAttachment(GprsModule& pController):StateBase(pController){}
+
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
 
             virtual void onEnter() {
                mTimer = 10000;
@@ -301,6 +320,15 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
          public:
             BringUpWirelessConnection(GprsModule& pController):StateBase(pController){}
 
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
+
+
             virtual void onEnter() {
                if(!mController->mMobileTerminal->bringUpWirelessConnection("gprs.swisscom.ch")){
                   mController->nextState(mController->mReseting);
@@ -317,6 +345,15 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       class Ready : public StateBase  {
          public:
             Ready(GprsModule& pController):StateBase(pController){}
+
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
+
 
             virtual void onEnter() {
                mController->setTimer(0);
@@ -350,6 +387,15 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       class Connecting : public StateBase  {
          public:
             Connecting(GprsModule& pController):StateBase(pController){}
+
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
+
 
             virtual void onEnter() {
                mTimer = 160000;
@@ -403,6 +449,15 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
          public:
             Connected(GprsModule& pController):StateBase(pController){}
 
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
+
+
             virtual void onEnter() {
                mController->setTimer(0);
             }
@@ -437,6 +492,11 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                return -1;
             }
 
+            virtual int disconnect(){
+               mController->nextState(mController->mDisconnected);
+               return 0;
+            }
+
             virtual void timeUp(){
                mController->connectedCallback();
             }
@@ -446,11 +506,23 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
       };
 
+
+
       class Disconnected : public StateBase  {
          public:
             Disconnected(GprsModule& pController):StateBase(pController){}
 
+            virtual int getRSSI() {
+               Return<int> rssi = mController->mMobileTerminal->getRSSI();
+               if(rssi) {
+                  return rssi.value();
+               }
+               return -2;
+            }
+
+
             virtual void onEnter() {
+               mController->mMobileTerminal->close();
                mController->setTimer(0);
             }
 

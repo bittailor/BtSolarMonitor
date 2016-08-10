@@ -64,6 +64,12 @@ bool GprsModule::isConnected() {
 
 //-------------------------------------------------------------------------------------------------
 
+int GprsModule::getRSSI() {
+   return handle(&GprsModuleState::getRSSI);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 int GprsModule::connect(const char* pHostname, int pPort) {
    return handle(&GprsModuleState::connect,pHostname,pPort);
 }
@@ -86,7 +92,8 @@ int GprsModule::write(unsigned char* pBuffer, int pLen, int pTimeout) {
 //-------------------------------------------------------------------------------------------------
 
 int GprsModule::disconnect() {
-   return -1;
+   int rc = handle(&GprsModuleState::disconnect);
+   return rc;
 }
 
 //-------------------------------------------------------------------------------------------------

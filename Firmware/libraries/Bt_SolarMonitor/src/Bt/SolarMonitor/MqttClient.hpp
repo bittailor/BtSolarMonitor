@@ -7,12 +7,13 @@
 #ifndef INC__Bt_SolarMonitor_MqttClient__hpp
 #define INC__Bt_SolarMonitor_MqttClient__hpp
 
+#include <Bt/Core/Logger.hpp>
+
 #include <Arduino.h>
 #include <MQTTClient.h>
 
 #include <Bt/Core/I_Time.hpp>
 #include <Bt/Core/I_Workcycle.hpp>
-#include <Bt/Core/Logger.hpp>
 #include <Bt/Core/Time.hpp>
 #include <Bt/Core/DigitalOut.hpp>
 #include <Bt/Core/DigitalIn.hpp>
@@ -69,9 +70,8 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       ~MqttClient();
 
       void begin();
+      void shutdown();
 
-      virtual bool connect();
-      virtual bool isConnected();
 
       virtual bool yield(uint32_t pTimeoutInMilliseconds);
 
@@ -82,6 +82,9 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       virtual void onConnected();
       virtual void onDisconnected();
 
+      // TODO hack inject
+      Net::Gprs::GprsModule& gprsModule() {return mGprsModule;}
+
 
    private:
         // Constructor to prohibit copy construction.
@@ -90,11 +93,10 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       // Operator= to prohibit copy assignment
       MqttClient& operator=(const MqttClient&);
 
-      bool connectGPRS();
-      bool connectMQTT();
+      void disconnect();
 
+      bool mShutdown;
       Core::I_Workcycle* mWorkcycle;
-
       Core::DigitalOut mOnOffKey;
       Core::DigitalOut mReset;
       Core::DigitalIn mPowerState;

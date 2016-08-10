@@ -34,6 +34,7 @@ class MobileTerminal : public I_MobileTerminal
       virtual Return<bool> checkGprsAttachment();
       virtual Return<void> bringUpWirelessConnection(const char* pApn, const char* pUser, const char* pPassword);
       virtual Return<void> connect(const char* pHostname, int pPort);
+      virtual Return<void> close();
       virtual Return<ConnectionStatus> getConnectionStatus();
       virtual Return<int> write(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout);

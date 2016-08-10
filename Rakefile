@@ -263,4 +263,4 @@ def compile_host_test(library_path)
 end
 
 
-task :quick => ["host:test", :compile_arduino_Spike_Screens]
+task :quick => ["host:test", :compile_arduino_SolarMonitor]

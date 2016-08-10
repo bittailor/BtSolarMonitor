@@ -19,7 +19,7 @@ namespace {
 
 //   #define TOPIC "BT/BSM/v2/feeds/838919833.json"
 // #define TOPIC "/v2/feeds/838919833.csv"
-   #define TOPIC "BT/Solar/sens"
+   #define TOPIC "sensors/raw"
 
    typedef const char* FeedId;
 
@@ -64,11 +64,6 @@ void Publisher::begin() {
 
 void Publisher::publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter) {
 
-   if(!mMqttClient->isConnected()){
-      LOG("!!! mqtt not connected => skip publish !!!");
-   }
-
-
    char message[500] = {0};
    Bt::Core::StaticStringBuilder builder(message,sizeof(message)/sizeof(message[0]));
 
@@ -96,14 +91,10 @@ void Publisher::publish(const MeasurementRecord& pMeasurementRecord, uint32_t pR
    //builder.print(",");
    builder.print(pReconnectCounter);
 
-
-
-
-
    LOG("message length = " << strlen(message));
    LOG("message " << message);
    mMqttClient->publish(TOPIC, message, I_MqttClient::QOS1);
-   //mMqttClient->publish(TOPIC, "HELLO");
+
 }
 
 

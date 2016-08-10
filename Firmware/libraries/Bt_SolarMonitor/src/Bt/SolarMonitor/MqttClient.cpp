@@ -28,7 +28,8 @@ namespace SolarMonitor {
 //-------------------------------------------------------------------------------------------------
 
 MqttClient::MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle)
-: mWorkcycle(&pWorkcycle)
+: mShutdown(false)
+, mWorkcycle(&pWorkcycle)
 , mOnOffKey(FONA_KEY)
 , mReset(FONA_RST)
 , mPowerState(FONA_PS)
@@ -61,15 +62,30 @@ void MqttClient::begin() {
 
 //-------------------------------------------------------------------------------------------------
 
+void MqttClient::shutdown() {
+   mShutdown = true;
+   disconnect();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 bool MqttClient::publish(const char* pTopicName, void* pPayload, size_t pPayloadlen, QoS pQos, bool pRetained) {
+   if(mShutdown) {
+      LOG("MqttClient::publish: Shutdown!");
+      return false;
+   }
+
    MQTT::QoS qos;
    switch(pQos){
       case QoS::QOS0 : qos =  MQTT::QOS0; break;
       case QoS::QOS1 : qos =  MQTT::QOS1; break;
       case QoS::QOS2 : qos =  MQTT::QOS2; break;
    }
-
-   return mMqttClient.publish(pTopicName, pPayload, pPayloadlen, qos, pRetained) == 0;
+   if(mMqttClient.publish(pTopicName, pPayload, pPayloadlen, qos, pRetained) == 0) {
+      return true;
+   }
+   disconnect();
+   return false;
 }
 
 bool MqttClient::publish(const char* pTopicName, const char* pMessage, QoS pQos, bool pRetained) {
@@ -82,8 +98,12 @@ bool MqttClient::publish(const char* pTopicName, const char* pMessage, QoS pQos,
 //-------------------------------------------------------------------------------------------------
 
 void MqttClient::onReady() {
-   LOG("MqttClient::onReady()");
+   if(mShutdown) {
+      LOG("MqttClient::onReady: Shutdown!");
+      return;
+   }
 
+   LOG("MqttClient::onReady()");
    const char * url = "broker.shiftr.io";
    //const char * url = "bittailor.cloudapp.net";
    //const char * url = "api.xively.com";
@@ -99,12 +119,17 @@ void MqttClient::onReady() {
 //-------------------------------------------------------------------------------------------------
 
 void MqttClient::onConnected() {
+   if(mShutdown) {
+      LOG("MqttClient::onConnected: Shutdown!");
+      return;
+   }
+
    MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
    data.MQTTVersion = 3;
-   data.clientID.cstring = (char*)"bt-solar";
+   data.clientID.cstring = (char*)"solar-device";
    data.keepAliveInterval = 10 * 60;
    data.willFlag = true;
-   data.will.topicName.cstring = (char*)"BT/Solar/status";
+   data.will.topicName.cstring = (char*)"device/status";
    data.will.message.cstring = (char*)"0";
    data.will.retained = true;
    data.will.qos = MQTT::QOS1;
@@ -118,7 +143,7 @@ void MqttClient::onConnected() {
       return;
    }
    LOG("MQTT connected");
-   publish("BT/Solar/status", "1", QoS::QOS1, true);
+   publish("device/status", "1", QoS::QOS1, true);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -129,26 +154,18 @@ void MqttClient::onDisconnected() {
 
 //-------------------------------------------------------------------------------------------------
 
-bool MqttClient::connect() {
-   if(mGprsModule.isConnected() && !mMqttClient.isConnected()) {
-      LOG("--> reconnect MQTT !");
-      onConnected();
-   }
-   return true;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-bool MqttClient::isConnected() {
-   bool gprsIsConnected = mGprsModule.isConnected();
-   bool mqttIsConnected = mMqttClient.isConnected();
-   LOG("GPRS connected = "  << gprsIsConnected << "MQTT connected = "  << mqttIsConnected );
-   return gprsIsConnected && mqttIsConnected;
+void MqttClient::disconnect() {
+   mMqttClient.disconnect();
+   mGprsModule.disconnect();
 }
 
 //-------------------------------------------------------------------------------------------------
 
 bool MqttClient::yield(uint32_t pTimeoutInMilliseconds) {
+   if(mShutdown) {
+      LOG("MqttClient::yield: Shutdown!");
+      return false;
+   }
    if(mGprsModule.isConnected()) {
       return mMqttClient.yield(pTimeoutInMilliseconds);
    }

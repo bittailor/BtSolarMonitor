@@ -9,5 +9,6 @@
 namespace Bt {
 namespace SolarMonitor {
 
+
 } // namespace SolarMonitor
 } // namespace Bt

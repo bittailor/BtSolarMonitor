@@ -19,6 +19,7 @@
 #include "Bt/SolarMonitor/Screens.hpp"
 #include "Bt/SolarMonitor/MqttClient.hpp"
 #include "Bt/SolarMonitor/Publisher.hpp"
+#include "Bt/SolarMonitor/AveragingMeasurementRecord.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
@@ -31,6 +32,7 @@ class MainController
 
       void begin();
       bool loop();
+      void shutdown();
 
    private:
    	  // Constructor to prohibit copy construction.
@@ -77,7 +79,7 @@ class MainController
       MqttClient mMqttClient;
       Publisher mPublisher;
 
-      MeasurementRecord mRecordToPublish;
+      AveragingMeasurementRecord mRecordToPublish;
 };
 
 } // namespace SolarMonitor

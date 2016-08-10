@@ -15,6 +15,9 @@ namespace SolarMonitor {
 class MeasurementRecord
 {
    public:
+      MeasurementRecord(){
+      }
+
       MeasurementRecord(Measurement pPanelA,
                         Measurement pPanelB,
                         Measurement pBatteryA,
@@ -35,6 +38,38 @@ class MeasurementRecord
       const Measurement& batteryB() const {return mBatteryB;}
       const Measurement& load() const {return mLoad;}
       const Measurement& control() const {return mControl;}
+
+      MeasurementRecord& operator+=(const MeasurementRecord& rhs) {
+         mPanelA += rhs.mPanelA;
+         mPanelB += rhs.mPanelB;
+         mBatteryA += rhs.mBatteryA;
+         mBatteryB += rhs.mBatteryB;
+         mLoad += rhs.mLoad;
+         mControl += rhs.mControl;
+         return *this;
+      }
+
+      MeasurementRecord& operator/=(double rhs) {
+         mPanelA /= rhs;
+         mPanelB /= rhs;
+         mBatteryA /= rhs;
+         mBatteryB /= rhs;
+         mLoad /= rhs;
+         mControl /= rhs;
+         return *this;
+      }
+
+      friend MeasurementRecord operator+(MeasurementRecord lhs,const MeasurementRecord& rhs)
+      {
+         lhs += rhs;
+         return lhs;
+      }
+
+      friend MeasurementRecord operator/(MeasurementRecord lhs, double rhs)
+      {
+         lhs /= rhs;
+         return lhs;
+      }
 
    private:
 

@@ -228,13 +228,14 @@ Return<bool> MobileTerminal::checkNetworkRegistration() {
 
 Return<int>  MobileTerminal::getRSSI() {
    Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CSQ");
 
    int rssi = -1;
    int ber = -1;
    while(true){
       Return<const char*> line = readLine(timer);
       checkLine(line);
-      if(sscanf(line.value(),"+CREG: %d,%d", &rssi, &ber ) == 2) {
+      if(sscanf(line.value(),"+CSQ: %d,%d", &rssi, &ber ) == 2) {
          continue;
       }
       if (strcmp(line.value(), "OK") == 0) {
@@ -412,6 +413,19 @@ Return<void> MobileTerminal::connect(const char* pHostname, int pPort) {
       checkLine(line);
 
       if (strcmp(line.value(), "OK") == 0) {
+         return ReturnCode::RC_SUCCESS;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
+}
+
+Return<void> MobileTerminal::close() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CIPCLOSE=1");
+   while(true){
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+      if (strcmp(line.value(), "CLOSE OK") == 0) {
          return ReturnCode::RC_SUCCESS;
       }
       return ReturnCode::RC_FAILURE;

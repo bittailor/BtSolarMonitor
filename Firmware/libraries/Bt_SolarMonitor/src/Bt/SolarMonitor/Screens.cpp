@@ -46,7 +46,7 @@ static unsigned char sMobileBits[] = {
    0xb0, 0x6d, 0xb0, 0x6d, 0x00, 0x00, 0x00, 0x00
 };
 
-static unsigned char GsmAntennaBits[] = {
+static unsigned char sGsmAntennaBits[] = {
    0x00, 0x00, 0x00, 0x10, 0x00, 0x24, 0x20, 0x29, 0x70, 0x4a, 0x70, 0x4a,
    0x20, 0x29, 0x20, 0x24, 0x20, 0x10, 0xf8, 0x00, 0x88, 0x00, 0x88, 0x00,
    0x88, 0x00, 0x88, 0x00, 0xf8, 0x00, 0x00, 0x00
@@ -54,19 +54,19 @@ static unsigned char GsmAntennaBits[] = {
 
 #define SMALL_ICON_SIZE 8
 
-static unsigned char RssiSmallBits[] = {
+static unsigned char sRssiSmallBits[] = {
    0x40, 0x40, 0x40, 0x50, 0x50, 0x54, 0x55, 0x00
 };
 
-static unsigned char InfoSmallBits[] = {
+static unsigned char sInfoSmallBits[] = {
    0x1c, 0x22, 0x49, 0x41, 0x49, 0x49, 0x22, 0x1c
 };
 
-static unsigned char OnSmallBits[] = {
+static unsigned char sOnSmallBits[] = {
    0x00, 0x00, 0x40, 0x20, 0x10, 0x0a, 0x04, 0x00
 };
 
-static unsigned char OffSmallBits[] = {
+static unsigned char sOffSmallBits[] = {
    0x00, 0x58, 0x24, 0x52, 0x4a, 0x24, 0x1a, 0x00
 };
 
@@ -76,7 +76,7 @@ static unsigned char OffSmallBits[] = {
 
 Screens::Screens(I_Screen& pOne, I_Screen& pTwo)
 : mScreens{&pOne, &pTwo}
-, mMeasurementRecord(Measurement(),Measurement(),Measurement(),Measurement(),Measurement(),Measurement()){
+, mMeasurementRecord(){
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -218,17 +218,17 @@ void Screens::drawPowerState(size_t pScreenIndex) {
 
 void Screens::drawConnectionState(size_t pScreenIndex) {
    mScreens[pScreenIndex]->setTextSize(1);
-   mScreens[pScreenIndex]->drawXBitmap(0, 2*ICON_SIZE+SMALL_ICON_SIZE, RssiSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+   mScreens[pScreenIndex]->drawXBitmap(0, 2*ICON_SIZE+SMALL_ICON_SIZE, sRssiSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
    mScreens[pScreenIndex]->setCursor(10,2*ICON_SIZE+SMALL_ICON_SIZE);
    mScreens[pScreenIndex]->print(mRSSI);
    mScreens[pScreenIndex]->print(" ");
    mGsmState = mGsmState % 6;
    int x = 26;
    for(int i = 0 ; i < mGsmState; i++) {
-      mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, OnSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, sOnSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
    }
    for(int i = mGsmState ; i < 5; i++) {
-      mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, OffSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, sOffSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
    }
    mScreens[pScreenIndex]->setCursor(70, 2*ICON_SIZE+SMALL_ICON_SIZE);
    mScreens[pScreenIndex]->print(mCounter%100);

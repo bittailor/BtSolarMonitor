@@ -16,6 +16,7 @@ class StaticStringBuilder : public Print {
    public:
       StaticStringBuilder(char* pBuffer, size_t size);
       virtual size_t write(uint8_t pByte);
+      void clear();
 
    private:
       // Constructor to prohibit copy construction.

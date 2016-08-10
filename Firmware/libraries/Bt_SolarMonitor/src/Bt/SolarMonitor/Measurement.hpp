@@ -15,7 +15,7 @@ namespace SolarMonitor {
 class Measurement
 {
    public:
-      Measurement() : mCurrent(NAN), mVoltage(NAN) {
+      Measurement() : mCurrent(0), mVoltage(0) {
       }
 
       Measurement(float pCurrent, float pVoltage) : mCurrent(pCurrent), mVoltage(pVoltage) {
@@ -23,6 +23,18 @@ class Measurement
 
       float current() const { return mCurrent; }
       float voltage() const { return mVoltage; }
+
+      Measurement& operator+=(const Measurement& rhs) {
+         mCurrent += rhs.mCurrent;
+         mVoltage += rhs.mVoltage;
+         return *this;
+      }
+
+      Measurement& operator/=(double rhs) {
+         mCurrent /= rhs;
+         mVoltage /= rhs;
+         return *this;
+      }
 
    private:
 

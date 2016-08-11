@@ -11,8 +11,9 @@ addons:
       - g++-6
     sources: &sources
         - ubuntu-toolchain-r-test
-env:
-  - CC=gcc-6 CXX=g++-6
+
+compiler: gcc-6
+
 before_install:
   - gem update --system
   - gem install rake

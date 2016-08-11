@@ -4,6 +4,13 @@ require 'json'
 require 'rake/clean'
 require 'digest/sha1'
 
+
+$cc = ENV['CC'] || 'gcc'
+$cxx = ENV['CXX'] || 'g++'
+
+puts "$cc is #{$cc}"
+puts "$cxx is #{$cxx}"
+
 $arduino = "/Applications/Arduino.app/Contents/MacOS/Arduino"
 $arduino_folder = "/Applications/Arduino.app/Contents/Java"
 $builder = "#{$arduino_folder}/arduino-builder"
@@ -149,11 +156,11 @@ namespace :host do
 
   task :compile_gtest => $host_output_folder do
     gtest_dir = "Firmware/sketchbook/libraries/googletest"
-    sh "g++ -isystem #{gtest_dir}/include -I#{gtest_dir} -pthread -c #{gtest_dir}/src/gtest-all.cc -o #{$host_output_folder}/gtest-all.o" unless File.exists?("#{$host_output_folder}/gtest-all.o")
+    sh "#{$cxx} -isystem #{gtest_dir}/include -I#{gtest_dir} -pthread -c #{gtest_dir}/src/gtest-all.cc -o #{$host_output_folder}/gtest-all.o" unless File.exists?("#{$host_output_folder}/gtest-all.o")
     sh "ar -rv #{$host_output_folder}/libgtest.a #{$host_output_folder}/gtest-all.o" unless File.exists?("#{$host_output_folder}/libgtest.a")
 
     gmock_dir = "Firmware/sketchbook/libraries/googlemock"
-    sh "g++ -isystem #{gmock_dir}/include -I#{gmock_dir} -I#{gtest_dir}/include -pthread -c #{gmock_dir}/src/gmock-all.cc -o #{$host_output_folder}/gmock-all.o" unless File.exists?("#{$host_output_folder}/gmock-all.o")
+    sh "#{$cxx} -isystem #{gmock_dir}/include -I#{gmock_dir} -I#{gtest_dir}/include -pthread -c #{gmock_dir}/src/gmock-all.cc -o #{$host_output_folder}/gmock-all.o" unless File.exists?("#{$host_output_folder}/gmock-all.o")
     sh "ar -rv #{$host_output_folder}/libgmock.a #{$host_output_folder}/gmock-all.o" unless File.exists?("#{$host_output_folder}/libgmock.a")
   end
 
@@ -221,7 +228,8 @@ def compile_host_library(library_path)
     file.write(ERB.new(IO.read("Build/host_library.erb")).result(binding))
   end
 
-  sh "ninja -v -j8 -f #{ninja_file}"
+  sh("ninja -v -j8 -f #{ninja_file}")
+  #sh("env && ninja -v -j8 -f #{ninja_file}")
 end
 
 def compile_host_test(library_path)

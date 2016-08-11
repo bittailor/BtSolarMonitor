@@ -5,12 +5,12 @@ global_includes = -I/opt/local/include
 linkflags = -pthread
 
 rule cc
-  command = gcc -MMD -MT $out -MF $out.d $ccflags $flags $global_includes $includes -c $in -o $out
+  command = <%= $cc %> -MMD -MT $out -MF $out.d $ccflags $flags $global_includes $includes -c $in -o $out
   description = CC $out
   depfile = $out.d
 
 rule cxx
-  command = g++ -MMD -MT $out -MF $out.d $cxxflags $flags $global_includes $includes -c $in -o $out
+  command = <%= $cxx %> -MMD -MT $out -MF $out.d $cxxflags $flags $global_includes $includes -c $in -o $out
   description = CXX $out
   depfile = $out.d
 
@@ -19,5 +19,5 @@ rule ar
   description = AR $out
 
 rule link
-  command = g++ -o $out $in $libs $linkflags
+  command = <%= $cxx %> -o $out $in $libs $linkflags
   description = LINK $out

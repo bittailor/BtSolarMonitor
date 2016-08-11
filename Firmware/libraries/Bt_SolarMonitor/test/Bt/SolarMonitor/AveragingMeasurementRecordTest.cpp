@@ -64,8 +64,6 @@ TEST(AveragingMeasurementRecordTest, clear) {
    AveragingMeasurementRecord mAveragingMeasurementRecord;
 
    int counts = 2 * 60 * 2;
-   float sum = (counts*(counts + 1))/2;
-   float expectedAverage = sum / counts;
 
    for (int i = 1; i <= counts; ++i) {
       float d = i;
@@ -75,9 +73,7 @@ TEST(AveragingMeasurementRecordTest, clear) {
    mAveragingMeasurementRecord.averageAndClear();
    MeasurementRecord average = mAveragingMeasurementRecord.averageAndClear();
 
-
    EXPECT_FLOAT_EQ(0,average.panelA().current());
-
 }
 
 

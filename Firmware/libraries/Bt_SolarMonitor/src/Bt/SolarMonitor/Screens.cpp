@@ -34,23 +34,23 @@ static const unsigned char sLightBits[] = {
    0xc0, 0x03, 0x80, 0x01, 0x00, 0x00, 0x00, 0x00
 };
 
-static unsigned char sGsmBits[] = {
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x0e, 0x00, 0x0b,
-   0x80, 0x09, 0xc0, 0x08, 0x60, 0x08, 0x30, 0x08, 0x18, 0x08, 0x0c, 0x08,
-   0x06, 0x08, 0xfe, 0x0f, 0x00, 0x00, 0x00, 0x00
-};
-
-static unsigned char sMobileBits[] = {
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60,
-   0x00, 0x60, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6c, 0x80, 0x6d, 0x80, 0x6d,
-   0xb0, 0x6d, 0xb0, 0x6d, 0x00, 0x00, 0x00, 0x00
-};
-
-static unsigned char sGsmAntennaBits[] = {
-   0x00, 0x00, 0x00, 0x10, 0x00, 0x24, 0x20, 0x29, 0x70, 0x4a, 0x70, 0x4a,
-   0x20, 0x29, 0x20, 0x24, 0x20, 0x10, 0xf8, 0x00, 0x88, 0x00, 0x88, 0x00,
-   0x88, 0x00, 0x88, 0x00, 0xf8, 0x00, 0x00, 0x00
-};
+//static unsigned char sGsmBits[] = {
+//   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x0e, 0x00, 0x0b,
+//   0x80, 0x09, 0xc0, 0x08, 0x60, 0x08, 0x30, 0x08, 0x18, 0x08, 0x0c, 0x08,
+//   0x06, 0x08, 0xfe, 0x0f, 0x00, 0x00, 0x00, 0x00
+//};
+//
+//static unsigned char sMobileBits[] = {
+//   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60,
+//   0x00, 0x60, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6c, 0x80, 0x6d, 0x80, 0x6d,
+//   0xb0, 0x6d, 0xb0, 0x6d, 0x00, 0x00, 0x00, 0x00
+//};
+//
+//static unsigned char sGsmAntennaBits[] = {
+//   0x00, 0x00, 0x00, 0x10, 0x00, 0x24, 0x20, 0x29, 0x70, 0x4a, 0x70, 0x4a,
+//   0x20, 0x29, 0x20, 0x24, 0x20, 0x10, 0xf8, 0x00, 0x88, 0x00, 0x88, 0x00,
+//   0x88, 0x00, 0x88, 0x00, 0xf8, 0x00, 0x00, 0x00
+//};
 
 #define SMALL_ICON_SIZE 8
 
@@ -58,9 +58,9 @@ static unsigned char sRssiSmallBits[] = {
    0x40, 0x40, 0x40, 0x50, 0x50, 0x54, 0x55, 0x00
 };
 
-static unsigned char sInfoSmallBits[] = {
-   0x1c, 0x22, 0x49, 0x41, 0x49, 0x49, 0x22, 0x1c
-};
+//static unsigned char sInfoSmallBits[] = {
+//   0x1c, 0x22, 0x49, 0x41, 0x49, 0x49, 0x22, 0x1c
+//};
 
 static unsigned char sOnSmallBits[] = {
    0x00, 0x00, 0x40, 0x20, 0x10, 0x0a, 0x04, 0x00
@@ -120,46 +120,14 @@ void Screens::updateCounter(int pCounter) {
    updateScreens();
 }
 
-
-//-------------------------------------------------------------------------------------------------
-
-/*
-void Screens::update(const MeasurementRecord& pMeasurementRecord, PowerState::State pPowerState, bool pConnectionState) {
-   mMeasurementRecord = pMeasurementRecord;
-   mPowerState = pPowerState;
-   updateScreens();
-
-}
-*/
-
 //-------------------------------------------------------------------------------------------------
 
 void Screens::updateScreens() {
 
    mScreens[0]->clear();
-
-   //mScreens[0]->print("I");
-   mScreens[0]->print(" ");
-   mScreens[0]->drawXBitmap(0, 0*ICON_SIZE, sSunBits, ICON_SIZE, ICON_SIZE, 1);
-   mScreens[0]->setTextSize(1);
-   mScreens[0]->print(" ");
-   drawMeasureValue(mMeasurementRecord.panelA().current(), 0);
-   mScreens[0]->print(" ");
-   mScreens[0]->setTextSize(2);
-   mScreens[0]->println("A");
-   mScreens[0]->display();
-
-
-   mScreens[0]->print(" ");
-   mScreens[0]->drawXBitmap(0, 1*ICON_SIZE, sBatteryBits, ICON_SIZE, ICON_SIZE, 1);
-   //mScreens[0]->print("U");
-   mScreens[0]->setTextSize(1);
-   mScreens[0]->print(" ");
-   drawMeasureValue(mMeasurementRecord.batteryA().voltage(), 0);
-   mScreens[0]->print(" ");
-   mScreens[0]->setTextSize(2);
-   mScreens[0]->println("V");
-
+   mScreens[0]->setTextColor(BLACK);
+   drawPanelCurrent(0,mMeasurementRecord.panelA().current());
+   drawBatteryVoltage(0,mMeasurementRecord.batteryA().voltage());
    if(mPowerState == PowerState::OnA) {
       drawPowerState(0);
    } else {
@@ -167,42 +135,53 @@ void Screens::updateScreens() {
    }
    mScreens[0]->display();
 
-
    mScreens[1]->clear();
    mScreens[1]->setTextColor(BLACK);
-   mScreens[1]->print("I");
-   mScreens[1]->setTextSize(1);
-   mScreens[1]->print(" ");
-   drawMeasureValue(mMeasurementRecord.panelB().current(), 1);
-   mScreens[1]->print(" ");
-   mScreens[1]->setTextSize(2);
-   mScreens[1]->println("A");
-   mScreens[1]->display();
-
-   mScreens[1]->print("U");
-   mScreens[1]->setTextSize(1);
-   mScreens[1]->print(" ");
-   drawMeasureValue(mMeasurementRecord.batteryB().voltage(), 1);
-   mScreens[1]->print(" ");
-   mScreens[1]->setTextSize(2);
-   mScreens[1]->println("V");
-   mScreens[1]->display();
-
+   drawPanelCurrent(1,mMeasurementRecord.panelB().current());
+   drawBatteryVoltage(1,mMeasurementRecord.batteryB().voltage());
    if(mPowerState == PowerState::OnB) {
       drawPowerState(1);
-   }
-
-   if(mPowerState == PowerState::OnA) {
+   } else if(mPowerState == PowerState::OnA) {
       drawConnectionState(1);
    }
-
    mScreens[1]->display();
 
+}
+
+
+//-------------------------------------------------------------------------------------------------
+
+void Screens::drawPanelCurrent(size_t pScreenIndex, float pCurrent) {
+   mScreens[pScreenIndex]->setTextSize(2);
+   mScreens[pScreenIndex]->print(" ");
+   mScreens[pScreenIndex]->drawXBitmap(0, 0*ICON_SIZE, sSunBits, ICON_SIZE, ICON_SIZE, 1);
+   mScreens[pScreenIndex]->setTextSize(1);
+   mScreens[pScreenIndex]->print(" ");
+   drawMeasureValue(pCurrent, pScreenIndex);
+   mScreens[pScreenIndex]->print(" ");
+   mScreens[pScreenIndex]->setTextSize(2);
+   mScreens[pScreenIndex]->println("A");
+}
+
+
+//-------------------------------------------------------------------------------------------------
+
+void Screens::drawBatteryVoltage(size_t pScreenIndex, float pVoltage) {
+   mScreens[pScreenIndex]->setTextSize(2);
+   mScreens[pScreenIndex]->print(" ");
+   mScreens[pScreenIndex]->drawXBitmap(0, 1*ICON_SIZE, sBatteryBits, ICON_SIZE, ICON_SIZE, 1);
+   mScreens[pScreenIndex]->setTextSize(1);
+   mScreens[pScreenIndex]->print(" ");
+   drawMeasureValue(pVoltage, pScreenIndex);
+   mScreens[pScreenIndex]->print(" ");
+   mScreens[pScreenIndex]->setTextSize(2);
+   mScreens[pScreenIndex]->println("V");
 }
 
 //-------------------------------------------------------------------------------------------------
 
 void Screens::drawPowerState(size_t pScreenIndex) {
+   mScreens[pScreenIndex]->setTextSize(2);
    mScreens[pScreenIndex]->print(" ");
    mScreens[pScreenIndex]->drawXBitmap(0, 2*ICON_SIZE, sLightBits, ICON_SIZE, ICON_SIZE, 1);
    mScreens[pScreenIndex]->setTextSize(1);
@@ -211,7 +190,6 @@ void Screens::drawPowerState(size_t pScreenIndex) {
    mScreens[pScreenIndex]->print(" ");
    mScreens[pScreenIndex]->setTextSize(2);
    mScreens[pScreenIndex]->println("A");
-   mScreens[pScreenIndex]->display();
 }
 
 //-------------------------------------------------------------------------------------------------

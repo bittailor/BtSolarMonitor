@@ -37,6 +37,8 @@ class Screens
       Screens& operator=(const Screens&);
 
       void updateScreens();
+      void drawPanelCurrent(size_t pScreenIndex, float pCurrent);
+      void drawBatteryVoltage(size_t pScreenIndex, float pVoltage);
       void drawPowerState(size_t pScreenIndex);
       void drawConnectionState(size_t pScreenIndex);
       void drawMeasureValue(double value, size_t pScreenIndex);

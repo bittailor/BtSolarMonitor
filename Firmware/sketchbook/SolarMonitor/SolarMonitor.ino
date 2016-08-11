@@ -16,6 +16,7 @@ void shutdown() {
    sRunning = false;
    Serial.println("start shutdown ...");
    sMainController.shutdown();
+   Serial.println("... shutdown done");
 }
 
 void executeCommand(const char* pCommand) {
@@ -45,6 +46,9 @@ void setup() {
 void loop() {
    if(sRunning) {
       sMainController.loop();
+   } else {
+      Serial.println("Ready to reboot ...");
+      delay(1000);
    }
    while(Serial.available()) {
       char c = Serial.read();

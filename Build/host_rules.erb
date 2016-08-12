@@ -1,8 +1,8 @@
 
-ccflags = -Wall -Werror=return-type -g -O0 -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1 -DUSE_NAMED_SEMAPHORES -DARDUINO=10609 -DARDUINO_HOST_COMPILE
-cxxflags = -Wall -Werror=return-type -std=c++11 -g -O0  -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1 -DARDUINO=10609 -DARDUINO_HOST_COMPILE
+ccflags = --coverage -Wall -Werror=return-type -g -O0 -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1 -DUSE_NAMED_SEMAPHORES -DARDUINO=10609 -DARDUINO_HOST_COMPILE
+cxxflags = --coverage -Wall -Werror=return-type -std=c++11 -g -O0  -D_GLIBCXX_USE_NANOSLEEP=1 -D_GLIBCXX_USE_SCHED_YIELD=1 -DARDUINO=10609 -DARDUINO_HOST_COMPILE
 global_includes = -I/opt/local/include
-linkflags = -pthread
+linkflags = --coverage -pthread
 
 rule cc
   command = <%= $cc %> -MMD -MT $out -MF $out.d $ccflags $flags $global_includes $includes -c $in -o $out

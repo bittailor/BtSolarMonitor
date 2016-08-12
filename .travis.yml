@@ -7,23 +7,26 @@ addons:
   apt:
     packages:
       - ninja-build
+      - lcov
       - gcc-6
       - g++-6
-    sources: &sources
-        - ubuntu-toolchain-r-test
-
+    sources:
+      - ubuntu-toolchain-r-test
 compiler: gcc-6
-
+env:
+  global:
+    - secure: qFQoNYMcHkPX8whRw7OVCv+YzjlRECZnGonlD8i0SrLLZyWe6iJehQ2LoA8pTAPbAdPrOmREDJVan6rtu1OpIRQEAh8TgDbHK8nKgX5mJQUCKbdtwz2hkro5Xx6uKc742nEAhKrSHJqZcSAJod+1+P8wQ/W47hVALDve0oN2j0VFscLByhZNK6mGlQBjwk3uD6yBC5PBuMi+EI4tPZ6W75EJ7/+rL5MOD+pSeJYwLyZuvYjm8Mfpye2c93gjM7aL4lBD+2cQwjXhAJh4GPIN6mH2BTH9VEUz/jwJQyKBy4tedwhNlQ4qIhTE58BiO+yiWjOaXO+2076DqEdTd44MUo6cCTUCbN6Khp3T5kVCrofkWe3rht3LWcFCwoi9xXWoBdvTVbHrRlXj1/dPaQ2TQQUmo5gGZ3530LWbSsxN0cpj1/DF7sOpfDAs/rn2axNDW5lvi4PBXHLXQDToAHqa7MFkGx4BsIl7yAiAsz2jJPafsaZ6ZL12zMZXBos6Z/1TmH+S4rs3q7XujEd6eUCZmWYr+TN8aVG0NJUYYDScQNk54CLeQbKZSNncrCLXD/xWeeK1n8M2eYVkPPG5JtO0kg/yjXgo0pU1RM72FMcQnvM9cR5lEQNjkDArnb7zaSl+R0j5seIpHZgrRWCD5TU1TOuZ2Rw6fmwX5LZuavGDj08=
 before_install:
   - export CC=gcc-6
   - export CXX=g++-6
   - gem update --system
   - gem install rake
+  - gem install coveralls-lcov
 install:
   - rake install
 script:
-  - $CC -v
-  - rake host:test
+  - "$CC -v"
+  - rake travis
 notifications:
   email:
     on_success: change

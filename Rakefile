@@ -190,6 +190,19 @@ namespace :host do
       fail "tests failed: #{failed_tests.join(' ')}"
     end
   end
+
+  task :coverage => :test do
+    coverage_info = 'coverage.info'
+    sh "lcov --directory #{$output_folder} --capture --output-file #{$output_folder}/#{coverage_info}"
+    sh "lcov --remove #{$output_folder}/#{coverage_info} '*/Xcode.app/*' '*/googletest/*' '*/googlemock/*' '*/test/*' --output-file #{$output_folder}/#{coverage_info}"
+    sh "lcov --list #{$output_folder}/#{coverage_info}"
+    if(ENV['COVERALLS_TOKEN'])
+      puts "have COVERALLS_TOKEN => upload"
+      sh "coveralls-lcov --repo-token #{ENV['COVERALLS_TOKEN']} #{$output_folder}/#{coverage_info}"
+    else
+      puts "have no COVERALLS_TOKEN => skip upload"
+    end
+  end
 end
 
 def compile_host_library(library_path)
@@ -270,5 +283,5 @@ def compile_host_test(library_path)
   sh "ninja -v -j8 -f #{ninja_file}"
 end
 
-
 task :quick => ["host:test", :compile_arduino_SolarMonitor]
+task :travis => "host:coverage"

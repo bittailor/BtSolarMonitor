@@ -198,7 +198,9 @@ namespace :host do
     sh "lcov --list #{$output_folder}/#{coverage_info}"
     if(ENV['COVERALLS_TOKEN'])
       puts "have COVERALLS_TOKEN => upload"
-      sh "coveralls-lcov --repo-token #{ENV['COVERALLS_TOKEN']} #{$output_folder}/#{coverage_info}"
+      verbose(false) do
+        sh "coveralls-lcov --repo-token #{ENV['COVERALLS_TOKEN']} #{$output_folder}/#{coverage_info}"
+      end
     else
       puts "have no COVERALLS_TOKEN => skip upload"
     end

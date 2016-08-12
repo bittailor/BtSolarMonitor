@@ -2,31 +2,31 @@ language: c++
 sudo: required
 dist: trusty
 os:
-  - linux
+- linux
 addons:
   apt:
     packages:
-      - ninja-build
-      - lcov
-      - gcc-6
-      - g++-6
+    - ninja-build
+    - lcov
+    - gcc-6
+    - g++-6
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
 compiler: gcc-6
 env:
   global:
-    - secure: qFQoNYMcHkPX8whRw7OVCv+YzjlRECZnGonlD8i0SrLLZyWe6iJehQ2LoA8pTAPbAdPrOmREDJVan6rtu1OpIRQEAh8TgDbHK8nKgX5mJQUCKbdtwz2hkro5Xx6uKc742nEAhKrSHJqZcSAJod+1+P8wQ/W47hVALDve0oN2j0VFscLByhZNK6mGlQBjwk3uD6yBC5PBuMi+EI4tPZ6W75EJ7/+rL5MOD+pSeJYwLyZuvYjm8Mfpye2c93gjM7aL4lBD+2cQwjXhAJh4GPIN6mH2BTH9VEUz/jwJQyKBy4tedwhNlQ4qIhTE58BiO+yiWjOaXO+2076DqEdTd44MUo6cCTUCbN6Khp3T5kVCrofkWe3rht3LWcFCwoi9xXWoBdvTVbHrRlXj1/dPaQ2TQQUmo5gGZ3530LWbSsxN0cpj1/DF7sOpfDAs/rn2axNDW5lvi4PBXHLXQDToAHqa7MFkGx4BsIl7yAiAsz2jJPafsaZ6ZL12zMZXBos6Z/1TmH+S4rs3q7XujEd6eUCZmWYr+TN8aVG0NJUYYDScQNk54CLeQbKZSNncrCLXD/xWeeK1n8M2eYVkPPG5JtO0kg/yjXgo0pU1RM72FMcQnvM9cR5lEQNjkDArnb7zaSl+R0j5seIpHZgrRWCD5TU1TOuZ2Rw6fmwX5LZuavGDj08=
+  - secure: BJeKcODdfwSQDn0vz65qE9uLQAEfMuKAu/p+Gjc0M4hY7LULORcT/3cgXzoIK6RVjEVxTcjolgOfcFWjCdX8c52bmW/R6avdzQT5N/yAT8516IB2aS2kEC3fTtaFPsufNCpaG4jVgF1T+n8svRuK9ucEEKIXfjHbyIJhYRibIRSUkbur/Vf04K9YVHrYLJ3Hz9Q7q/0IFIwcXtWheWDLHHMIZji7Qle4FcFNhvKPe/pMwwiCNH7lBW0nNUJkQ5CvsXaRs7bsDCAsZ8+0Ap6e75jIPmgXuilSDc99dD0ejzUY/KGIF+7gfoeYBNoKlJ8CiMDHdP8b+EXK9gPNHYdBA8balj4M9uyQbl7s9J093W01l1DxE631i6MA+zfXuDUxTxiqx7RPo62OfteGQtnxMeK7H3jfoiQTm1zygxubkp1qM4qF6lrdyCfGyfI5Y0OnlLqRq1a4hfsWle+nU7LBnjYNMxRV8GFRsqFWYdSp+R38K+911sz0PM9w61dnaKTNAJN8TlYpAq0pLTd2Oo2oJMKQijABs6e4DuL+DwMDwdr62+pS8HbwExHIFrOHjxl1/Q8LHxPrH82QF9bM1a/g6FOHBl4eYl8c859Rv6G5suPGc0+n5BKWjOh86P/Ao+ySHbjvnAJCwCytJSaoImjoMhCMs5hDLJJJ6xCasegW8ww=
 before_install:
-  - export CC=gcc-6
-  - export CXX=g++-6
-  - gem update --system
-  - gem install rake
-  - gem install coveralls-lcov
+- export CC=gcc-6
+- export CXX=g++-6
+- gem update --system
+- gem install rake
+- gem install coveralls-lcov
 install:
-  - rake install
+- rake install
 script:
-  - "$CC -v"
-  - rake travis
+- "$CC -v"
+- rake travis
 notifications:
   email:
     on_success: change

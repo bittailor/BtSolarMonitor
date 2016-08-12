@@ -194,7 +194,7 @@ namespace :host do
   task :coverage => :test do
     coverage_info = 'coverage.info'
     sh "lcov --directory #{$output_folder} --capture --output-file #{$output_folder}/#{coverage_info}"
-    sh "lcov --remove #{$output_folder}/#{coverage_info} '*/Xcode.app/*' '*/googletest/*' '*/googlemock/*' '*/test/*' --output-file #{$output_folder}/#{coverage_info}"
+    sh "lcov --remove #{$output_folder}/#{coverage_info} '*/Xcode.app/*' '/usr/include/*' '*/googletest/*' '*/googlemock/*' '*/test/*' --output-file #{$output_folder}/#{coverage_info}"
     sh "lcov --list #{$output_folder}/#{coverage_info}"
     if(ENV['COVERALLS_TOKEN'])
       puts "have COVERALLS_TOKEN => upload"

@@ -194,7 +194,7 @@ namespace :host do
   task :coverage => :test do
     coverage_info = "#{$output_folder}/coverage.info"
     sh "lcov --directory #{$output_folder} --capture --output-file #{coverage_info}"
-    sh "lcov --remove #{coverage_info} '*/Xcode.app/*' '/usr/include/*' '*/googletest/*' '*/googlemock/*' '*/test/*' --output-file #{coverage_info}"
+    sh "lcov --remove #{coverage_info} '*/Xcode.app/*' '/usr/include/*' '*/googletest/*' '*/googlemock/*' '*/test/*' '*/mock/*'  --output-file #{coverage_info}"
     puts "have COVERALLS_TOKEN => upload"
     text = File.read(coverage_info)
     text = text.gsub(/Firmware\/sketchbook\/libraries/, "Firmware/libraries")

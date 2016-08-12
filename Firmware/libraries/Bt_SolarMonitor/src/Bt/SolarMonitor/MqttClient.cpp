@@ -97,6 +97,36 @@ bool MqttClient::publish(const char* pTopicName, const char* pMessage, QoS pQos,
 
 //-------------------------------------------------------------------------------------------------
 
+void MqttClient::stateChanged(Net::Gprs::GprsModule::State pState) {
+
+   switch(pState){
+      case Net::Gprs::GprsModule::State::OFF                     : mState = State::OFF; break;
+      case Net::Gprs::GprsModule::State::PIN_OK                  : mState = State::PIN_OK; break;
+      case Net::Gprs::GprsModule::State::NETWORK_REGISTRATION_OK : mState = State::NETWORK_REGISTRATION_OK; break;
+      case Net::Gprs::GprsModule::State::GPRS_READY              : mState = State::GPRS_READY; break;
+      case Net::Gprs::GprsModule::State::TCP_CONNECTED           : mState = State::TCP_CONNECTED; break;
+   }
+
+   publishState();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void MqttClient::publishState() {
+   if(mState == State::TCP_CONNECTED) {
+      if (mMqttClient.isConnected()) {
+         mState = State::MQTT_CONNECTED;
+      }
+   }
+
+   if(!mStateListener) {
+      return;
+   }
+   mStateListener(mState);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void MqttClient::onReady() {
    if(mShutdown) {
       LOG("MqttClient::onReady: Shutdown!");
@@ -142,6 +172,7 @@ void MqttClient::onConnected() {
       LOG("connect returned"  << rc);
       return;
    }
+   publishState();
    LOG("MQTT connected");
    publish("device/status", "1", QoS::QOS1, true);
 }

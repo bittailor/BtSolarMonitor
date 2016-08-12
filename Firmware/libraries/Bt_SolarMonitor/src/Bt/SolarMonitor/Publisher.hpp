@@ -24,7 +24,7 @@ class Publisher : public I_Publisher
 
       void begin();
 
-      virtual void publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter);
+      virtual bool publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter);
 
    private:
 

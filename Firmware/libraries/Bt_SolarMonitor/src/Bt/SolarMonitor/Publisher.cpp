@@ -62,7 +62,7 @@ Publisher::~Publisher() {
 void Publisher::begin() {
 }
 
-void Publisher::publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter) {
+bool Publisher::publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter) {
 
    char message[500] = {0};
    Bt::Core::StaticStringBuilder builder(message,sizeof(message)/sizeof(message[0]));
@@ -93,7 +93,7 @@ void Publisher::publish(const MeasurementRecord& pMeasurementRecord, uint32_t pR
 
    LOG("message length = " << strlen(message));
    LOG("message " << message);
-   mMqttClient->publish(TOPIC, message, I_MqttClient::QOS1);
+   return mMqttClient->publish(TOPIC, message, I_MqttClient::QOS1);
 
 }
 

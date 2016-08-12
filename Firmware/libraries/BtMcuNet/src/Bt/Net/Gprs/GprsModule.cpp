@@ -110,6 +110,14 @@ const char* GprsModule::name() {
 
 //-------------------------------------------------------------------------------------------------
 
+void GprsModule::stateChangedCallback(State pState) {
+   if(mListener != nullptr) {
+      mListener->stateChanged(pState);
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void GprsModule::readyCallback() {
    if(mListener != nullptr) {
       mListener->onReady();

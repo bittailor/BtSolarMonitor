@@ -17,7 +17,7 @@ class I_Publisher {
    public:
       virtual ~I_Publisher() {}
 
-      virtual void publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter) = 0;
+      virtual bool publish(const MeasurementRecord& pMeasurementRecord, uint32_t pReconnectCounter) = 0;
 };
 
 } // namespace SolarMonitor

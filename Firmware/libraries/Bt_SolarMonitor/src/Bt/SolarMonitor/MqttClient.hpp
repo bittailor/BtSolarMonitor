@@ -17,6 +17,7 @@
 #include <Bt/Core/Time.hpp>
 #include <Bt/Core/DigitalOut.hpp>
 #include <Bt/Core/DigitalIn.hpp>
+#include <Bt/Core/Function.hpp>
 #include <Bt/Core/Workcycle.hpp>
 #include <Bt/Net/Gprs/MobileTerminal.hpp>
 #include <Bt/Net/Gprs/GprsModule.hpp>
@@ -66,21 +67,32 @@ class PahoTimer {
 class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listener
 {
    public:
+      enum class State : int {
+         OFF = 0,
+         PIN_OK = 1,
+         NETWORK_REGISTRATION_OK = 2,
+         GPRS_READY = 3,
+         TCP_CONNECTED = 4,
+         MQTT_CONNECTED = 5
+      };
+
       MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle);
       ~MqttClient();
 
       void begin();
       void shutdown();
-
+      void setListener(Bt::Core::Function<void (State)> pStateListener){mStateListener = pStateListener;}
 
       virtual bool yield(uint32_t pTimeoutInMilliseconds);
 
       virtual bool publish(const char* pTopicName, void* pPayload, size_t pPayloadlen, QoS pQos = QOS0, bool pRetained = false);
       virtual bool publish(const char* pTopicName, const char* pMessage, QoS pQos = QOS0, bool pRetained = false);
 
+      virtual void stateChanged(Net::Gprs::GprsModule::State pState);
       virtual void onReady();
       virtual void onConnected();
       virtual void onDisconnected();
+      void publishState();
 
       // TODO hack inject
       Net::Gprs::GprsModule& gprsModule() {return mGprsModule;}
@@ -96,6 +108,7 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       void disconnect();
 
       bool mShutdown;
+      State mState;
       Core::I_Workcycle* mWorkcycle;
       Core::DigitalOut mOnOffKey;
       Core::DigitalOut mReset;
@@ -105,6 +118,7 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       Net::Gprs::GprsModule mGprsModule;
       MQTT::Client<Net::Gprs::I_GprsClient, PahoTimer, 500> mMqttClient;
 
+      Bt::Core::Function<void (State)> mStateListener;
 
 };
 

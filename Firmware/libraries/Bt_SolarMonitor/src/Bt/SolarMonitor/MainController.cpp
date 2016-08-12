@@ -63,7 +63,7 @@ MainController::MainController()
           mSensorBatteryB,
           mSensorLoad,
           mSensorControl,
-          MeasureLoop::Callback::build<MainController,&MainController::OnMeasurementRecord>(*this))
+          MeasureLoop::Callback::build<MainController,&MainController::onMeasurementRecord>(*this))
 , mNokiaScreenOne(A5, A4, A3)
 , mNokiaScreenTwo(A5, A2, A1)
 , mScreens(mNokiaScreenOne, mNokiaScreenTwo)
@@ -73,6 +73,7 @@ MainController::MainController()
    mMainWorkcycle.add(mMeasureCallback);
    mMainWorkcycle.add(mYieldCallback);
    mMainWorkcycle.add(mPublishCallback);
+   mMqttClient.setListener(Bt::Core::Function<void(MqttClient::State)>::build<MainController,&MainController::mqttStateUpdate>(*this));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -136,14 +137,26 @@ void MainController::yield() {
 void MainController::publish() {
    LOG("");
    LOG("publish to cloud ...");
-   mPublisher.publish(mRecordToPublish.averageAndClear(),mReconnectCounter);
+   if(mPublisher.publish(mRecordToPublish.averageAndClear(),mReconnectCounter)){
+      mSuccessfulPublishCounter++;
+      mScreens.updateCounter(mSuccessfulPublishCounter);
+   } else {
+      mSuccessfulPublishCounter = 0;
+   }
    mMqttClient.yield(10);
    LOG(" ... done publish to cloud");
 }
 
 //-------------------------------------------------------------------------------------------------
 
-void MainController::OnMeasurementRecord(const MeasurementRecord& pRecord) {
+
+void MainController::mqttStateUpdate(MqttClient::State pState) {
+   mScreens.updateGsmState(static_cast<int>(pState));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void MainController::onMeasurementRecord(const MeasurementRecord& pRecord) {
 
    mRecordToPublish.add(pRecord);
    mScreens.updateMeasurementRecord(pRecord);

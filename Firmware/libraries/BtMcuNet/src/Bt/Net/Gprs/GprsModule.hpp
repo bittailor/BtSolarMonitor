@@ -33,9 +33,18 @@ class GprsModuleState {
 class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public I_GprsClient
 {
    public:
+      enum class State : int {
+         OFF = 0,
+         PIN_OK = 1,
+         NETWORK_REGISTRATION_OK = 2,
+         GPRS_READY = 3,
+         TCP_CONNECTED = 4,
+      };
+
       class I_Listener {
          public:
             virtual ~I_Listener(){}
+            virtual void stateChanged(State pState)=0;
             virtual void onReady()=0;
             virtual void onConnected()=0;
             virtual void onDisconnected()=0;
@@ -69,6 +78,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             return "Initial";
          }
          virtual void onEnter() {
+            mController->stateChangedCallback(State::OFF);
             if(mController->mPowerState->read()) {
                mController->nextState(mController->mReseting);
             } else {
@@ -84,6 +94,11 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             virtual const char* name() {
                return "Off";
             }
+
+            virtual void onEnter() {
+               mController->stateChangedCallback(State::OFF);
+            }
+
       };
 
       class PoweringOn : public StateBase  {
@@ -91,6 +106,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             PoweringOn(GprsModule& pController):StateBase(pController){}
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::OFF);
                mController->mOnOffKey->write(false);
                mController->setTimer(3000);
             }
@@ -110,6 +126,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             Reseting(GprsModule& pController):StateBase(pController){}
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::OFF);
                mController->mReset->write(false);
                mController->setTimer(100);
             }
@@ -129,6 +146,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             WaitForPowerOn(GprsModule& pController):StateBase(pController){}
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::OFF);
                mTimer = 10000;
                check();
             }
@@ -161,6 +179,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             SyncAt(GprsModule& pController):StateBase(pController), mAtOkCounter(0){}
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::OFF);
                mCounter = 0;
                mAtOkCounter = 0;
                ceckAtOk();
@@ -206,6 +225,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             ConfigurePin(GprsModule& pController):StateBase(pController){}
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::OFF);
                mTimer = 10000;
                tryConfigurePin();
             }
@@ -247,6 +267,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::PIN_OK);
                mTimer = 60000;
                checkNetworkRegistration();
             }
@@ -288,6 +309,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::NETWORK_REGISTRATION_OK);
                mTimer = 10000;
                checkGprsAttachment();
             }
@@ -356,6 +378,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
 
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::GPRS_READY);
                mController->setTimer(0);
             }
 
@@ -459,6 +482,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
 
 
             virtual void onEnter() {
+               mController->stateChangedCallback(State::TCP_CONNECTED);
                mController->setTimer(0);
             }
 
@@ -560,6 +584,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
 
 
       virtual const char* name();
+      void stateChangedCallback(State pState);
       void readyCallback();
       void connectedCallback();
       void disconnectedCallback();

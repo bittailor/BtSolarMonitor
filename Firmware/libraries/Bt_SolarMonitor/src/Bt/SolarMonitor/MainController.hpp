@@ -45,10 +45,13 @@ class MainController
       void yield();
       void publish();
 
-      void OnMeasurementRecord(const MeasurementRecord& pRecord);
+      void mqttStateUpdate(MqttClient::State pState);
+
+      void onMeasurementRecord(const MeasurementRecord& pRecord);
       void log(const char* pPrefix, const Measurement& pMeasurement);
 
       uint32_t mReconnectCounter = 0;
+      uint32_t mSuccessfulPublishCounter = 0;
 
       Bt::Core::WireWrapper mWire;
       Bt::Core::Time mTime;

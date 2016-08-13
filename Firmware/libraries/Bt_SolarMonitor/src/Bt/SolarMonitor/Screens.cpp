@@ -70,6 +70,21 @@ static unsigned char sOffSmallBits[] = {
    0x00, 0x58, 0x24, 0x52, 0x4a, 0x24, 0x1a, 0x00
 };
 
+//static unsigned char sMqttSmallBits[] = {
+//   0x0f, 0x10, 0x27, 0x48, 0x53, 0x54, 0x55, 0x00
+//};
+
+static unsigned char sMessageBits[] = {
+   0x00, 0x7f, 0x63, 0x55, 0x49, 0x41, 0x7f, 0x00
+};
+
+static unsigned char sSocketSmallBits[] = {
+   0x00, 0x07, 0x0f, 0x7f, 0x7f, 0x0f, 0x07, 0x00
+};
+
+static unsigned char sPlugSmallBits[] = {
+   0x00, 0x18, 0x7c, 0x1f, 0x1f, 0x7c, 0x18, 0x00 };
+
 
 
 //-------------------------------------------------------------------------------------------------
@@ -197,20 +212,29 @@ void Screens::drawPowerState(size_t pScreenIndex) {
 void Screens::drawConnectionState(size_t pScreenIndex) {
    mScreens[pScreenIndex]->setTextSize(1);
    mScreens[pScreenIndex]->drawXBitmap(0, 2*ICON_SIZE+SMALL_ICON_SIZE, sRssiSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
-   mScreens[pScreenIndex]->setCursor(10,2*ICON_SIZE+SMALL_ICON_SIZE);
+   mScreens[pScreenIndex]->setCursor(9,2*ICON_SIZE+SMALL_ICON_SIZE);
    mScreens[pScreenIndex]->print(mRSSI);
    mScreens[pScreenIndex]->print(" ");
    mGsmState = mGsmState % 6;
-   int x = 26;
-   for(int i = 0 ; i < mGsmState; i++) {
-      mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, sOnSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+   int x = 25;
+   if(mGsmState < 5) {
+      mScreens[pScreenIndex]->drawXBitmap(x, 2*ICON_SIZE+SMALL_ICON_SIZE, sPlugSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      x+=8;
+      mScreens[pScreenIndex]->drawXBitmap(x, 2*ICON_SIZE+SMALL_ICON_SIZE, sSocketSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      x+=8;
+      for(int i = 0 ; i < mGsmState; i++) {
+         mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, sOnSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      }
+      for(int i = mGsmState ; i < 5; i++) {
+         mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, sOffSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      }
    }
-   for(int i = mGsmState ; i < 5; i++) {
-      mScreens[pScreenIndex]->drawXBitmap(x + (i*8), 2*ICON_SIZE+SMALL_ICON_SIZE, sOffSmallBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+   else {
+      mScreens[pScreenIndex]->drawXBitmap(x, 2*ICON_SIZE+SMALL_ICON_SIZE, sMessageBits, SMALL_ICON_SIZE, SMALL_ICON_SIZE, 1);
+      x+=10;
+      mScreens[pScreenIndex]->setCursor(x, 2*ICON_SIZE+SMALL_ICON_SIZE);
+      mScreens[pScreenIndex]->print(mCounter%100000000);
    }
-   mScreens[pScreenIndex]->setCursor(70, 2*ICON_SIZE+SMALL_ICON_SIZE);
-   mScreens[pScreenIndex]->print(mCounter%100);
-
    mScreens[pScreenIndex]->setTextSize(2);
 }
 

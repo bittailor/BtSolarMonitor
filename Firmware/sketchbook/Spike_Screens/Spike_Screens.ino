@@ -12,7 +12,7 @@ NokiaScreen sDisplay1(A5, A4, A3);
 NokiaScreen sDisplay2(A5, A2, A1);
 Screens sScreens(sDisplay1,sDisplay2);
 int sCounter = 1000;
-#define DELAY 1000
+#define DELAY 200
 
 void setup()   {
   pinMode(13, OUTPUT);
@@ -35,7 +35,8 @@ void loop() {
    double i = sCounter % 12000;
    i = i / 2000;
    int rssi = (sCounter % 33) -2;
-   int gsmState = (sCounter % 6);
+   int gsmState = (sCounter % 12);
+   gsmState = (gsmState > 5) ? 5 : gsmState;
 
    sScreens.updateMeasurementRecord(MeasurementRecord(
       Measurement(i,v),
@@ -48,12 +49,12 @@ void loop() {
 
    sScreens.updateRSSI(rssi);
    sScreens.updateGsmState(gsmState);
-   sScreens.updateCounter(sCounter);
+   sScreens.updateCounter(sCounter-1000);
 
-   sScreens.updatePowerState(PowerState::OnA);
-   delay(DELAY);
-   sScreens.updatePowerState(PowerState::OnB);
-   delay(DELAY);
+//   sScreens.updatePowerState(PowerState::OnA);
+//   delay(DELAY);
+//   sScreens.updatePowerState(PowerState::OnB);
+//   delay(DELAY);
    sScreens.updatePowerState(PowerState::Off);
    delay(DELAY);
 

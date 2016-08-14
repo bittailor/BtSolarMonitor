@@ -41,6 +41,11 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
          TCP_CONNECTED = 4,
       };
 
+      struct Settings {
+            const char* pin;
+            const char* accessPointName;
+      };
+
       class I_Listener {
          public:
             virtual ~I_Listener(){}
@@ -51,7 +56,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       };
 
 
-      GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core::I_DigitalOut& pReset, Core::I_DigitalIn& pPowerState, I_MobileTerminal& pMobileTerminal);
+      GprsModule(Settings pSettings, Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core::I_DigitalOut& pReset, Core::I_DigitalIn& pPowerState, I_MobileTerminal& pMobileTerminal);
       GprsModule(const GprsModule&) = delete ;
       GprsModule& operator=(const GprsModule&) = delete ;
       ~GprsModule();
@@ -59,13 +64,13 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       void begin(I_Listener& pListener);
 
       virtual bool isConnected();
-      virtual int getRSSI();
 
       virtual int connect(const char* pHostname, int pPort);
       virtual int read(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual int write(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual int disconnect();
 
+      virtual int getRSSI();
       virtual const char* state();
 
    private:
@@ -235,7 +240,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
             }
 
             void tryConfigurePin() {
-               if(mController->mMobileTerminal->checkAndSetPin("1210")){
+               if(mController->mMobileTerminal->checkAndSetPin(mController->mSettings.pin)){
                   mController->nextState(mController->mAwaitNetworkRegistration);
                   return;
                }
@@ -352,7 +357,7 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
 
 
             virtual void onEnter() {
-               if(!mController->mMobileTerminal->bringUpWirelessConnection("gprs.swisscom.ch")){
+               if(!mController->mMobileTerminal->bringUpWirelessConnection(mController->mSettings.accessPointName)){
                   mController->nextState(mController->mReseting);
                   return;
                }
@@ -589,6 +594,8 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       void connectedCallback();
       void disconnectedCallback();
 
+
+      Settings mSettings;
       uint32_t mConnectFailureCounter;
 
       Core::I_DigitalOut* mOnOffKey;

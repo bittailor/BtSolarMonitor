@@ -10,9 +10,22 @@
 
 #include "Bt/Core/Logger.hpp"
 
+#define FONA_KEY 12
+#define FONA_PS A0
+#define FONA_RST 9
+
+#if defined(ARDUINO_ARCH_SAMD)
+ #define FONA_SERIAL Serial1
+#elif defined(HAVE_HWSERIAL1) // TODO Franz workaround
+ #define FONA_SERIAL Serial1
+#else
+ #define FONA_SERIAL Serial
+#endif
 
 namespace Bt {
 namespace SolarMonitor {
+
+namespace {
 
 const uint16_t sConfigurationPanel =
          INA219_BUS_VOLTAGE_RANGE_16V |
@@ -42,6 +55,13 @@ const uint16_t sConfigurationControl =
          INA219_SADCRES_12BIT_1S_532US |
          INA219_MODE_SANDBVOLT_CONTINUOUS;
 
+Net::Gprs::GprsModule::Settings sGprsModuleSettings = {
+         "1210",
+         "gprs.swisscom.ch"
+};
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 
 MainController::MainController()
@@ -67,12 +87,20 @@ MainController::MainController()
 , mNokiaScreenOne(A5, A4, A3)
 , mNokiaScreenTwo(A5, A2, A1)
 , mScreens(mNokiaScreenOne, mNokiaScreenTwo)
-, mMqttClient(mTime,mMainWorkcycle)
+
+, mOnOffKey(FONA_KEY)
+, mReset(FONA_RST)
+, mPowerState(FONA_PS)
+, mMobileTerminal(FONA_SERIAL)
+, mGprsModule(sGprsModuleSettings, mTime, mOnOffKey, mReset, mPowerState, mMobileTerminal)
+, mMqttClient(mTime, mMainWorkcycle, mGprsModule)
+
 , mPublisher(mMqttClient)
-, mRecordToPublish(){
+, mRecordToPublish() {
    mMainWorkcycle.add(mMeasureCallback);
    mMainWorkcycle.add(mYieldCallback);
    mMainWorkcycle.add(mPublishCallback);
+   mMainWorkcycle.add(mGprsModule);
    mMqttClient.setListener(Bt::Core::Function<void(MqttClient::State)>::build<MainController,&MainController::mqttStateUpdate>(*this));
 }
 
@@ -95,6 +123,12 @@ void MainController::begin() {
    mNokiaScreenOne.begin();
    mNokiaScreenTwo.begin();
    mIoSlave.begin();
+
+   FONA_SERIAL.begin(9600);
+   mOnOffKey.begin();
+   mReset.begin();
+   mPowerState.begin();
+   mGprsModule.begin(mMqttClient);
    mMqttClient.begin();
 }
 
@@ -129,7 +163,7 @@ void MainController::measure() {
 
 
 void MainController::yield() {
-   mScreens.updateRSSI(mMqttClient.gprsModule().getRSSI());
+   mScreens.updateRSSI(mGprsModule.getRSSI());
 }
 
 //-------------------------------------------------------------------------------------------------

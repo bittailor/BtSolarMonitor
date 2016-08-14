@@ -15,7 +15,7 @@ namespace Gprs {
 
 class I_GprsClient : public I_Client {
    public:
-
+      virtual ~I_GprsClient() {}
 };
 
 } // namespace Gprs

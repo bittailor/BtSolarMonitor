@@ -79,6 +79,12 @@ class MainController
 
       Screens mScreens;
 
+      Core::DigitalOut mOnOffKey;
+      Core::DigitalOut mReset;
+      Core::DigitalIn mPowerState;
+      Net::Gprs::MobileTerminal mMobileTerminal;
+      Net::Gprs::GprsModule mGprsModule;
+
       MqttClient mMqttClient;
       Publisher mPublisher;
 

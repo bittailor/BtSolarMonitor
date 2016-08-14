@@ -76,7 +76,7 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
          MQTT_CONNECTED = 5
       };
 
-      MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle);
+      MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle, Net::Gprs::I_GprsClient& pGprsModule);
       ~MqttClient();
 
       void begin();
@@ -94,10 +94,6 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       virtual void onDisconnected();
       void publishState();
 
-      // TODO hack inject
-      Net::Gprs::GprsModule& gprsModule() {return mGprsModule;}
-
-
    private:
         // Constructor to prohibit copy construction.
       MqttClient(const MqttClient&);
@@ -110,14 +106,8 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       bool mShutdown;
       State mState;
       Core::I_Workcycle* mWorkcycle;
-      Core::DigitalOut mOnOffKey;
-      Core::DigitalOut mReset;
-      Core::DigitalIn mPowerState;
-      Net::Gprs::MobileTerminal mMobileTerminal;
-
-      Net::Gprs::GprsModule mGprsModule;
+      Net::Gprs::I_GprsClient* mGprsModule;
       MQTT::Client<Net::Gprs::I_GprsClient, PahoTimer, 500> mMqttClient;
-
       Bt::Core::Function<void (State)> mStateListener;
 
 };

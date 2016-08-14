@@ -10,32 +10,13 @@
 namespace Bt {
 namespace SolarMonitor {
 
-#define FONA_KEY 12
-#define FONA_PS A0
-#define FONA_RST 9
-#define FONA_APN "gprs.swisscom.ch"
-
-
-#if defined(ARDUINO_ARCH_SAMD)
- #define FONA_SERIAL Serial1
-#elif defined(HAVE_HWSERIAL1) // TODO Franz workaround
- #define FONA_SERIAL Serial1
-#else
- #define FONA_SERIAL Serial
-#endif
-
-
 //-------------------------------------------------------------------------------------------------
 
-MqttClient::MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle)
+MqttClient::MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle, Net::Gprs::I_GprsClient& pGprsModule)
 : mShutdown(false)
 , mWorkcycle(&pWorkcycle)
-, mOnOffKey(FONA_KEY)
-, mReset(FONA_RST)
-, mPowerState(FONA_PS)
-, mMobileTerminal(FONA_SERIAL)
-, mGprsModule(pTime, mOnOffKey, mReset, mPowerState, mMobileTerminal)
-, mMqttClient(mGprsModule)
+, mGprsModule(&pGprsModule)
+, mMqttClient(*mGprsModule)
 {
 
 }
@@ -49,15 +30,6 @@ MqttClient::~MqttClient() {
 //-------------------------------------------------------------------------------------------------
 
 void MqttClient::begin() {
-   //FONA_SERIAL.begin(115200);
-   //FONA_SERIAL.begin(57600);
-   FONA_SERIAL.begin(9600);
-   mWorkcycle->add(mGprsModule);
-   mOnOffKey.begin();
-   mReset.begin();
-   mPowerState.begin();
-   mGprsModule.begin(*this);
-
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -140,9 +112,9 @@ void MqttClient::onReady() {
    //const char * url = "iot.eclipse.org";
    //const char * url = "test.mosquitto.org";
 
-   if(int rc = mGprsModule.connect(url,1883) != 0) {
+   if(int rc = mGprsModule->connect(url,1883) != 0) {
       LOG("tcp connect failed with " << rc);
-      LOG(" => state is " << mGprsModule.state());
+      //LOG(" => state is " << mGprsModule->state());
    }
 }
 
@@ -187,7 +159,7 @@ void MqttClient::onDisconnected() {
 
 void MqttClient::disconnect() {
    mMqttClient.disconnect();
-   mGprsModule.disconnect();
+   mGprsModule->disconnect();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -197,7 +169,7 @@ bool MqttClient::yield(uint32_t pTimeoutInMilliseconds) {
       LOG("MqttClient::yield: Shutdown!");
       return false;
    }
-   if(mGprsModule.isConnected()) {
+   if(mGprsModule->isConnected()) {
       return mMqttClient.yield(pTimeoutInMilliseconds);
    }
    return false;

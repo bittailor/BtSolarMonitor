@@ -15,8 +15,9 @@ namespace Gprs {
 
 //-------------------------------------------------------------------------------------------------
 
-GprsModule::GprsModule(Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core::I_DigitalOut& pReset, Core::I_DigitalIn& pPowerState, I_MobileTerminal& pMobileTerminal)
+GprsModule::GprsModule(Settings pSettings, Core::I_Time& pTime, Core::I_DigitalOut& pOnOffKey, Core::I_DigitalOut& pReset, Core::I_DigitalIn& pPowerState, I_MobileTerminal& pMobileTerminal)
 : Core::StateMachine<GprsModuleState,GprsModule>(pTime)
+, mSettings(pSettings)
 , mConnectFailureCounter(0)
 , mOnOffKey(&pOnOffKey)
 , mReset(&pReset)

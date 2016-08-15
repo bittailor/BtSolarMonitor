@@ -27,7 +27,7 @@ class Screens
       void updatePowerState(PowerState::State pPowerState);
       void updateRSSI(int pRSSI);
       void updateGsmState(int pGsmState);
-      void updateCounter(int pCounter);
+      void updateCounter(uint32_t pCounter);
 
    private:
    	  // Constructor to prohibit copy construction.
@@ -48,7 +48,7 @@ class Screens
       PowerState::State mPowerState;
       int mRSSI;
       int mGsmState;
-      int mCounter;
+      uint32_t mCounter;
 
 
 

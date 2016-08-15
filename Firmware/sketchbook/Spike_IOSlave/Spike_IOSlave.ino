@@ -1,5 +1,9 @@
 #include <Wire.h>
 
+#ifndef BUFFER_LENGTH
+   #define BUFFER_LENGTH 32
+#endif
+
 #define CMD_READ_REQUEST_COUNTER  0x01
 #define CMD_DATA_LOOP_BACK  0x02
 

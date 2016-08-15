@@ -33,11 +33,17 @@ class NokiaScreen : public I_Screen
       virtual size_t print(const char* pString);
       virtual size_t print(char pChar);
       virtual size_t print(int pInt);
+      virtual size_t print(unsigned int pInt);
+      virtual size_t print(long pLong);
+      virtual size_t print(unsigned long pLong);
       virtual size_t print(double pDouble, int pDigits= 2);
 
       virtual size_t println(const char* pString);
       virtual size_t println(char pChar);
       virtual size_t println(int pInt);
+      virtual size_t println(unsigned int pInt);
+      virtual size_t println(long pLong);
+      virtual size_t println(unsigned long pLong);
       virtual size_t println(double pDouble, int pDigits= 2);
 
       virtual void drawXBitmap(int16_t pX, int16_t pY, const uint8_t *pBitmap, int16_t pW, int16_t pH, uint16_t color);

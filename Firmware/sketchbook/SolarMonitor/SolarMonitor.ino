@@ -1,10 +1,13 @@
 #include <Wire.h>
 #include <BtMcuCore.h>
 #include <Bt_SolarMonitor.h>
+
 #include <Bt/SolarMonitor/MainController.hpp>
 #include <Bt/Core/StaticStringBuilder.hpp>
 
-Bt::SolarMonitor::MainController sMainController;
+#include "SolarMonitorSettings.settings.hpp"
+
+Bt::SolarMonitor::MainController sMainController(sSettings);
 
 int led = 13;
 const size_t COMMAND_BUFFER_SIZE = 200;

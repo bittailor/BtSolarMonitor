@@ -27,7 +27,12 @@ namespace SolarMonitor {
 class MainController
 {
    public:
-      MainController();
+      struct Settings {
+         Net::Gprs::GprsModule::Settings gprsModuleSettings;
+         MqttClient::Settings mqttSettings;
+      };
+
+      MainController(Settings pSettings);
       ~MainController();
 
       void begin();
@@ -50,8 +55,8 @@ class MainController
       void onMeasurementRecord(const MeasurementRecord& pRecord);
       void log(const char* pPrefix, const Measurement& pMeasurement);
 
-      uint32_t mReconnectCounter = 0;
-      uint32_t mSuccessfulPublishCounter = 0;
+      Settings mSettings;
+      uint32_t mSuccessfulPublishCounter;
 
       Bt::Core::WireWrapper mWire;
       Bt::Core::Time mTime;

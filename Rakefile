@@ -100,11 +100,22 @@ end
 desc "Compile all arduino sketches"
 task :compile_arduino_all
 
+
+task :settings do
+  Dir.glob("Firmware/sketchbook/*/*.default_settings.*").each do |default_setting|
+    setting = default_setting.gsub('.default_settings.','.settings.')
+    if(!File.exists?(setting))
+      FileUtils.cp(default_setting,setting)
+    end
+  end
+end
+
+
 sketches = Dir.glob("Firmware/sketchbook/*/*.ino")
 sketches.each do |sketch|
   sketch_name = File.basename(sketch,".ino")
   desc "compile the #{sketch_name} sketch"
-  task "compile_arduino_#{sketch_name}" do
+  task "compile_arduino_#{sketch_name}" => :settings do
     build_info = {};
     build_info_file = sketch.pathmap("%d") + "/.build.json"
     if(File.exists?(build_info_file))
@@ -165,7 +176,7 @@ namespace :host do
   end
 
   desc "compile all host tests"
-  task :compile => :compile_gtest do
+  task :compile => [:settings, :compile_gtest] do
     libraries_with_tests = Rake::FileList["Firmware/libraries/*/test"]
     libraries_with_tests.collect{|path| path.gsub('Firmware/libraries','Firmware/sketchbook/libraries').pathmap('%d')}.each do |library|
       compile_host_library(library)
@@ -288,5 +299,6 @@ def compile_host_test(library_path)
   sh "ninja -v -j8 -f #{ninja_file}"
 end
 
+task :all => ["host:test", :compile_arduino_all]
 task :quick => ["host:test", :compile_arduino_SolarMonitor]
 task :travis => "host:coverage"

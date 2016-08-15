@@ -130,7 +130,7 @@ void Screens::updateGsmState(int pGsmState) {
 
 //-------------------------------------------------------------------------------------------------
 
-void Screens::updateCounter(int pCounter) {
+void Screens::updateCounter(uint32_t pCounter) {
    mCounter = pCounter;
    updateScreens();
 }

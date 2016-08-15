@@ -12,8 +12,10 @@ namespace SolarMonitor {
 
 //-------------------------------------------------------------------------------------------------
 
-MqttClient::MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle, Net::Gprs::I_GprsClient& pGprsModule)
-: mShutdown(false)
+MqttClient::MqttClient(Settings pSettings, Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle, Net::Gprs::I_GprsClient& pGprsModule)
+: mSettings(pSettings)
+, mShutdown(false)
+, mConnectCounter(0)
 , mWorkcycle(&pWorkcycle)
 , mGprsModule(&pGprsModule)
 , mMqttClient(*mGprsModule)
@@ -106,11 +108,7 @@ void MqttClient::onReady() {
    }
 
    LOG("MqttClient::onReady()");
-   const char * url = "broker.shiftr.io";
-   //const char * url = "bittailor.cloudapp.net";
-   //const char * url = "api.xively.com";
-   //const char * url = "iot.eclipse.org";
-   //const char * url = "test.mosquitto.org";
+   const char * url = mSettings.brokerAddress;
 
    if(int rc = mGprsModule->connect(url,1883) != 0) {
       LOG("tcp connect failed with " << rc);
@@ -128,15 +126,15 @@ void MqttClient::onConnected() {
 
    MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
    data.MQTTVersion = 3;
-   data.clientID.cstring = (char*)"solar-device";
+   data.clientID.cstring = (char*)mSettings.clientId;
    data.keepAliveInterval = 10 * 60;
    data.willFlag = true;
    data.will.topicName.cstring = (char*)"device/status";
    data.will.message.cstring = (char*)"0";
    data.will.retained = true;
    data.will.qos = MQTT::QOS1;
-   data.username.cstring = (char*)"f64edae4";
-   data.password.cstring = (char*)"eea9554c6e05c108";
+   data.username.cstring = (char*)mSettings.username;
+   data.password.cstring = (char*)mSettings.password;
 
    int rc = mMqttClient.connect(data);
    if (rc != 0)
@@ -144,6 +142,7 @@ void MqttClient::onConnected() {
       LOG("connect returned"  << rc);
       return;
    }
+   mConnectCounter++;
    publishState();
    LOG("MQTT connected");
    publish("device/status", "1", QoS::QOS1, true);

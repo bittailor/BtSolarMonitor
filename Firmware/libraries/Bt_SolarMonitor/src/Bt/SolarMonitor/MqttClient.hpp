@@ -76,7 +76,14 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
          MQTT_CONNECTED = 5
       };
 
-      MqttClient(Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle, Net::Gprs::I_GprsClient& pGprsModule);
+      struct Settings {
+         const char* brokerAddress;
+         const char* clientId;
+         const char* username;
+         const char* password;
+      };
+
+      MqttClient(Settings pSettings, Core::I_Time& pTime, Core::I_Workcycle& pWorkcycle, Net::Gprs::I_GprsClient& pGprsModule);
       ~MqttClient();
 
       void begin();
@@ -94,6 +101,8 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
       virtual void onDisconnected();
       void publishState();
 
+      uint32_t connectCounter() {return mConnectCounter;}
+
    private:
         // Constructor to prohibit copy construction.
       MqttClient(const MqttClient&);
@@ -103,7 +112,9 @@ class MqttClient : public I_MqttClient , public Net::Gprs::GprsModule::I_Listene
 
       void disconnect();
 
+      Settings mSettings;
       bool mShutdown;
+      uint32_t mConnectCounter;
       State mState;
       Core::I_Workcycle* mWorkcycle;
       Net::Gprs::I_GprsClient* mGprsModule;

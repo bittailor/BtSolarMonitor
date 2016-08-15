@@ -1,7 +1,6 @@
 #define FONA_KEY 12
 #define FONA_PS A0
 #define FONA_RST 9
-#define FONA_APN "gprs.swisscom.ch"
 
 #include <BtMcuCore.h>
 #include <BtMcuNet.h>
@@ -16,6 +15,8 @@
 #include <Bt/Core/PeriodicCallback.hpp>
 #include <Bt/Net/Gprs/MobileTerminal.hpp>
 #include <Bt/Net/Gprs/GprsModule.hpp>
+
+#include "Spike_GprsModule_Settings.settings.hpp"
 
 using namespace Bt;
 
@@ -55,14 +56,12 @@ class PahoTimer {
 
 };
 
-
 Core::Time sTime;
 Core::DigitalOut sOnOffKey(FONA_KEY);
 Core::DigitalOut sReset(FONA_RST);
 Core::DigitalIn sPowerState(FONA_PS);
 Net::Gprs::MobileTerminal sMobileTerminal(Serial1);
-
-Net::Gprs::GprsModule sGprsModule(sTime,sOnOffKey,sReset,sPowerState,sMobileTerminal);
+Net::Gprs::GprsModule sGprsModule(sGprsModuleSettings, sTime,sOnOffKey,sReset,sPowerState,sMobileTerminal);
 MQTT::Client<Net::Gprs::I_GprsClient, PahoTimer, 500> sMqttClient(sGprsModule);
 Core::Workcycle sWorkcycle;
 
@@ -70,6 +69,10 @@ Core::Workcycle sWorkcycle;
 
 class Listener : public Net::Gprs::GprsModule::I_Listener {
    public:
+      virtual void stateChanged(Net::Gprs::GprsModule::State pState) {
+         LOG("stateChanged " << static_cast<int>(pState));
+      }
+
       virtual void onReady() {
          //const char * url = "broker.shiftr.io";
          const char * url = "iot.eclipse.org";

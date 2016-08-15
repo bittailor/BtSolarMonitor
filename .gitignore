@@ -10,7 +10,7 @@ Scripts/*.csv
 
 .ninja_deps
 .ninja_log
-
+*.settings.*
 
 
 ## Ignore list for Mac

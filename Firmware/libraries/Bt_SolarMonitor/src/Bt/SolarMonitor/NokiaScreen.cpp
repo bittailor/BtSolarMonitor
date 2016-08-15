@@ -77,6 +77,24 @@ size_t NokiaScreen::print(int pInt) {
 
 //-------------------------------------------------------------------------------------------------
 
+size_t NokiaScreen::print(unsigned int pInt){
+   return mPCD8544.print(pInt);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+size_t NokiaScreen::print(long pLong){
+   return mPCD8544.print(pLong);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+size_t NokiaScreen::print(unsigned long pLong){
+   return mPCD8544.print(pLong);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 size_t NokiaScreen::print(double pDouble, int pDigits) {
    return mPCD8544.print(pDouble, pDigits);
 }
@@ -96,7 +114,25 @@ size_t NokiaScreen::println(char pChar) {
 //-------------------------------------------------------------------------------------------------
 
 size_t NokiaScreen::println(int pInt) {
-   return mPCD8544.println();
+   return mPCD8544.println(pInt);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+size_t NokiaScreen::println(unsigned int pInt){
+   return mPCD8544.println(pInt);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+size_t NokiaScreen::println(long pLong){
+   return mPCD8544.println(pLong);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+size_t NokiaScreen::println(unsigned long pLong){
+   return mPCD8544.println(pLong);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -55,17 +55,14 @@ const uint16_t sConfigurationControl =
          INA219_SADCRES_12BIT_1S_532US |
          INA219_MODE_SANDBVOLT_CONTINUOUS;
 
-Net::Gprs::GprsModule::Settings sGprsModuleSettings = {
-         "1210",
-         "gprs.swisscom.ch"
-};
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
-MainController::MainController()
-: mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
+MainController::MainController(Settings pSettings)
+: mSettings(pSettings)
+, mSuccessfulPublishCounter(0)
+, mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
 , mYieldCallback(mTime, 2 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::yield>(*this))
 , mPublishCallback(mTime,/*10 * 60 * 1000*/ 2 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
@@ -92,8 +89,8 @@ MainController::MainController()
 , mReset(FONA_RST)
 , mPowerState(FONA_PS)
 , mMobileTerminal(FONA_SERIAL)
-, mGprsModule(sGprsModuleSettings, mTime, mOnOffKey, mReset, mPowerState, mMobileTerminal)
-, mMqttClient(mTime, mMainWorkcycle, mGprsModule)
+, mGprsModule(pSettings.gprsModuleSettings, mTime, mOnOffKey, mReset, mPowerState, mMobileTerminal)
+, mMqttClient(mSettings.mqttSettings, mTime, mMainWorkcycle, mGprsModule)
 
 , mPublisher(mMqttClient)
 , mRecordToPublish() {
@@ -171,12 +168,12 @@ void MainController::yield() {
 void MainController::publish() {
    LOG("");
    LOG("publish to cloud ...");
-   if(mPublisher.publish(mRecordToPublish.averageAndClear(),mReconnectCounter)){
+   if(mPublisher.publish(mRecordToPublish.averageAndClear(), mMqttClient.connectCounter() - 1)){
       mSuccessfulPublishCounter++;
-      mScreens.updateCounter(mSuccessfulPublishCounter);
    } else {
       mSuccessfulPublishCounter = 0;
    }
+   mScreens.updateCounter(mSuccessfulPublishCounter);
    mMqttClient.yield(10);
    LOG(" ... done publish to cloud");
 }

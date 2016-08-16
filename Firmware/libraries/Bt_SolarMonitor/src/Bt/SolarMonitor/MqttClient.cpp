@@ -112,7 +112,6 @@ void MqttClient::onReady() {
 
    if(int rc = mGprsModule->connect(url,1883) != 0) {
       LOG("tcp connect failed with " << rc);
-      //LOG(" => state is " << mGprsModule->state());
    }
 }
 

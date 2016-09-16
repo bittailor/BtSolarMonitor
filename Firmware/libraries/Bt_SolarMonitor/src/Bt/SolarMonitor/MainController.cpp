@@ -63,7 +63,7 @@ MainController::MainController(Settings pSettings)
 : mSettings(pSettings)
 , mSuccessfulPublishCounter(0)
 , mMeasureCallback(mTime,500,Bt::Core::Function<void()>::build<MainController,&MainController::measure>(*this))
-, mYieldCallback(mTime, 2 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::yield>(*this))
+, mYieldCallback(mTime, 30 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::yield>(*this))
 , mPublishCallback(mTime,/*10 * 60 * 1000*/ 2 * 60 * 1000,Bt::Core::Function<void()>::build<MainController,&MainController::publish>(*this))
 , mSensorPanelA  (mWire,0x40,sConfigurationPanel,   32768,250)
 , mSensorPanelB  (mWire,0x44,sConfigurationPanel,   32768,250)
@@ -160,7 +160,10 @@ void MainController::measure() {
 
 
 void MainController::yield() {
-   mScreens.updateRSSI(mGprsModule.getRSSI());
+   mGprsModule.ensureAwake();
+   int rssi = mGprsModule.getRSSI();
+   mGprsModule.allowSleep();
+   mScreens.updateRSSI(rssi);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -168,6 +171,7 @@ void MainController::yield() {
 void MainController::publish() {
    LOG("");
    LOG("publish to cloud ...");
+   mGprsModule.ensureAwake();
    if(mPublisher.publish(mRecordToPublish.averageAndClear(), mMqttClient.connectCounter() - 1)){
       mSuccessfulPublishCounter++;
    } else {
@@ -176,6 +180,7 @@ void MainController::publish() {
    mScreens.updateCounter(mSuccessfulPublishCounter);
    mMqttClient.yield(10);
    LOG(" ... done publish to cloud");
+   mGprsModule.allowSleep();
 }
 
 //-------------------------------------------------------------------------------------------------

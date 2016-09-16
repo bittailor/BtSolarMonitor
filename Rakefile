@@ -286,8 +286,6 @@ def compile_host_test(library_path)
 
   libraries << "#{$host_output_folder}/lib#{name}.a"
 
-
-
   ninja_path = library_path.pathmap("%{^Firmware,#{target}}X/test")
   ninja_file = "#{ninja_path}/build.ninja"
   FileUtils.mkdir_p(ninja_path) unless Dir.exists?(ninja_path)

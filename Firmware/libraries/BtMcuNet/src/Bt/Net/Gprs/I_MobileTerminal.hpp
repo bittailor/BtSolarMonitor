@@ -44,7 +44,8 @@ class I_MobileTerminal {
       virtual Return<ConnectionStatus> getConnectionStatus() = 0;
       virtual Return<int> write(unsigned char* pBuffer, int pLen, int pTimeout) = 0;
       virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout) = 0;
-
+      virtual Return<void> enableSleepMode() = 0;
+      virtual Return<void> disableSleepMode() = 0;
 
 
 

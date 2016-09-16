@@ -18,6 +18,11 @@
 
 #include "Spike_GprsModule_Settings.settings.hpp"
 
+const size_t COMMAND_BUFFER_SIZE = 200;
+char sCommandBuffer[COMMAND_BUFFER_SIZE] = {0};
+bool sRunning = true;
+Bt::Core::StaticStringBuilder sCommandBuilder(sCommandBuffer, COMMAND_BUFFER_SIZE);
+
 using namespace Bt;
 
 class PahoTimer {
@@ -66,6 +71,23 @@ MQTT::Client<Net::Gprs::I_GprsClient, PahoTimer, 500> sMqttClient(sGprsModule);
 Core::Workcycle sWorkcycle;
 
 
+void handleAction(MQTT::MessageData& pMessageData) {
+   MQTT::Message& message = pMessageData.message;
+   char payload[message.payloadlen + 1];
+   memcpy(payload,message.payload,message.payloadlen);
+   payload[message.payloadlen] = 0;
+   Serial.print("Message ");
+   Serial.print(" arrived: qos ");
+   Serial.print(message.qos);
+   Serial.print(", retained ");
+   Serial.print(message.retained);
+   Serial.print(", dup ");
+   Serial.print(message.dup);
+   Serial.print(", packetid ");
+   Serial.println(message.id);
+   Serial.print("Payload ");
+   Serial.println(payload);
+}
 
 class Listener : public Net::Gprs::GprsModule::I_Listener {
    public:
@@ -74,8 +96,7 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
       }
 
       virtual void onReady() {
-         //const char * url = "broker.shiftr.io";
-         const char * url = "iot.eclipse.org";
+         const char * url = MQTT_BROKER;
 
          int rc = sGprsModule.connect(url,1883);
          if(rc!= 0) {
@@ -86,67 +107,50 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
       virtual void onConnected() {
          MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
          data.MQTTVersion = 3;
-         data.clientID.cstring = (char*)"bt-resource-check";
+         data.clientID.cstring = (char*)MQTT_CLIENT_ID;
          data.keepAliveInterval = 120;
          data.willFlag = true;
-         data.will.topicName.cstring = (char*)"BT/GprsModule/Status";
+         data.will.topicName.cstring = (char*)"device/state";
          data.will.message.cstring = (char*)"offline";
          data.will.retained = true;
-         data.will.qos = MQTT::QOS0;
-         //data.username.cstring = (char*)"f64edae4";
-         //data.password.cstring = (char*)"eea9554c6e05c108";
-
+         data.will.qos = MQTT::QOS1;
+         data.username.cstring = (char*)MQTT_USERNAME;
+         data.password.cstring = (char*)MQTT_PASSWORD;
 
          int rc = sMqttClient.connect(data);
          if (rc != 0)
          {
-            LOG("mqtt connect returned "  << rc);
+            LOG("!!! mqtt connect failed "  << rc);
+            sGprsModule.disconnect();
             return;
          }
          LOG("MQTT connected");
+         sMqttClient.subscribe("spike/action", MQTT::QOS1, &handleAction);
 
-         rc = publish("BT/GprsModule/Status","online",MQTT::QOS0,true);
+         rc = publish("device/state","online",MQTT::QOS1,true);
          LOG("MQTT publish returned " << rc);
          mConnected = true;
       }
 
       virtual void onDisconnected() {
-      }
-
-      void yield(){
-         bool gprsConnected = sGprsModule.isConnected();
-         bool mqttConnected = sMqttClient.isConnected();
-         LOG("GPRS connected "  << gprsConnected);
-         LOG("MQTT Connected "  << mqttConnected);
-
-         if(gprsConnected && mqttConnected) {
-            int rc = sMqttClient.yield(10);
-            return;
-         }
-
-         if(!gprsConnected) {
-            onReady();
-            return;
-         }
-
-         if(!mqttConnected) {
-            onConnected();
-            return;
-         }
+         mConnected = false;
       }
 
       void publishTime(){
          if(mConnected){
+            sMobileTerminal.disableSleepMode();
             sMqttClient.yield(1);
             char msg[30];
             Core::StaticStringBuilder builder(msg,30);
             builder.print(millis());
-            int rc = publish("BT/GprsModule/Msg",msg, MQTT::QOS0);
+            int rc = publish("spike/millis",msg, MQTT::QOS1);
             if(rc != 0) {
-               LOG("!!!");
                LOG("!!! MQTT publish failed " << rc);
-               LOG("!!!");
+            } else {
+               LOG("MQTT publish success ");
             }
+            sMqttClient.yield(10);
+            sMobileTerminal.enableSleepMode();
 
          }
       }
@@ -162,8 +166,8 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
 
 Listener sListener;
 
-Core::PeriodicCallback sYield(sTime,500,Core::Function<void()>::build<Listener,&Listener::yield>(sListener));
-Core::PeriodicCallback sPublish(sTime,5000,Core::Function<void()>::build<Listener,&Listener::publishTime>(sListener));
+//Core::PeriodicCallback sYield(sTime,500,Core::Function<void()>::build<Listener,&Listener::yield>(sListener));
+Core::PeriodicCallback sPublish(sTime,20000,Core::Function<void()>::build<Listener,&Listener::publishTime>(sListener));
 
 void setup() {
    pinMode(13, OUTPUT);
@@ -177,7 +181,6 @@ void setup() {
 
 
    sWorkcycle.add(sGprsModule);
-   sWorkcycle.add(sYield);
    sWorkcycle.add(sPublish);
 
    sOnOffKey.begin();
@@ -186,8 +189,46 @@ void setup() {
    sGprsModule.begin(sListener);
 }
 
-
-
 void loop() {
    sWorkcycle.oneWorkcycle();
+   //sMqttClient.yield(10);
+
+   while(Serial.available()) {
+      char c = Serial.read();
+      if(c == '\n') {
+         executeCommand(sCommandBuffer);
+         sCommandBuilder.clear();
+      } else {
+         Serial.print(" ++ Append '");
+         Serial.print(c);
+         Serial.println("'");
+         sCommandBuilder.print(c);
+      }
+   }
+
 }
+
+void executeCommand(const char* pCommand) {
+   if(strcmp("s",pCommand)==0) {
+      shutdown();
+   }else if(strcmp("shutdown",pCommand)==0) {
+      shutdown();
+   } else {
+      Serial.print("Unknown command: '");
+      Serial.print(pCommand);
+      Serial.println("'");
+   }
+}
+
+void shutdown() {
+   sRunning = false;
+   Serial.println("start shutdown ...");
+   sMqttClient.disconnect();
+   sGprsModule.disconnect();
+   Serial.println("... shutdown done");
+   while (true) {
+      Serial.println("Ready to reboot ...");
+      delay(2000);
+   }
+}
+

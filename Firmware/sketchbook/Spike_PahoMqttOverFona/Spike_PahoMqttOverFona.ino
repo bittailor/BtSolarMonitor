@@ -96,7 +96,7 @@ bool connectGPRS() {
 }
 
 bool connectMQTT() {
-    char hostname[] = "broker.shiftr.io";
+    char hostname[] = "iot.eclipse.org";
     int port = 1883;
 
     
@@ -114,8 +114,6 @@ bool connectMQTT() {
     data.will.message.cstring = (char*)"offline";
     data.will.retained = true;
     data.will.qos = MQTT::QOS1;
-    data.username.cstring = (char*)"f64edae4";
-    data.password.cstring = (char*)"eea9554c6e05c108";
    
     
     rc = sMqttClient.connect(data);

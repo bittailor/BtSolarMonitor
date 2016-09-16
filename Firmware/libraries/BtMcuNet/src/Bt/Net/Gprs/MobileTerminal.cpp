@@ -14,7 +14,7 @@ namespace Bt {
 namespace Net {
 namespace Gprs {
 
-#define LOG_MT(msg) LOG(msg)
+#define LOG_MT(msg)  LOG(msg)
 #define CMD_BUFFER_SIZE 256
 #define DEFAULT_QUERY_CMD_TIMEOUT 500
 #define FIVE_SECOND_TIMEOUT 5000
@@ -613,6 +613,40 @@ Return<int> MobileTerminal::available() {
 
       if (strcmp(line.value(), "OK") == 0) {
          return available;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Return<void> MobileTerminal::enableSleepMode() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CSCLK=2");
+
+   while(true){
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+      if (strcmp(line.value(), "OK") == 0) {
+         return ReturnCode::RC_SUCCESS;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Return<void> MobileTerminal::disableSleepMode() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT");
+   Core::delayInMilliseconds(100);
+   sendCommand("AT+CSCLK=0");
+
+   while(true){
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+      if (strcmp(line.value(), "OK") == 0) {
+         return ReturnCode::RC_SUCCESS;
       }
       return ReturnCode::RC_FAILURE;
    }

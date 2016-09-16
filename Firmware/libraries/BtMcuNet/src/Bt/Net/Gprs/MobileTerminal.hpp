@@ -39,6 +39,9 @@ class MobileTerminal : public I_MobileTerminal
       virtual Return<int> write(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual Return<int> available();
+      virtual Return<void> enableSleepMode();
+      virtual Return<void> disableSleepMode();
+
 
    private:
 

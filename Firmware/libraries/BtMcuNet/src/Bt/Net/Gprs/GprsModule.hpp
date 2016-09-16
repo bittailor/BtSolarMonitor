@@ -22,12 +22,20 @@ namespace Gprs {
 class GprsModuleState {
    public:
       virtual ~GprsModuleState(){}
+
       virtual bool isConnected() {return false;}
-      virtual int getRSSI() {return -1;}
       virtual int connect(const char* pHostname, int pPort){return -1;}
       virtual int disconnect(){return -1;}
+
       virtual int write(unsigned char* pBuffer, int pLen, int pTimeout){return -1;}
       virtual int read(unsigned char* pBuffer, int pLen, int pTimeout){return -1;}
+
+      virtual int getRSSI() {return -1;}
+
+      virtual void ensureAwake() {};
+      virtual void allowSleep() {};
+
+
 };
 
 class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public I_GprsClient
@@ -69,6 +77,9 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
       virtual int read(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual int write(unsigned char* pBuffer, int pLen, int pTimeout);
       virtual int disconnect();
+
+      virtual void ensureAwake();
+      virtual void allowSleep();
 
       virtual int getRSSI();
       virtual const char* state();
@@ -525,6 +536,16 @@ class GprsModule : public Core::StateMachine<GprsModuleState,GprsModule>, public
                mController->nextState(mController->mDisconnected);
                return 0;
             }
+
+            virtual void ensureAwake() {
+               mController->mMobileTerminal->disableSleepMode();
+            };
+
+            virtual void allowSleep() {
+               mController->mMobileTerminal->enableSleepMode();
+            };
+
+
 
             virtual void timeUp(){
                mController->connectedCallback();

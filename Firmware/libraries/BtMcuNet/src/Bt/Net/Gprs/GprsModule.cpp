@@ -65,6 +65,18 @@ bool GprsModule::isConnected() {
 
 //-------------------------------------------------------------------------------------------------
 
+void GprsModule::ensureAwake() {
+   handle(&GprsModuleState::ensureAwake);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void GprsModule::allowSleep() {
+   handle(&GprsModuleState::allowSleep);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 int GprsModule::getRSSI() {
    return handle(&GprsModuleState::getRSSI);
 }

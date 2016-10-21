@@ -57,6 +57,15 @@ I_PowerState::State IoSlave::powerState() {
 
 //-------------------------------------------------------------------------------------------------
 
+void IoSlave::batteryState(I_BatteryState::State pState) {
+   mWire->beginTransmission(IO_SLAVE_ADDRESS);
+   mWire->write(IoSlaveCommand::SetBatteryState);
+   mWire->write(static_cast<uint8_t>(pState));
+   mWire->endTransmission();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void IoSlave::updatePowerState() {
    mWire->beginTransmission(IO_SLAVE_ADDRESS);
    mWire->write(IoSlaveCommand::GetPowerState);

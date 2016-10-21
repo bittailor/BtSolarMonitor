@@ -14,10 +14,12 @@ namespace SolarMonitor {
 
 //-------------------------------------------------------------------------------------------------
 
-WireSlave::WireSlave(Bt::Core::I_Wire& pWire, I_PowerState& pPowerState)
+WireSlave::WireSlave(Bt::Core::I_Wire& pWire, I_PowerState& pPowerState, I_BatteryState& pBatteryState)
 : mWire(&pWire)
 , mPowerState(&pPowerState)
+, mBatteryState(&pBatteryState)
 , mCommandBuffer(IoSlaveCommand::_LastCommand), mBuffer{0} {
+   mReceiveHandlers[IoSlaveCommand::SetBatteryState] = &WireSlave::setBatteryState;
    mRequestHandlers[IoSlaveCommand::GetPowerState] = &WireSlave::getPowerState;
 }
 
@@ -74,6 +76,20 @@ void WireSlave::getPowerState() {
    LOG("PowerState " << mPowerState->state());
    mPowerState->resetNotify();
    mWire->write(static_cast<uint8_t>(mPowerState->state()));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void WireSlave::setBatteryState(int numBytes) {
+   if(numBytes != 1) {
+      ERROR("wire setBatteryState failed ! " << numBytes <<  " != " << numBytes);
+      return;
+   }
+   uint8_t rawState = mWire->read();
+   I_BatteryState::State state = static_cast<I_BatteryState::State>(rawState);
+   mBatteryState->state(state);
+   LOG("BatteryState update " << state);
+
 }
 
 //-------------------------------------------------------------------------------------------------

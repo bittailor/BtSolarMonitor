@@ -172,7 +172,8 @@ void MainController::publish() {
    LOG("");
    LOG("publish to cloud ...");
    mGprsModule.ensureAwake();
-   if(mPublisher.publish(mRecordToPublish.averageAndClear(), mMqttClient.connectCounter() - 1)){
+   MeasurementRecord average = mRecordToPublish.averageAndClear();
+   if(mPublisher.publish(average, mMqttClient.connectCounter() - 1)){
       mSuccessfulPublishCounter++;
    } else {
       mSuccessfulPublishCounter = 0;
@@ -181,6 +182,12 @@ void MainController::publish() {
    mMqttClient.yield(10);
    LOG(" ... done publish to cloud");
    mGprsModule.allowSleep();
+   I_BatteryState::State state =
+            (average.batteryA().voltage() > average.batteryB().voltage()) ?
+                     I_BatteryState::UseFromA :
+                     I_BatteryState::UseFromB;
+   LOG("BatteryState A=" << average.batteryA().voltage() << " B=" << average.batteryB().voltage() << " => send " << state);
+   mIoSlave.batteryState(state);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@ namespace SolarMonitor {
 struct IoSlaveCommandEnum {
       enum IoSlaveCommand {
          GetPowerState,
+         SetBatteryState,
          _LastCommand
       };
 };

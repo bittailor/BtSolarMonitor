@@ -18,7 +18,8 @@ namespace SolarMonitor {
 RelayControllerQueryPort::RelayControllerQueryPort()
 : mLoadASense(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_A)
 , mLoadBSense(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_B)
-, mLoadOut(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_L) {
+, mLoadOut(BT_SOLARMONITOR_IOSLAVE_PIN_Sense_L)
+, mBatteryState(I_BatteryState::UseFromA){
 
 }
 
@@ -39,7 +40,11 @@ bool RelayControllerQueryPort::loadOut() {
 }
 
 bool RelayControllerQueryPort::isBatteryABetter() {
-   return true;
+   return mBatteryState == I_BatteryState::UseFromA;
+}
+
+void RelayControllerQueryPort::state(I_BatteryState::State pState) {
+   mBatteryState = pState;
 }
 
 } // namespace SolarMonitor

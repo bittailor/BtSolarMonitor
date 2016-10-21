@@ -8,13 +8,14 @@
 #define INC__Bt_SolarMonitor_RelayControllerQueryPort__hpp
 
 #include "Bt/SolarMonitor/I_RelayControllerQueryPort.hpp"
+#include "Bt/SolarMonitor/I_BatteryState.hpp"
 
 #include "Bt/Core/DigitalIn.hpp"
 
 namespace Bt {
 namespace SolarMonitor {
 
-class RelayControllerQueryPort : public I_RelayControllerQueryPort
+class RelayControllerQueryPort : public I_RelayControllerQueryPort, public I_BatteryState
 {
    public:
       RelayControllerQueryPort();
@@ -24,6 +25,8 @@ class RelayControllerQueryPort : public I_RelayControllerQueryPort
       virtual bool loadBSense();
       virtual bool loadOut();
       virtual bool isBatteryABetter();
+
+      virtual void state(I_BatteryState::State pState);
 
    private:
    	  // Constructor to prohibit copy construction.
@@ -35,6 +38,7 @@ class RelayControllerQueryPort : public I_RelayControllerQueryPort
       Core::DigitalIn mLoadASense;
       Core::DigitalIn mLoadBSense;
       Core::DigitalIn mLoadOut;
+      I_BatteryState::State mBatteryState;
 
 
 };

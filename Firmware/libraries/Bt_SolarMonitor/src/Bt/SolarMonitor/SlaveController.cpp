@@ -37,7 +37,7 @@ SlaveController::SlaveController()
 , mOnOffButton(mTime, mOnOff, mOnOffButtonListener)
 , mABButton(mTime, mAB, mABButtonListener)
 
-, mWireSlave(mWire, mPowerState) {
+, mWireSlave(mWire, mPowerState, mRelayControllerQueryPort) {
    mWorkcycle.add(mRelayController);
    mWorkcycle.add(mOnOffButton);
    mWorkcycle.add(mABButton);

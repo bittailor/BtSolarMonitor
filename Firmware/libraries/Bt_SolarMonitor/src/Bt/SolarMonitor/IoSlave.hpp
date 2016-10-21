@@ -25,6 +25,7 @@ class IoSlave : public I_IoSlave
       bool loop();
 
       virtual I_PowerState::State powerState();
+      virtual void batteryState(I_BatteryState::State pState);
 
    private:
    	  // Constructor to prohibit copy construction.

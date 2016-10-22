@@ -6,5 +6,21 @@
 
 #include "Arduino.h"
 
+void delay( uint32_t dwMs ) {
+
+}
+
+void delayMicroseconds( uint32_t dwMs ) {
+
+}
 
 
+uint32_t millis() {
+   return 0;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+uint32_t micros() {
+   return 0;
+}

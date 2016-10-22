@@ -35,7 +35,6 @@ RelayController::RelayController(
 , mToggleBOn(*this)
 , mToggleBOff(*this)
 , mSwitchToB(*this)
-, mToggleLoadOn(*this)
 {
 }
 

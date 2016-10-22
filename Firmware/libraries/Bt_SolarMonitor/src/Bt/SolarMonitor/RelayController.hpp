@@ -11,6 +11,7 @@
 #include <Bt/Core/I_InterruptIn.hpp>
 #include <Bt/Core/I_DigitalOut.hpp>
 #include <Bt/Core/StateMachine.hpp>
+#include <Bt/Core/Timing.hpp>
 
 #include <Bt/SolarMonitor/I_PowerState.hpp>
 #include <Bt/SolarMonitor/I_LatchingRelay.hpp>
@@ -24,7 +25,8 @@ namespace SolarMonitor {
 class RelayControllerState {
    public:
       virtual ~RelayControllerState() {}
-      virtual void toggleOnOff(){}
+      virtual void switchOn(){}
+      virtual void switchOff(){}
       virtual void toggleAB(){}
       virtual void toOn(){}
       virtual void toOff(){}
@@ -47,14 +49,17 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
 
       void begin();
 
-      virtual void toggleOnOff() {
-         handle(&RelayControllerState::toggleOnOff);
+      virtual void switchOn() {
+         handle(&RelayControllerState::switchOn);
+      }
+
+      virtual void switchOff() {
+        handle(&RelayControllerState::switchOff);
       }
 
       virtual void toggleAB() {
          handle(&RelayControllerState::toggleAB);
       }
-
 
    protected:
       virtual const char* name();
@@ -72,6 +77,11 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
             }
 
             virtual void onEnter() {
+               mController->mRelayLoad->onCoil(true);
+               Bt::Core::delayInMilliseconds(RELAY_ENERGIZATION_DURATION);
+               mController->mRelayLoad->onCoil(false);
+
+
                if(mController->mQueryPort->loadASense() && mController->mQueryPort->loadBSense()) {
                   mController->nextState(mController->mOff);
                } else if (mController->mQueryPort->loadASense()) {
@@ -94,7 +104,7 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
                return "Off";
             }
 
-            virtual void toggleOnOff(){
+            virtual void switchOn(){
                toOn();
             }
 
@@ -116,17 +126,13 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
             }
 
             virtual void onEnter() {
-               if(!mController->mQueryPort->loadOut()){
-                  mController->nextState(mController->mToggleLoadOn);
-               } else {
-                  mController->mPowerState->state(I_PowerState::OnA);
-               }
+               mController->mPowerState->state(I_PowerState::OnA);
             }
 
             virtual void onExit() {
             }
 
-            virtual void toggleOnOff() {
+            virtual void switchOff() {
                toOff();
             }
 
@@ -153,17 +159,13 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
             }
 
             virtual void onEnter() {
-               if(!mController->mQueryPort->loadOut()){
-                  mController->nextState(mController->mToggleLoadOn);
-               } else {
-                  mController->mPowerState->state(I_PowerState::OnB);
-               }
+               mController->mPowerState->state(I_PowerState::OnB);
             }
 
             virtual void onExit() {
             }
 
-            virtual void toggleOnOff() {
+            virtual void switchOff() {
                toOff();
             }
 
@@ -294,29 +296,6 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
             }
       };
 
-      class ToggleLoadOn : public StateBase  {
-         public:
-            ToggleLoadOn(RelayController& pController) :StateBase(pController){}
-
-            virtual const char* name() {
-               return "ToggleLoadOn";
-            }
-
-            virtual void onEnter(){
-               mController->mRelayLoad->onCoil(true);
-               mController->setTimer(RELAY_ENERGIZATION_DURATION);
-            }
-
-            virtual void timeUp(){
-               mController->mRelayLoad->onCoil(false);
-               if(mController->mQueryPort->loadASense()) {
-                  mController->nextState(mController->mOnB);
-               } else {
-                  mController->nextState(mController->mOnA);
-               }
-            }
-      };
-
 
    	// Constructor to prohibit copy construction.
       RelayController(const RelayController&);
@@ -342,7 +321,6 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
       ToggleBOn mToggleBOn;
       ToggleBOff mToggleBOff;
       SwitchToB mSwitchToB;
-      ToggleLoadOn mToggleLoadOn;
 
       //Core::StateMachine<State> mStateMachine;
 

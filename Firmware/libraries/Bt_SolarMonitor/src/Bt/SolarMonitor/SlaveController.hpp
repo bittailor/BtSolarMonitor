@@ -45,7 +45,8 @@ class SlaveController
       // Operator= to prohibit copy assignment
       SlaveController& operator=(const SlaveController&);
 
-      void toggleOnOff();
+      void switchOn();
+      void switchOff();
       void toggleAB();
 
       Core::Workcycle mWorkcycle;

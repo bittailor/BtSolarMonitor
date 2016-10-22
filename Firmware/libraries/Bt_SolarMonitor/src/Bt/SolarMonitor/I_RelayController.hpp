@@ -14,8 +14,8 @@ class I_RelayController {
    public:
       virtual ~I_RelayController() {}
 
-      virtual void toggleOnOff() = 0;
-      virtual void toggleAB() = 0;
+      virtual void switchOn() = 0;
+      virtual void switchOff() = 0;
 
 };
 

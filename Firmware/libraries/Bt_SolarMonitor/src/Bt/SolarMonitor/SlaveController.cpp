@@ -31,7 +31,7 @@ SlaveController::SlaveController()
 
 , mRelayController(mTime, mRelayControllerQueryPort, mRelayA, mRelayB, mRelayLoad, mPowerState)
 
-, mOnOffButtonListener(*this, &SlaveController::toggleOnOff)
+, mOnOffButtonListener(*this, &SlaveController::switchOn, &SlaveController::switchOff)
 , mABButtonListener(*this, &SlaveController::toggleAB)
 
 , mOnOffButton(mTime, mOnOff, mOnOffButtonListener)
@@ -67,14 +67,27 @@ void SlaveController::begin() {
    mRelayController.begin();
    mOnOffButton.begin();
    mABButton.begin();
+
+   bool initialOnOffState = mOnOff.read();
+   LOG("initialOnOffState " << initialOnOffState);
+   if(initialOnOffState) {
+      switchOff();
+   } else {
+      switchOn();
+   }
+
 }
 
 uint32_t SlaveController::oneWorkcycle() {
    return mWorkcycle.oneWorkcycle();
 }
 
-void SlaveController::toggleOnOff() {
-   mRelayController.toggleOnOff();
+void SlaveController::switchOn() {
+   mRelayController.switchOn();
+}
+
+void SlaveController::switchOff() {
+   mRelayController.switchOff();
 }
 
 void SlaveController::toggleAB() {

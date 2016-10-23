@@ -186,6 +186,9 @@ namespace :host do
 
   desc "run all host tests"
   task :test => :compile do
+    Rake::FileList["#{$host_output_folder}/**/*.gcda"].each do |f|
+      File.delete(f)
+    end
     libraries_with_tests = Rake::FileList["Firmware/libraries/*/test"]
     puts libraries_with_tests
     failed_tests = []

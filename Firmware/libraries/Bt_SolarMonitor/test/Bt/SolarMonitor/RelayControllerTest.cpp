@@ -52,6 +52,8 @@ TEST_F(RelayControllerTest, beginOff) {
    ON_CALL(mQueryPortMock, loadOut()).WillByDefault(Return(false));
 
    EXPECT_CALL(mPowerState, state(I_PowerState::Off)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    mRelayController.begin();
 }
 
@@ -63,6 +65,8 @@ TEST_F(RelayControllerTest, beginOff_ToggleOn_WithLoadOnAndBatteryABetter) {
    ON_CALL(mTimeGMock, milliseconds()).WillByDefault(Return(100));
 
    EXPECT_CALL(mPowerState,  state(I_PowerState::Off)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    mRelayController.begin();
    mRelayController.workcycle();
 
@@ -83,6 +87,8 @@ TEST_F(RelayControllerTest, beginOff_ToggleOn_WithLoadOnAndBatteryANotBetter) {
    ON_CALL(mTimeGMock, milliseconds()).WillByDefault(Return(100));
 
    EXPECT_CALL(mPowerState,  state(I_PowerState::Off)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    mRelayController.begin();
    mRelayController.workcycle();
 
@@ -157,6 +163,8 @@ TEST_F(RelayControllerTest, beginOnA_ToggleOff) {
    ON_CALL(mTimeGMock, milliseconds()).WillByDefault(Return(100));
 
    EXPECT_CALL(mPowerState,  state(I_PowerState::OnA)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    mRelayController.begin();
 
    EXPECT_CALL(mRelayA,  offCoil(true)).Times(1);
@@ -175,6 +183,8 @@ TEST_F(RelayControllerTest, beginOnB_ToggleOff) {
    ON_CALL(mTimeGMock, milliseconds()).WillByDefault(Return(100));
 
    EXPECT_CALL(mPowerState,  state(I_PowerState::OnB)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    mRelayController.begin();
 
    EXPECT_CALL(mRelayB,  offCoil(true)).Times(1);
@@ -193,6 +203,8 @@ TEST_F(RelayControllerTest, beginOnA_SwitchToB) {
    ON_CALL(mTimeGMock, milliseconds()).WillByDefault(Return(100));
 
    EXPECT_CALL(mPowerState,  state(I_PowerState::OnA)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    mRelayController.begin();
 
    EXPECT_CALL(mRelayA,  offCoil(true)).Times(1);
@@ -216,6 +228,8 @@ TEST_F(RelayControllerTest, beginOnB_SwitchToA) {
    ON_CALL(mQueryPortMock, loadOut()).WillByDefault(Return(true));
    ON_CALL(mTimeGMock, milliseconds()).WillByDefault(Return(100));
 
+   EXPECT_CALL(mRelayLoad,  onCoil(true)).Times(1);
+   EXPECT_CALL(mRelayLoad,  onCoil(false)).Times(1);
    EXPECT_CALL(mPowerState,  state(I_PowerState::OnB)).Times(1);
    mRelayController.begin();
 

@@ -78,7 +78,7 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
 
             virtual void onEnter() {
                mController->mRelayLoad->onCoil(true);
-               Core::delayInMilliseconds(RELAY_ENERGIZATION_DURATION);
+               //Core::delayInMilliseconds(RELAY_ENERGIZATION_DURATION);
                mController->mRelayLoad->onCoil(false);
 
 

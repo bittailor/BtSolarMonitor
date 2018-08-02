@@ -654,6 +654,22 @@ Return<void> MobileTerminal::disableSleepMode() {
 
 //-------------------------------------------------------------------------------------------------
 
+Return<void> MobileTerminal::powerDown() {
+   Bt::Core::Timer timer(DEFAULT_QUERY_CMD_TIMEOUT);
+   sendCommand("AT+CPOWD=1");
+
+   while(true){
+      Return<const char*> line = readLine(timer);
+      checkLine(line);
+      if (strcmp(line.value(), "[NORMAL POWER DOWN]") == 0) {
+         return ReturnCode::RC_SUCCESS;
+      }
+      return ReturnCode::RC_FAILURE;
+   }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void MobileTerminal::sendCommand(const char* pCommand) {
    flushInput();
    sendLine(pCommand);

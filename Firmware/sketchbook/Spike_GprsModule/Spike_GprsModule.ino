@@ -167,7 +167,7 @@ class Listener : public Net::Gprs::GprsModule::I_Listener {
 Listener sListener;
 
 //Core::PeriodicCallback sYield(sTime,500,Core::Function<void()>::build<Listener,&Listener::yield>(sListener));
-Core::PeriodicCallback sPublish(sTime,20000,Core::Function<void()>::build<Listener,&Listener::publishTime>(sListener));
+Core::PeriodicCallback sPublish(sTime,50000,Core::Function<void()>::build<Listener,&Listener::publishTime>(sListener));
 
 void setup() {
    pinMode(13, OUTPUT);
@@ -175,7 +175,7 @@ void setup() {
    while (!Serial) {}
    Serial.begin(115200);
    Serial.println(F("** Spike GPRS Module**"));
-   Serial1.begin(115200);
+   Serial1.begin(9600);
    digitalWrite(13, LOW);
    delay(1000);
 
@@ -225,6 +225,7 @@ void shutdown() {
    Serial.println("start shutdown ...");
    sMqttClient.disconnect();
    sGprsModule.disconnect();
+   sMobileTerminal.powerDown();
    Serial.println("... shutdown done");
    while (true) {
       Serial.println("Ready to reboot ...");

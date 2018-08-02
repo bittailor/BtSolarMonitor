@@ -55,7 +55,7 @@ void setup() {
   Serial.println(F("FONA basic test"));
   Serial.println(F("Initializing....(May take 3 seconds)"));
 
-  fonaSerial->begin(4800);
+  fonaSerial->begin(115200);
   if (! fona.begin(*fonaSerial)) {
     Serial.println(F("Couldn't find FONA"));
     while (1);
@@ -109,6 +109,7 @@ void printMenu(void) {
   Serial.println(F("[b] read the Battery V and % charged"));
   Serial.println(F("[C] read the SIM CCID"));
   Serial.println(F("[U] Unlock SIM with PIN code"));
+  Serial.println(F("[p] PIN code status"));
   Serial.println(F("[i] read RSSI"));
   Serial.println(F("[n] get Network status"));
   Serial.println(F("[v] set audio Volume"));
@@ -116,7 +117,7 @@ void printMenu(void) {
   Serial.println(F("[H] set Headphone audio (FONA800 & 808)"));
   Serial.println(F("[e] set External audio (FONA800 & 808)"));
   Serial.println(F("[T] play audio Tone"));
-  Serial.println(F("[P] PWM/Buzzer out (FONA800 & 808)"));
+  //Serial.println(F("[P] PWM/Buzzer out (FONA800 & 808)"));
 
   // FM (SIM800 only!)
   Serial.println(F("[f] tune FM radio (FONA800)"));
@@ -230,6 +231,11 @@ void loop() {
         }
         break;
       }
+
+    case 'p': {
+       fona.sendCheckReply("AT+CPIN?","OK");
+       break;
+    }
 
     case 'C': {
         // read the CCID
@@ -407,6 +413,7 @@ void loop() {
 
     /*** PWM ***/
 
+    /*
     case 'P': {
         // PWM Buzzer output @ 2KHz max
         flushSerial();
@@ -420,6 +427,7 @@ void loop() {
         }
         break;
       }
+   */
 
     /*** Call ***/
     case 'c': {
@@ -461,6 +469,7 @@ void loop() {
         break;
       }
 
+    /*
     case 'p': {
         // pick up!
         if (! fona.pickUp()) {
@@ -470,6 +479,7 @@ void loop() {
         }
         break;
       }
+      */
 
     /*** SMS ***/
 

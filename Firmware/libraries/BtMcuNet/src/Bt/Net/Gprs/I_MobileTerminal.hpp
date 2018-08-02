@@ -46,6 +46,7 @@ class I_MobileTerminal {
       virtual Return<int> read(unsigned char* pBuffer, int pLen, int pTimeout) = 0;
       virtual Return<void> enableSleepMode() = 0;
       virtual Return<void> disableSleepMode() = 0;
+      virtual Return<void> powerDown() = 0;
 
 
 

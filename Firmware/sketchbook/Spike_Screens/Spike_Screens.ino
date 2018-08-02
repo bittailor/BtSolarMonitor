@@ -17,7 +17,7 @@ int sCounter = 1000;
 void setup()   {
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
-  //while (!Serial) {}
+  while (!Serial) {}
   Serial.begin(115200); 
   Serial.println(F("** Spike Screens **"));
   digitalWrite(13, LOW);
@@ -29,6 +29,7 @@ void setup()   {
 
 
 void loop() {
+   Serial.println(F("** loop **"));
    sCounter++;
    double v = sCounter % 1600;
    v = (v / 100);

@@ -41,6 +41,7 @@ class MobileTerminal : public I_MobileTerminal
       virtual Return<int> available();
       virtual Return<void> enableSleepMode();
       virtual Return<void> disableSleepMode();
+      virtual Return<void> powerDown();
 
 
    private:

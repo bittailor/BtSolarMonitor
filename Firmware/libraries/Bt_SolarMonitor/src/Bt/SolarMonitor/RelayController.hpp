@@ -77,11 +77,7 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
             }
 
             virtual void onEnter() {
-               mController->mRelayLoad->onCoil(true);
-               //Core::delayInMilliseconds(RELAY_ENERGIZATION_DURATION);
-               mController->mRelayLoad->onCoil(false);
-
-
+               mController->turnOnLoadRelay();
                if(mController->mQueryPort->loadASense() && mController->mQueryPort->loadBSense()) {
                   mController->nextState(mController->mOff);
                } else if (mController->mQueryPort->loadASense()) {
@@ -296,12 +292,13 @@ class RelayController : public I_RelayController, public Core::StateMachine<Rela
             }
       };
 
-
    	// Constructor to prohibit copy construction.
       RelayController(const RelayController&);
 
       // Operator= to prohibit copy assignment
       RelayController& operator=(const RelayController&);
+
+      void turnOnLoadRelay();
 
       //I_RelayControllerActionPort* mActionPort;
       I_RelayControllerQueryPort* mQueryPort;

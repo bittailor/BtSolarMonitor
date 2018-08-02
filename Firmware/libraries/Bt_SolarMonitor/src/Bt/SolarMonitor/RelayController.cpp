@@ -55,7 +55,17 @@ const char* RelayController::name() {
 
 void RelayController::begin() {
    init(mInitial);
+
+
 }
+
+//-------------------------------------------------------------------------------------------------
+
+void RelayController::turnOnLoadRelay() {
+    mRelayLoad->onCoil(true);  
+    Core::delayInMilliseconds(RELAY_ENERGIZATION_DURATION);
+    mRelayLoad->onCoil(false);
+} 
 
 //-------------------------------------------------------------------------------------------------
 

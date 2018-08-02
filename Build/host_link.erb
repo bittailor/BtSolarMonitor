@@ -1,2 +1,2 @@
-build <%= "#{target}/#{name}" %>  : link <%= sources.pathmap("%{^Firmware,#{target}}X.obj").join(' ') %> <%= libraries.join(' ') %> <%= libraries.reverse.join(' ') %> <% if !external_libraries.empty? %>
+build <%= "#{target}/#{name}" %>  : link <%= sources.pathmap("%{^Firmware,#{target}}X.obj").join(' ') %> <%= libraries.reverse.join(' ') %> <% if !external_libraries.empty? %>
    libs = <%= external_libraries.collect{|i| "-l"+i}.join(" ")  %><% end %>
